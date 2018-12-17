@@ -1,0 +1,201 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+ 
+.titlebar {
+	position: absolute;
+	box-sizing: border-box;
+	width: 100%;
+	font-size: 13px;
+	padding: 0 70px;
+	overflow: hidden;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	user-select: none;
+	zoom: 1; /* prevent zooming */
+	line-height: 22px;
+	height: 22px;
+	display: flex;
+}
+
+.titlebar > .titlebar-drag-region {
+	top: 0;
+	left: 0;
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	-webkit-app-region: drag;
+}
+
+.titlebar > .window-title {
+	flex: 0 1 auto;
+	font-size: 12px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	margin-left: auto;
+	margin-right: auto;
+	zoom: 1; /* prevent zooming */
+}
+
+/* Windows/Linux: Rules for custom title (icon, window controls)  */
+
+.windows > .titlebar,
+.linux > .titlebar {
+	padding: 0;
+	height: 30px;
+	line-height: 30px;
+	justify-content: left;
+	overflow: visible;
+}
+
+.windows > .titlebar > .window-title,
+.linux > .titlebar > .window-title {
+	cursor: default;
+}
+
+.linux > .titlebar > .window-title {
+	font-size: inherit;
+}
+
+.windows > .titlebar > .resizer,
+.linux > .titlebar > .resizer {
+	-webkit-app-region: no-drag;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 20%;
+}
+
+.windows.fullscreen > .titlebar > .resizer,
+.linux.fullscreen > .titlebar > .resizer {
+	display: none;
+}
+
+.fullscreen > .titlebar > .window-appicon {
+	display: none;
+}
+
+.titlebar > .window-controls-container {
+	display: flex;
+	flex-grow: 0;
+	flex-shrink: 0;
+	text-align: center;
+	position: relative;
+	z-index: 99;
+	-webkit-app-region: no-drag;
+	height: 100%;
+	width: 138px;
+	margin-left: 5px;
+}
+
+.fullscreen > .titlebar > .window-controls-container {
+	display: none;
+}
+
+.titlebar > .window-controls-container > .window-icon-bg {
+	display: inline-block;
+	-webkit-app-region: no-drag;
+	height: 100%;
+	width: 33.34%;
+}
+
+.titlebar > .window-controls-container .window-icon svg {
+	shape-rendering: crispEdges;
+	text-align: center;
+}
+
+.titlebar > .window-controls-container .window-close {
+	-webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6.279 5.5L11 10.221l-.779.779L5.5 6.279.779 11 0 10.221 4.721 5.5 0 .779.779 0 5.5 4.721 10.221 0 11 .779 6.279 5.5z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
+}
+
+.titlebar > .window-controls-container .window-unmaximize {
+	-webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 8.798H8.798V11H0V2.202h2.202V0H11v8.798zm-3.298-5.5h-6.6v6.6h6.6v-6.6zM9.9 1.1H3.298v1.101h5.5v5.5h1.1v-6.6z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
+}
+
+.titlebar > .window-controls-container .window-maximize {
+	-webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 0v11H0V0h11zM9.899 1.101H1.1V9.9h8.8V1.1z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
+}
+
+.titlebar > .window-controls-container .window-minimize {
+	-webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 4.399V5.5H0V4.399h11z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
+}
+
+.titlebar > .window-controls-container > .window-icon-bg > .window-icon {
+	height: 100%;
+	width: 100%;
+	-webkit-mask-size: 23.1%;
+}
+
+.titlebar > .window-controls-container > .window-icon-bg:hover, .titlebar > .menubar > .menubar-menu-button:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
+.titlebar.light > .window-controls-container > .window-icon-bg:hover, .titlebar.light > .menubar > .menubar-menu-button:hover {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.titlebar > .window-controls-container > .window-icon-bg.window-close-bg:hover {
+	background-color: rgba(232, 17, 35, 0.9);
+}
+
+.titlebar > .window-controls-container .window-icon.window-close:hover {
+	background-color: white;
+}
+
+.menubar {
+    display: flex;
+    flex-shrink: 1;
+    box-sizing: border-box;
+    height: 30px;
+    -webkit-app-region: no-drag;
+    overflow: hidden;
+    flex-wrap: wrap
+}
+
+.fullscreen .menubar {
+    margin: 0;
+    padding: 0 5px
+}
+
+.menubar > .menubar-menu-button {
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 8px;
+    cursor: default;
+    -webkit-app-region: no-drag;
+    zoom:1;white-space: nowrap;
+    outline: 0
+}
+
+.menubar .menubar-menu-items-holder {
+    position: absolute;
+    left: 0;
+    opacity: 1;
+    z-index: 2000
+}
+
+.menubar .menubar-menu-items-holder.menu-container {
+    outline: 0;
+    border: none
+}
+
+.menubar .menubar-menu-items-holder.menu-container:focus {
+    outline: 0
+}
+
+.menubar .toolbar-toggle-more {
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: 14px;
+    width: 20px;
+    height: 100%;
+    display: inline-block;
+    padding: 0;
+    -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cdefs%3E%3Cstyle%3E.icon-canvas-transparent,.icon-vs-out{fill:%23f6f6f6}.icon-canvas-transparent{opacity:0}.icon-vs-bg{fill:%23424242}%3C/style%3E%3C/defs%3E%3Ctitle%3EEllipsis_bold_16x%3C/title%3E%3Cpath class='icon-canvas-transparent' d='M16 0v16H0V0z' id='canvas'/%3E%3Cpath class='icon-vs-bg' d='M5 7.5A1.5 1.5 0 1 1 3.5 6 1.5 1.5 0 0 1 5 7.5zM8.5 6A1.5 1.5 0 1 0 10 7.5 1.5 1.5 0 0 0 8.5 6zm5 0A1.5 1.5 0 1 0 15 7.5 1.5 1.5 0 0 0 13.5 6z' id='iconBg'/%3E%3C/svg%3E") no-repeat 50% 55%/14px 14px;
+    mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cdefs%3E%3Cstyle%3E.icon-canvas-transparent,.icon-vs-out{fill:%23f6f6f6}.icon-canvas-transparent{opacity:0}.icon-vs-bg{fill:%23424242}%3C/style%3E%3C/defs%3E%3Ctitle%3EEllipsis_bold_16x%3C/title%3E%3Cpath class='icon-canvas-transparent' d='M16 0v16H0V0z' id='canvas'/%3E%3Cpath class='icon-vs-bg' d='M5 7.5A1.5 1.5 0 1 1 3.5 6 1.5 1.5 0 0 1 5 7.5zM8.5 6A1.5 1.5 0 1 0 10 7.5 1.5 1.5 0 0 0 8.5 6zm5 0A1.5 1.5 0 1 0 15 7.5 1.5 1.5 0 0 0 13.5 6z' id='iconBg'/%3E%3C/svg%3E") no-repeat 50% 55%/14px 14px
+}
