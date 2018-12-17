@@ -14,7 +14,7 @@ interface TitleBarConstructorOptions {
    * The menu to show in the title bar.
    * You can use `Menu` or not add this option and the menu created in the main process will be taken.
    */
-  menu?: Menu;
+  menu?: Menu | null;
   /**
    * Define whether or not you can drag the window by holding the click on the title bar.
    * *The default value is true*
@@ -38,30 +38,32 @@ interface TitleBarConstructorOptions {
 }
 
 export class TitleBar {
+  private currentWindow: BrowserWindow;
+  private baseUrl: string;
+
+  private defaultOptions: TitleBarConstructorOptions = {
+    icon: '',
+    menu: remote.Menu.getApplicationMenu(),
+    drag: true,
+    minimizable: true,
+    maximizable: true,
+    closeable: true
+  };
+
   /**
    * Background color of the title bar
    */
   backgroundColor: string;
+  /**
+   * Options of the title bar
+   */
   options: TitleBarConstructorOptions;
 
-  private window: BrowserWindow;
-  private baseUrl: string;
-  private menu: Menu | null;
-  private drag: boolean;
-  private minimizable: boolean;
-  private maximizable: boolean;
-  private closeable: boolean;
-
   constructor(backgroundColor: string, options?: TitleBarConstructorOptions) {
-    this.window = remote.getCurrentWindow();
+    this.currentWindow = remote.getCurrentWindow();
     this.baseUrl = path.resolve(path.dirname(require.resolve('./index')), 'assets');
     this.backgroundColor = backgroundColor;
-    this.options = options!;
-    this.menu = options!.menu || remote.Menu.getApplicationMenu();
-    this.drag = options!.drag || true;
-    this.minimizable = options!.minimizable || true;
-    this.maximizable = options!.maximizable || true;
-    this.closeable = options!.closeable || true;
+    this.options = {...this.defaultOptions, ...options};
 
     this.createTitleBar();
     this.addEvents();
@@ -74,8 +76,8 @@ export class TitleBar {
 
     let menuChildren: Element[] = [];
     
-    if(this.menu) {
-      for(let item of this.menu.items) {
+    if(this.options.menu) {
+      for(let item of this.options.menu.items) {
         if(item.label) {
           const itemMenu = createDivElement('menubar-menu-button');
           itemMenu.textContent = item.label;
@@ -84,14 +86,14 @@ export class TitleBar {
       }
     }
 
-    const container = createDivElement('window-controls-container', [
-      this.minimizable ? createDivElement('window-icon-bg', [createDivElement('window-icon window-minimize') ]) : undefined,
-      this.maximizable ? createDivElement('window-icon-bg', [createDivElement(`window-icon ${this.window.isMaximized() ? 'window-unmaximize' : 'window-maximize'}`) ]) : undefined,
-      this.closeable ? createDivElement('window-icon-bg window-close-bg', [createDivElement('window-icon window-close') ]) : undefined
-    ]);
+    let controlsChildren: Element[] = [];
+
+    if (this.options.minimizable) controlsChildren.push(createDivElement('window-icon-bg', [createDivElement('window-icon window-minimize') ]));
+    if (this.options.maximizable) controlsChildren.push(createDivElement('window-icon-bg', [createDivElement(`window-icon ${this.currentWindow.isMaximized() ? 'window-unmaximize' : 'window-maximize'}`) ]));
+    if (this.options.closeable) controlsChildren.push(createDivElement('window-icon-bg window-close-bg', [createDivElement('window-icon window-close') ]));
 
     const resizer = createDivElement('resizer');
-    addStyle(resizer, { 'display': this.window.isMaximizable() ? 'none': 'block' });
+    addStyle(resizer, { 'display': this.currentWindow.isMaximizable() ? 'none': 'block' });
     
     var div = document.createElement('div');
     div.id = 'content-after-titlebar';
@@ -103,11 +105,11 @@ export class TitleBar {
     document.body.appendChild(div);
 
     const titlebar = createDivElement('titlebar', [
-        this.drag ? createDivElement('titlebar-drag-region') : undefined,
+        this.options.drag ? createDivElement('titlebar-drag-region') : null,
         createDivElement('window-appicon'),
-        this.menu ? createDivElement('menubar', menuChildren) : undefined,
+        this.options.menu ? createDivElement('menubar', menuChildren) : null,
         createDivElement('window-title'),
-        this.minimizable || this.maximizable || this.closeable && platform !== 'darwin' ? container : undefined,
+        platform !== 'darwin' && this.options.minimizable || this.options.maximizable || this.options.closeable ? createDivElement('window-controls-container', controlsChildren) : null,
         resizer
       ]);
 
@@ -120,44 +122,44 @@ export class TitleBar {
     const minimizeButton = document.querySelector('.window-minimize');
 
     if(minimizeButton) minimizeButton.addEventListener('click', () => {
-      this.window.minimize();
+      this.currentWindow.minimize();
     });
 
     document.querySelectorAll('.window-maximize, .window-unmaximize').forEach((elem: Element) => {
       elem.addEventListener('click', () => {
-        if(!this.window.isMaximized()) this.window.maximize();
-        else this.window.unmaximize();
+        if(!this.currentWindow.isMaximized()) this.currentWindow.maximize();
+        else this.currentWindow.unmaximize();
       });
     });
 
     const closeButton = document.querySelector('.window-close');
     if(closeButton) closeButton.addEventListener('click', () => {
-      this.window.close();
+      this.currentWindow.close();
     });
 
-    this.window.on('maximize', () => {
+    this.currentWindow.on('maximize', () => {
       showHide('.window-maximize', false);
     });
 
-    this.window.on('unmaximize', () => {
+    this.currentWindow.on('unmaximize', () => {
       showHide('.window-unmaximize', true);
     });
 
-    this.window.on('blur', () => {
+    this.currentWindow.on('blur', () => {
       const titlebar = document.getElementById('titlebar');
       if(titlebar) addStyle(titlebar, {'background-color': Color(titlebar.style.backgroundColor).lighten(0.3), 'color': Color(titlebar.style.color).lighten(0.3) });
     });
 
-    this.window.on('focus', () => {
+    this.currentWindow.on('focus', () => {
       this.setBackground(this.backgroundColor);
     });
 
-    this.window.on('enter-full-screen', () => {
+    this.currentWindow.on('enter-full-screen', () => {
       document.body.classList.add('fullscreen');
       console.log('full');
     });
 
-    this.window.on('leave-full-screen', () => {
+    this.currentWindow.on('leave-full-screen', () => {
       document.body.classList.remove('fullscreen');
     });
   }
@@ -215,11 +217,11 @@ export class TitleBar {
    */
   setBackground(color: string) {
     this.backgroundColor = color;
-    const isDark = Color(this.backgroundColor).isDark();
+    const isDark = Color(color).isDark();
     const titlebar = document.getElementById('titlebar');
 
     if (titlebar) {
-      addStyle(titlebar, {'background-color': this.backgroundColor, 'color': isDark ? '#cccccc' : '#333333'});
+      addStyle(titlebar, {'background-color': color, 'color': isDark ? '#cccccc' : '#333333'});
 
       if (!isDark) {
         titlebar.classList.add('light');
@@ -228,21 +230,21 @@ export class TitleBar {
       }
     }
 
-    setIconsColor(color);
+    setIconsColor(isDark ? '#cccccc' : '#333333');
   }
   
 }
 
-function createDivElement(classes: string, childen?: (Element | undefined )[]): Element {
+function createDivElement(classes: string, children?: (Element | null)[]): Element {
   const element = document.createElement('div');
 
   for(let _class of classes.split(' ')) {
     element.classList.add(_class);
   }
 
-  if(childen) {
-    for(let child of childen) {
-      element.appendChild(child!);
+  if(children) {
+    for(let child of children) {
+      if(child) element.appendChild(child);
     }
   }
 
@@ -283,7 +285,7 @@ function setIconsColor(color: string) {
   }
 
   style.textContent = `.titlebar > .window-controls-container .window-icon {
-    background-color: ${Color(color).isDark() ? '#cccccc' : '#333333'};
+    background-color: ${color};
   }`;
 
   if(!styleElement) document.head.appendChild(style);

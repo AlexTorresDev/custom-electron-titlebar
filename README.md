@@ -2,24 +2,25 @@
 
 This is an typescript/javascript library for electron that allows you to configure a fully customizable title bar.
 
-### Screenshots
-
 ![Windows](images/windows.jpg)
 
-### Install
+## Whats new?
+- Bug fixes for options
+
+## Install
 
 ```
 npm i custom-electron-titlebar
 ```
 
-### Usage
+## Usage
 
 In your renderer file or in html add:
 
 ```js
-const TitleBar = require('custom-electron-titlebar');
+const customTitlebar = require('custom-electron-titlebar');
 
-new TitleBar('#444', {
+new customTitlebar.TitleBar('#444', {
 	icon: 'appicon.svg',
 	minimizable: false
 });
@@ -38,7 +39,7 @@ const titlebar = new TitleBar('#444', {
 The parameter `backgroundColor: string` is require, this can be rgba() or hls(), hexadecimal.
 (View [Set Background](#set-background) for more details).
 
-### Options 
+## Options 
 
 The interface TitleBarConstructorOptions is managed, which has the following configurable options for the title bar. This parameter is optional.
 
@@ -53,28 +54,28 @@ The interface TitleBarConstructorOptions is managed, which has the following con
 | maximizable | boolean | Define if the maximize and restore window buttons are displayed.                     | true                      |
 | closeable   | boolean | Define if the close window button is displayed.                                      | true                      |
 
-### Methods
+## Methods
 
-#### Set Background
+### Set Background
 
 When this method is executed, as well as when the title bar is created, it is checked whether the color is light or dark, so that the color of the icons adapts to the background of the title bar.
 
 ```js
-const TitleBar = require('custom-electron-titlebar');
+const custonTitlebar = require('custom-electron-titlebar');
 
-const titlebar = new TitleBar('rgba(0, 0, 0, .25)');
+const titlebar = new customTitlebar.TitleBar('rgba(0, 0, 0, .7)');
 
 titlebar.setBackground('#444444');
 ```
 
-#### Update Title
+### Update Title
 
 This method updated the title of the title bar, If you change the content of the `title` tag, you should call this method for update the title.
 
 ```js
-const TitleBar = require('custom-electron-titlebar');
+const customTitlebar = require('custom-electron-titlebar');
 
-const titlebar = new TitleBar('rgba(0, 0, 0, .25)');
+const titlebar = new customTitlebar.TitleBar('rgba(0, 0, 0, .7)');
 
 document.title = 'My new title';
 titlebar.updateTitle();

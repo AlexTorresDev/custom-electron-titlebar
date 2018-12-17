@@ -8,6 +8,5 @@ mymenu.append(new MenuItem({ label: 'Item 1', click: function () { console.log('
 mymenu.append(new MenuItem({ label: 'Item 2', type: 'checkbox', checked: true }));
 new __1.TitleBar('#546e7a', {
     icon: './icon.svg',
-    drag: true,
-    menu: mymenu
+    maximizable: false
 });

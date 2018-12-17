@@ -89,7 +89,6 @@
 	z-index: 99;
 	-webkit-app-region: no-drag;
 	height: 100%;
-	width: 138px;
 	margin-left: 5px;
 }
 
@@ -101,7 +100,7 @@
 	display: inline-block;
 	-webkit-app-region: no-drag;
 	height: 100%;
-	width: 33.34%;
+	width: 46px;
 }
 
 .titlebar > .window-controls-container .window-icon svg {
