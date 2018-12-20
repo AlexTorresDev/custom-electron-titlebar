@@ -5,7 +5,10 @@ This is an typescript/javascript library for electron that allows you to configu
 ![Windows](images/windows.jpg)
 
 ## Whats new?
-- Bug fixes for options
+- You can select the style of icons between windows and mac.
+- You can sort the items in the title bar.
+- You can add a shadow under the title bar.
+- Now all the icons are shown, but those that are defined as false are disabled and are clearer.
 
 ## Install
 
@@ -28,31 +31,35 @@ new customTitlebar.TitleBar('#444', {
 
 if you are using _typescript_:
 ```ts
-import { TitleBar } from 'custom-electron-titlebar'
+import { TitleBar, TitleBarIconStyle } from 'custom-electron-titlebar'
 
-const titlebar = new TitleBar('#444', {
+const titlebar = new TitleBar('#ECECEC', {
 	icon: 'appicon.png',
-	drag: false
+	drag: false,
+	iconsStyle: TitleBarIconStyle.mac()
 });
 ```
 
-The parameter `backgroundColor: string` is require, this can be rgba() or hls(), hexadecimal.
+The parameter `backgroundColor: string` is require, this can be rgba(), hls(), rgb(), hexadecimal.
 (View [Set Background](#set-background) for more details).
 
-## Options 
+## Options
 
-The interface TitleBarConstructorOptions is managed, which has the following configurable options for the title bar. This parameter is optional.
+The interface `TitleBarConstructorOptions` is managed, which has the following configurable options for the title bar. This parameter is optional.
 
 **Note:** _The `menu` option is in development_
 
-| Parameter   | Type    | Description                                                                          | Default                   |
-| ----------- | ------- | ------------------------------------------------------------------------------------ | ------------------------- |
-| icon        | string  | The icon shown on the left side of the title bar.                                    | Empty                     |
-| menu        | Menu    | The menu to show in the title bar.                                                   | Menu.getApplicationMenu() |
-| drag        | boolean | Define whether or not you can drag the window by holding the click on the title bar. | true                      |
-| minimizable | boolean | Define if the minimize window button is displayed.                                   | true                      |
-| maximizable | boolean | Define if the maximize and restore window buttons are displayed.                     | true                      |
-| closeable   | boolean | Define if the close window button is displayed.                                      | true                      |
+| Parameter   | Type             | Description                                                                           | Default                   |
+| ----------- | ---------------- | ------------------------------------------------------------------------------------- | ------------------------- |
+| icon        | string           | The icon shown on the left side of the title bar.                                     | Empty                     |
+| iconsStyle  | HTMLStyleElement | Style of the icons.                                                                   | TitleBarIconStyle.win()   |
+| shadow      | string           | The shadow of the titlebar. **This property is similar to box-shadow**                | Empty                     |
+| menu        | Electron.Menu    | The menu to show in the title bar.                                                    | Menu.getApplicationMenu() |
+| drag        | boolean          | Define whether or not you can drag the window by holding the click on the title bar.  | true                      |
+| minimizable | boolean          | Define if the minimize window button is displayed.                                    | true                      |
+| maximizable | boolean          | Define if the maximize and restore window buttons are displayed.                      | true                      |
+| closeable   | boolean          | Define if the close window button is displayed.                                       | true                      |
+| order       | string           | Set the order of the elements on the title bar. (`normal`, `reverse`, `firstButtons`) | normal                    |
 
 ## Methods
 

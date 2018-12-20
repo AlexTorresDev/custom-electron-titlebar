@@ -1,4 +1,4 @@
-import { remote, BrowserWindow, Menu } from  'electron';
+import { remote, BrowserWindow } from  'electron';
 import { platform } from 'process';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -11,10 +11,20 @@ interface TitleBarConstructorOptions {
    */
   icon?: string;
   /**
+   * Style of the icons.
+   * You can create your custom style using `HTMLStyleElements`
+   */
+  iconsStyle?: HTMLStyleElement;
+  /**
+   * The shadow of the titlebar.
+   * This property is similar to box-shadow
+   */
+  shadow?: string;
+  /**
    * The menu to show in the title bar.
    * You can use `Menu` or not add this option and the menu created in the main process will be taken.
    */
-  menu?: Menu | null;
+  menu?: Electron.Menu | null;
   /**
    * Define whether or not you can drag the window by holding the click on the title bar.
    * *The default value is true*
@@ -35,6 +45,11 @@ interface TitleBarConstructorOptions {
    * *The default value is true*
    */
   closeable?: boolean;
+  /**
+   * Set the order of the elements on the title bar.
+   * *The default value is normal*
+   */
+  order?: ('normal' | 'reverse' | 'firstButtons');
 }
 
 export class TitleBar {
@@ -43,11 +58,13 @@ export class TitleBar {
 
   private defaultOptions: TitleBarConstructorOptions = {
     icon: '',
-    menu: remote.Menu.getApplicationMenu(),
+    iconsStyle: TitleBarIconStyle.win(),
+    menu: null,
     drag: true,
     minimizable: true,
     maximizable: true,
-    closeable: true
+    closeable: true,
+    order: 'normal'
   };
 
   /**
@@ -74,66 +91,46 @@ export class TitleBar {
   private createTitleBar() {
     document.body.classList.add(platform == 'win32' ? 'windows' : platform == 'linux' ? 'linux' : 'mac');
 
-    let menuChildren: Element[] = [];
+    let controlsChildren: Node[] = [];
+    controlsChildren.push($(`.window-icon-bg${!this.options.minimizable ? '.inactive' : ''}`, {}, $('.window-icon.window-minimize')));
+    controlsChildren.push($(`.window-icon-bg${!this.options.maximizable ? '.inactive' : ''}`, {}, $(`.window-icon ${this.currentWindow.isMaximized() ? 'window-unmaximize' : 'window-maximize'}`)));
+    controlsChildren.push($(`.window-icon-bg.window-close-bg${!this.options.closeable ? '.inactive' : ''}`, {}, $('.window-icon.window-close')));
     
-    if(this.options.menu) {
-      for(let item of this.options.menu.items) {
-        if(item.label) {
-          const itemMenu = createDivElement('menubar-menu-button');
-          itemMenu.textContent = item.label;
-          menuChildren.push(itemMenu);
-        }
-      }
-    }
+    let div = $('#content-after-titlebar', { 'style': 'top:30px;right:0;bottom:0;left:0;position:absolute;overflow:auto;' });
 
-    let controlsChildren: Element[] = [];
-
-    if (this.options.minimizable) controlsChildren.push(createDivElement('window-icon-bg', [createDivElement('window-icon window-minimize') ]));
-    if (this.options.maximizable) controlsChildren.push(createDivElement('window-icon-bg', [createDivElement(`window-icon ${this.currentWindow.isMaximized() ? 'window-unmaximize' : 'window-maximize'}`) ]));
-    if (this.options.closeable) controlsChildren.push(createDivElement('window-icon-bg window-close-bg', [createDivElement('window-icon window-close') ]));
-
-    const resizer = createDivElement('resizer');
-    addStyle(resizer, { 'display': this.currentWindow.isMaximizable() ? 'none': 'block' });
-    
-    var div = document.createElement('div');
-    div.id = 'content-after-titlebar';
-
-    while (document.body.firstChild) {
-      div.appendChild(document.body.firstChild);
-    }
-
+    while (document.body.firstChild) div.appendChild(document.body.firstChild);
     document.body.appendChild(div);
 
-    const titlebar = createDivElement('titlebar', [
-        this.options.drag ? createDivElement('titlebar-drag-region') : null,
-        createDivElement('window-appicon'),
-        this.options.menu ? createDivElement('menubar', menuChildren) : null,
-        createDivElement('window-title'),
-        platform !== 'darwin' && this.options.minimizable || this.options.maximizable || this.options.closeable ? createDivElement('window-controls-container', controlsChildren) : null,
-        resizer
-      ]);
+    let titlebarChildren: Node[] = [];
+    if (this.options.drag) titlebarChildren.push($('.titlebar-drag-region'));
+    titlebarChildren.push($('.window-appicon'));
+    if (this.options.menu) titlebarChildren.push($('.menubar'));
+    titlebarChildren.push($('.window-title'));
+    if (platform !== 'darwin') titlebarChildren.push($('.window-controls-container', {}, ...controlsChildren));
+    titlebarChildren.push($('.resizer', { 'style': `display:${this.currentWindow.isMaximized() ? 'none': 'block'}` }));
 
-    titlebar.id = 'titlebar';
+    document.body.prepend($(`#titlebar.titlebar.${this.options.order}`,
+      this.options.shadow ? { 'style': `box-shadow:${this.options.shadow};` } : {}, ...titlebarChildren));
 
-    document.body.prepend(titlebar);
+    if (this.options.menu) this.setMenu(this.options.menu);
   }
 
   private addEvents() {
     const minimizeButton = document.querySelector('.window-minimize');
 
-    if(minimizeButton) minimizeButton.addEventListener('click', () => {
+    if(minimizeButton && this.options.minimizable) minimizeButton.addEventListener('click', () => {
       this.currentWindow.minimize();
     });
 
     document.querySelectorAll('.window-maximize, .window-unmaximize').forEach((elem: Element) => {
-      elem.addEventListener('click', () => {
+      if(this.options.maximizable) elem.addEventListener('click', () => {
         if(!this.currentWindow.isMaximized()) this.currentWindow.maximize();
         else this.currentWindow.unmaximize();
       });
     });
 
     const closeButton = document.querySelector('.window-close');
-    if(closeButton) closeButton.addEventListener('click', () => {
+    if(closeButton && this.options.closeable) closeButton.addEventListener('click', () => {
       this.currentWindow.close();
     });
 
@@ -147,7 +144,11 @@ export class TitleBar {
 
     this.currentWindow.on('blur', () => {
       const titlebar = document.getElementById('titlebar');
-      if(titlebar) addStyle(titlebar, {'background-color': Color(titlebar.style.backgroundColor).lighten(0.3), 'color': Color(titlebar.style.color).lighten(0.3) });
+
+      if(titlebar) {
+        titlebar.style.backgroundColor = Color(titlebar.style.backgroundColor).alpha(0.5);
+        titlebar.style.color = Color(titlebar.style.color).alpha(0.5);
+      }
     });
 
     this.currentWindow.on('focus', () => {
@@ -156,7 +157,6 @@ export class TitleBar {
 
     this.currentWindow.on('enter-full-screen', () => {
       document.body.classList.add('fullscreen');
-      console.log('full');
     });
 
     this.currentWindow.on('leave-full-screen', () => {
@@ -165,38 +165,25 @@ export class TitleBar {
   }
 
   private setStyles() {
-    const style = document.createElement('style');
-    style.classList.add('titlebar-style');
-    style.textContent = fs.readFileSync(path.resolve(this.baseUrl, 'titlebar.css'), 'utf8');
-    style.textContent += this.options.icon ? `.titlebar > .window-appicon {
-      width: 35px;
-      height: 100%;
-      position: relative;
-      z-index: 99;
-      background-image: url("${this.options.icon}");
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: 16px;
-      flex-shrink: 0;
-    }` : '';
-
-    document.head.appendChild(style);
+    document.head.appendChild($('style.titlebar-style', {}, `${fs.readFileSync(path.resolve(this.baseUrl, 'titlebar.css'), 'utf8')}
+      ${this.options.icon ? `.titlebar > .window-appicon {
+        width: 35px;
+        height: 100%;
+        position: relative;
+        z-index: 99;
+        background-image: url("${this.options.icon}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 16px;
+        flex-shrink: 0;
+      }` : ''}
+    `));
 
     this.setBackground(this.backgroundColor);
+    if (this.options.iconsStyle) this.setThemeIcons(this.options.iconsStyle);
 
-    addStyle(document.body, {
-      'margin': '0',
-      'overflow': 'hidden'
-    });
-
-    addStyle(document.getElementById('content-after-titlebar'), {
-      'top': '30px',
-      'right': '0',
-      'bottom': '0',
-      'left': '0',
-      'position': 'absolute',
-      'overflow': 'auto'
-    });
+    document.body.style.margin = '0';
+    document.body.style.overflow = 'hidden';
   }
 
   /**
@@ -217,48 +204,99 @@ export class TitleBar {
    */
   setBackground(color: string) {
     this.backgroundColor = color;
-    const isDark = Color(color).isDark();
+    const contentColor = Color(color).isDark() ? '#cccccc' : '#333333';
     const titlebar = document.getElementById('titlebar');
 
     if (titlebar) {
-      addStyle(titlebar, {'background-color': color, 'color': isDark ? '#cccccc' : '#333333'});
+      titlebar.style.backgroundColor = color;
+      titlebar.style.color = contentColor;
 
-      if (!isDark) {
+      if (!Color(color).isDark()) {
         titlebar.classList.add('light');
       } else {
         titlebar.classList.remove('light');
       }
     }
 
-    setIconsColor(isDark ? '#cccccc' : '#333333');
-  }
-  
-}
-
-function createDivElement(classes: string, children?: (Element | null)[]): Element {
-  const element = document.createElement('div');
-
-  for(let _class of classes.split(' ')) {
-    element.classList.add(_class);
+    if (this.options.iconsStyle && this.options.iconsStyle.textContent === TitleBarIconStyle.win().textContent) setIconsColor(contentColor);
   }
 
-  if(children) {
-    for(let child of children) {
-      if(child) element.appendChild(child);
+  /**
+   * Set the menu for the titlebar
+   */
+  setMenu(menu: Electron.Menu) {
+    const menubar = document.querySelector('.menubar');
+
+    if (menubar) {
+      menu.items.forEach(item => {
+        if(item.label) {
+          menubar.appendChild($('.menubar-menu-button', {}, item.label));
+        }
+      });
     }
   }
 
-  return element;
+  /**
+   * set theme for the icons of the title bar
+   */
+  setThemeIcons(theme: HTMLStyleElement) {
+    document.head.appendChild(theme);  
+  }
 }
 
-function addStyle(element: Element | null, styles: { [key: string]: string }) {
-  let style: string = '';
+export class TitleBarIconStyle {
+  private static baseUrl: string = path.resolve(path.dirname(require.resolve('./index')), 'assets/themes');
+  
+  /**
+   * get an `HTMLStyleElement` with the style of the **windows** type buttons
+   */
+  static win(): HTMLStyleElement {
+    return $('style#icons-style', {}, fs.readFileSync(path.resolve(this.baseUrl, 'win.css'), 'utf8'));
+  }
 
-  Object.keys(styles).forEach((key: string) => {
-    style += `${[key]}: ${styles[key]};`;
+  /**
+   * get an `HTMLStyleElement` with the style of the **mac** type buttons
+   */
+  static mac(): HTMLStyleElement {
+    return $('style#icons-style', {}, fs.readFileSync(path.resolve(this.baseUrl, 'mac.css'), 'utf8'));
+  }
+}
+
+function $<T extends HTMLElement>(description: string, attrs?: { [key: string]: any; }, ...children: (Node | string)[]): T {
+	let match = /([\w\-]+)?(#([\w\-]+))?((.([\w\-]+))*)/.exec(description);
+
+	if (!match) {
+		throw new Error('Bad use of emmet');
+	}
+
+	let result = document.createElement(match[1] || 'div');
+
+	if (match[3]) {
+		result.id = match[3];
+	}
+	if (match[4]) {
+		result.className = match[4].replace(/\./g, ' ').trim();
+	}
+
+	attrs = attrs || {};
+	Object.keys(attrs).forEach(name => {
+		const value = attrs![name];
+		if (/^on\w+$/.test(name)) {
+			(<any>result)[name] = value;
+		} else {
+			result.setAttribute(name, value);
+		}
+	});
+
+	children.forEach(child => {
+    if (child instanceof Node) {
+      result.appendChild(child);
+    } else {
+      result.appendChild(document.createTextNode(child as string));
+    }
   });
 
-  if(element) element.setAttribute('style', style);
+	return result as T;
 }
 
 function showHide(_class: string, _resizer: boolean) {
@@ -278,8 +316,7 @@ function setIconsColor(color: string) {
   let style: HTMLStyleElement | HTMLElement;
 
   if(!styleElement) {
-    style = document.createElement('style');
-    style.id = 'titlebar-style-icons';
+    style = $('style#titlebar-style-icons');
   } else {
     style = styleElement;
   }
