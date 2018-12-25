@@ -22,7 +22,7 @@ export class Themebar {
     return $('style', {}, fs.readFileSync(path.resolve(this.baseUrl, 'mac.css'), 'utf8'));
   }
 
-  static setIconsColor(color: string): void {
+  static setColors(color: string): void {
     let styleElement = document.getElementById('titlebar-style-icons');
     let style: HTMLStyleElement | HTMLElement;
 
@@ -33,18 +33,23 @@ export class Themebar {
     }
 
     style.textContent = `.titlebar > .window-controls-container .window-icon {
-      background-color: ${color};
+      background-color: ${this.contentColor(color)};
     }
     
     .menu-container .menu-item-check, .menu-container .submenu-indicator {
-      background-color: ${color};
+      background-color: ${this.contentColor(color)};
     }`;
 
     if(!styleElement) document.head.appendChild(style);
+
+    document.querySelectorAll<HTMLElement>('.menubar-menu-items-holder').forEach(menu => {
+      menu.style.backgroundColor = color !== 'transparent' ? Color(color).darken(0.12) : '#EDEDED';
+      menu.style.color = this.contentColor(color);
+    });
   }
   
   static contentColor(color: string): string {
-    return Color(color).isDark() ? '#ffffff' : '#333333';
+    return Color(color).isDark() && color !== 'transparent' ? '#ffffff' : '#333333';
   }
 
 }

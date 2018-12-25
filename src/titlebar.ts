@@ -56,7 +56,7 @@ interface TitlebarConstructorOptions {
   /**
    * The background color when the mouse is over the item
    */
-  menuItemHoverColor: string;
+  menuItemHoverColor?: string;
 }
 
 export class Titlebar {
@@ -72,7 +72,7 @@ export class Titlebar {
     maximizable: true,
     closeable: true,
     order: 'normal',
-    menuItemHoverColor: ''
+    menuItemHoverColor: 'rgba(0, 0, 0, .14)'
   };
 
   /**
@@ -230,27 +230,20 @@ export class Titlebar {
    */
   setBackground(color: string): void {
     this.backgroundColor = color;
-    const contentColor = Color(color).isDark() ? '#cccccc' : '#333333';
     const titlebar = document.getElementById('titlebar');
-    const menubar = document.querySelectorAll<HTMLElement>('.menubar-menu-items-holder');
 
     if (titlebar) {
       titlebar.style.backgroundColor = color;
-      titlebar.style.color = contentColor;
+      titlebar.style.color = Themebar.contentColor(color);
 
-      if (!Color(color).isDark()) {
+      if (!Color(color).isDark() || color === 'transparent') {
         titlebar.classList.add('light');
       } else {
         titlebar.classList.remove('light');
       }
     }
 
-    menubar.forEach(menu => {
-      menu.style.backgroundColor = Color(color).darken(0.12);
-      menu.style.color = contentColor;
-    });
-
-    Themebar.setIconsColor(contentColor);
+    Themebar.setColors(color);
   }
 
   /**
@@ -275,7 +268,9 @@ export class Titlebar {
       });
     }
 
-    Menubar.setEvents(this.options.menuItemHoverColor);
+    Themebar.setColors(this.backgroundColor);
+
+    if(this.options.menuItemHoverColor) Menubar.setEvents(this.options.menuItemHoverColor);
   }
 
   /**

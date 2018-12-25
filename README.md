@@ -9,8 +9,9 @@ This is an typescript / javascript library for electron that allows you to confi
 - `TitleBarIconStyle` is changed to `Themebar`.
 - `menuItemHoverColor` added to `TitlebarConstructorOptions`.
 - Now the menu is working.
-- Added the [`setMenu(menu)`](#set-menu) method
-- Added the [`setThemeIcons(theme)`](#set-theme-icons) method
+- Added the [`setMenu(menu)`](#set-menu) method.
+- Added the [`setThemeIcons(theme)`](#set-theme-icons) method.
+- v2.0.1 => Fixed the transparent color in submenus..
 
 ## Install
 
