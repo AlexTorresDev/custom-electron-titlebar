@@ -1,16 +1,9 @@
-import { remote } from 'electron';
-import { TitleBar, TitleBarIconStyle } from '..';
+import { Titlebar, Themebar } from '..';
 
-const { Menu, MenuItem } = remote;
-const mymenu = new Menu();
-
-mymenu.append(new MenuItem({label: 'Item 1', click() { console.log('item 1 clicked') }}));
-mymenu.append(new MenuItem({label: 'Item 2', type: 'checkbox', checked: true}));
-
-new TitleBar('#ECECEC', {
+new Titlebar('#37474f', {
   icon: './icon.svg',
   maximizable: false,
-  menu: mymenu,
   shadow: '0 1px 2px 0 rgba(0, 0, 0, 0.12)',
-  iconsStyle: TitleBarIconStyle.win()
+  iconsStyle: Themebar.win(),
+  menuItemHoverColor: '#388e3c'
 });
