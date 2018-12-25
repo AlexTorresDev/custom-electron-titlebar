@@ -143,7 +143,7 @@ titlebar.setMenu(menu);
 ```
 
 ### Set Theme Icons
-You can create your custom theme for the icons, to get an idea of this see the [windows or mac](lib/asset/themes) theme file.
+You can create your custom theme for the icons, to get an idea of this see the [windows or mac](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/lib/assets/themes) theme file.
 
 ```js
 const fs = require('fs');
