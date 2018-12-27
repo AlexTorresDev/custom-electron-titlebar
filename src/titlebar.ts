@@ -86,7 +86,7 @@ export class Titlebar {
 
   constructor(backgroundColor: string, options?: TitlebarConstructorOptions) {
     this.currentWindow = remote.getCurrentWindow();
-    this.baseUrl = path.resolve(path.dirname(require.resolve('./index')), 'assets');
+    this.baseUrl = path.resolve(path.dirname(require.resolve('./index')), 'css');
     this.backgroundColor = backgroundColor;
     this.options = {...this.defaultOptions, ...options};
 

@@ -6,7 +6,7 @@ const Color = require('color');
 
 export class Themebar {
 
-  private static baseUrl: string = path.resolve(path.dirname(require.resolve('./index')), 'assets/themes');
+  private static baseUrl: string = path.resolve(path.dirname(require.resolve('./index')), 'css/themes');
   
   /**
    * get an `HTMLStyleElement` with the style of the **windows** type buttons

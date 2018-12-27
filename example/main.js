@@ -1,6 +1,6 @@
-const { app, BrowserWindow, Menu } = require('electron');
-const path = require('path');
-const url = require('url');
+const { app, BrowserWindow, Menu }= require('electron');
+const path= require('path');
+const url= require('url');
 
 let mainWindow = null;
 
@@ -117,5 +117,4 @@ if (process.platform === 'darwin') {
   ]
 }
 
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
+Menu.setApplicationMenu(Menu.buildFromTemplate(template))

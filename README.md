@@ -61,7 +61,7 @@ The interface `TitleBarConstructorOptions` is managed, which has the following c
 | maximizable        | boolean          | Define if the maximize and restore window buttons are displayed.                      | true                      |
 | closeable          | boolean          | Define if the close window button is displayed.                                       | true                      |
 | order              | string           | Set the order of the elements on the title bar. (`normal`, `reverse`, `firstButtons`) | normal                    |
-| menuItemHoverColor | string           | The background color when the mouse is over the item                                  | Empty                     |
+| menuItemHoverColor | string           | The background color when the mouse is over the item                                  | rgba(0, 0, 0, .14)           |
 
 ## Methods
 
@@ -144,7 +144,7 @@ titlebar.setMenu(menu);
 ```
 
 ### Set Theme Icons
-You can create your custom theme for the icons, to get an idea of this see the [windows or mac](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/lib/assets/themes) theme file.
+You can create your custom theme for the icons, to get an idea of this see the [windows or mac](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/lib/css/themes) theme file.
 
 ```js
 const fs = require('fs');
