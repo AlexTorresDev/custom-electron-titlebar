@@ -1,7 +1,7 @@
-import { remote, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron';
-import { platform } from 'process';
+import * as electron from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import { platform } from 'process';
 import { Themebar } from './theme';
 import { Menubar } from './menubar';
 import { $ } from './global';
@@ -27,7 +27,7 @@ interface TitlebarConstructorOptions {
    * The menu to show in the title bar.
    * You can use `Menu` or not add this option and the menu created in the main process will be taken.
    */
-  menu?: Menu | null;
+  menu?: electron.Menu | null;
   /**
    * Define whether or not you can drag the window by holding the click on the title bar.
    * *The default value is true*
@@ -60,13 +60,13 @@ interface TitlebarConstructorOptions {
 }
 
 export class Titlebar {
-  private currentWindow: BrowserWindow;
+  private currentWindow: electron.BrowserWindow;
   private baseUrl: string;
 
   private defaultOptions: TitlebarConstructorOptions = {
     icon: '',
     iconsStyle: Themebar.win(),
-    menu: remote.Menu.getApplicationMenu(),
+    menu: electron.remote.Menu.getApplicationMenu(),
     drag: true,
     minimizable: true,
     maximizable: true,
@@ -85,7 +85,7 @@ export class Titlebar {
   options: TitlebarConstructorOptions;
 
   constructor(backgroundColor: string, options?: TitlebarConstructorOptions) {
-    this.currentWindow = remote.getCurrentWindow();
+    this.currentWindow = electron.remote.getCurrentWindow();
     this.baseUrl = path.resolve(path.dirname(require.resolve('./index')), 'css');
     this.backgroundColor = backgroundColor;
     this.options = {...this.defaultOptions, ...options};
@@ -249,20 +249,20 @@ export class Titlebar {
   /**
    * Set the menu for the titlebar
    */
-  setMenu(menu: Menu): void {
+  setMenu(menu: electron.Menu): void {
     const menubar = document.querySelector('.menubar');
 
     if (menubar) {
       menubar.innerHTML = '';
 
-      (menu.items as Array<MenuItemConstructorOptions>).forEach(item => {
+      (menu.items as Array<electron.MenuItemConstructorOptions>).forEach(item => {
         let menuButton = $('.menubar-menu-button', {
           'role': 'menuitem',
           'aria-label': Menubar.cleanMnemonic(`${item.label}`),
           'aria-keyshortcuts': item.accelerator
         }, Menubar.getLabelFormat(`${item.label}`));
         
-        let submenu = item.submenu as Menu;
+        let submenu = item.submenu as electron.Menu;
         if (submenu && submenu.items.length) Menubar.createSubmenu(menuButton, submenu.items, false);
         menubar.appendChild(menuButton);
       });

@@ -1,13 +1,13 @@
-import { remote, Menu, MenuItem, MenuItemConstructorOptions } from 'electron';
+import * as electron from 'electron';
 import { Themebar } from './theme';
 import { $ } from './global';
 
 export class Menubar {
-  static createSubmenu(element: Element, items: Array<MenuItem>, isSubmenu: boolean): void {
+  static createSubmenu(element: Element, items: Array<electron.MenuItem>, isSubmenu: boolean): void {
     let event: Electron.Event;
     const list: Array<Node> = [];
 
-    (items as Array<MenuItemConstructorOptions>).forEach(item => {
+    (items as Array<electron.MenuItemConstructorOptions>).forEach(item => {
       let child = $(`li.action-item.${item.type === 'separator' || !item.enabled ? 'disable' : ''}`);
 
       if(item.type === 'separator') {
@@ -24,13 +24,13 @@ export class Menubar {
             menuItem.setAttribute('aria-checked', `${item.checked}`);
             menuItem.classList.toggle('checked');
           }
-          if(item.click) item.click(item as MenuItem, remote.getCurrentWindow(), event);
+          if(item.click) item.click(item as electron.MenuItem, electron.remote.getCurrentWindow(), event);
         });
         child.appendChild(menuItem);
       }
 
       if(item.submenu || item.type === 'submenu') {
-        const submenu = item.submenu as Menu;
+        const submenu = item.submenu as electron.Menu;
         if (submenu.items.length) this.createSubmenu(child, submenu.items, true);
         element.appendChild(child);
       }

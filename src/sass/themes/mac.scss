@@ -15,6 +15,10 @@ $close-color: #ff5b5d;
 		&.inactive {
 			background-color: rgb(205, 205, 205);
 		}
+
+		&:nth-child(2n) {
+			order: -1;
+		}
 	
 		&:not(.inactive) {
 			.window-icon {
@@ -38,7 +42,6 @@ $close-color: #ff5b5d;
 			}
 	
 			&:nth-child(2n) {
-				order: -1;
 				background-color: $maximize-color;
 	
 				&:hover {
