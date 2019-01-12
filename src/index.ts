@@ -1,2 +1,2 @@
 export * from './titlebar';
-export * from './theme';
+export * from './themebar';

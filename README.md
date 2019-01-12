@@ -2,22 +2,21 @@
 
 This is an typescript / javascript library for electron that allows you to configure a fully customizable title bar.
 
-![Windows](images/windows.png)
+![Windows](screenshots/windows.png)
 
-## Whats new?
-- `TitleBar` is changed to `Titlebar`.
-- `TitleBarIconStyle` is changed to `Themebar`.
-- `menuItemHoverColor` added to `TitlebarConstructorOptions`.
-- Now the menu is working.
-- Added the [`setMenu(menu)`](#set-menu) method.
-- Added the [`setThemeIcons(theme)`](#set-theme-icons) method.
-- v2.0.1 => Fixed the transparent color in submenus..
+## Whats new? v2.1.0
+- **Now the menu is working.**
+- Fixed the error of [#2](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/2) when the main electron file is `.ts`
+- Changed `Themebar.win()` to `Themebar.win`
+- Changed `Themebar.mac()` to `Themebar.mac`
 
 ## Install
 
 ```
 npm i custom-electron-titlebar
 ```
+
+or use the base project [custom-electron-titlebar-quickstart](https://github.com/AlexTorresSk/custom-electron-titlebar-quickstart)
 
 ## Usage
 
@@ -37,9 +36,7 @@ new customTitlebar.Titlebar('#444', {
 import { Titlebar, Themebar } from 'custom-electron-titlebar'
 
 new Titlebar('#ECECEC', {
-	icon: 'appicon.png',
-	drag: false,
-	iconsStyle: Themebar.mac()
+	icon: 'appicon.png'
 });
 ```
 
@@ -48,7 +45,7 @@ The parameter `backgroundColor: string` is require, this can be rgba(), hls(), r
 
 ## Options
 
-The interface `TitleBarConstructorOptions` is managed, which has the following configurable options for the title bar. This parameter is optional.
+The interface [`TitleBarConstructorOptions`](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/src/options.ts) is managed, which has the following configurable options for the title bar. This parameter is optional.
 
 | Parameter          | Type             | Description                                                                           | Default                   |
 | ------------------ | ---------------- | ------------------------------------------------------------------------------------- | ------------------------- |
@@ -144,7 +141,7 @@ titlebar.setMenu(menu);
 ```
 
 ### Set Theme Icons
-You can create your custom theme for the icons, to get an idea of this see the [windows or mac](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/lib/css/themes) theme file.
+You can create your custom theme for the icons, to get an idea of this see the [windows or mac](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/src/themebar.ts) theme file.
 
 ```js
 const fs = require('fs');
@@ -154,6 +151,11 @@ const titlebar = new customTitlebar.Titlebar('rgba(0, 0, 0, .7)');
 
 const theme = document.createElement('style');
 theme.textContent = fs.readFileSync('url of css file', 'utf8');
+/* or
+theme.textContent = `
+	...style on css
+`;
+*/
 
 titlebar.setThemeIcons(theme);
 ```

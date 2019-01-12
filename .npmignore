@@ -21,6 +21,7 @@ test/
 
 # misc
 example/
+screenshots/
 src/
 .gitignore
 .editorconfig
