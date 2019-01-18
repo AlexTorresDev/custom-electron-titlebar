@@ -85,8 +85,6 @@ export class Titlebar extends GlobalTitlebar {
       titlebarChildren.push(this.$('.menubar', { 'role': 'menubar' }));
     }
 
-    titlebarChildren.push(this.$('.window-title'));
-
     if (platform !== 'darwin') {
       titlebarChildren.push(this.$('.window-controls-container', {},
         ...[
@@ -265,7 +263,7 @@ export class Titlebar extends GlobalTitlebar {
   * set horizontal alignment of the window title
   */
   setHorizontalAlignment(side: String) {
-    let wTitle = document.querySelector(".window-title") as HTMLElement;
+    const wTitle = document.querySelector(".window-title") as HTMLElement;
 
     if (wTitle) {
       if (allowAlign.some(x => x === side)) {
