@@ -25,6 +25,7 @@ export class Titlebar extends GlobalTitlebar {
     menuBackgroundColor: 'rgba(0, 0, 0, .08)',
     menuSeparatorColor: 'rgba(0, 0, 0, .29)',
     menuLeftPadding: '5px',
+    menuDirection: 'left',
     titleHorizontalAlignment: 'center'
   };
 
@@ -91,8 +92,9 @@ export class Titlebar extends GlobalTitlebar {
     }
 
     if (this.options.menu) {
+      let direction = this.getDirection(this.options.menuDirection);
       titlebarChildren.push(this.$('.window-menu-separator', { 'style': `background: ${this.options.menuSeparatorColor}; width: 100%; height: 1px; top: 30px; position: absolute;` }))
-      titlebarChildren.push(this.$('.window-menu', { 'id': 'window-menu', 'style': `background: ${this.options.menuBackgroundColor}; padding-left: ${this.options.menuLeftPadding}; width: 100%; height: 25px; top: 31px; position: absolute;` }))
+      titlebarChildren.push(this.$('.window-menu', { 'id': 'window-menu', 'style': `background: ${this.options.menuBackgroundColor}; padding-left: ${this.options.menuLeftPadding}; width: 100%; height: 25px; top: 31px; position: absolute; direction: ${direction};` }))
     }
 
     if (platform !== 'darwin') {
@@ -118,6 +120,14 @@ export class Titlebar extends GlobalTitlebar {
     if (this.options.menu) {
       document.getElementById("window-menu")!.appendChild(this.$('.menubar', { 'role': 'menubar' }))
       this.setMenu(this.options.menu);
+    }
+  }
+
+  private getDirection(rawString: string): string {
+    if (rawString == "right") {
+      return "rtl"
+    } else {
+      return "ltr"
     }
   }
 

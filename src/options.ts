@@ -66,4 +66,8 @@ export interface TitlebarConstructorOptions {
    * Menu padding from left window border.
    */
   menuLeftPadding?: string;
+  /**
+   * Menu direction, supported left and right.
+   */
+  menuDirection: "left" | "right";
 }
