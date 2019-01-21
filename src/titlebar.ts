@@ -22,6 +22,9 @@ export class Titlebar extends GlobalTitlebar {
     closeable: true,
     order: 'normal',
     menuItemHoverColor: 'rgba(0, 0, 0, .14)',
+    menuBackgroundColor: 'rgba(0, 0, 0, .08)',
+    menuSeparatorColor: 'rgba(0, 0, 0, .29)',
+    menuLeftPadding: '5px',
     titleHorizontalAlignment: 'center'
   };
 
@@ -48,10 +51,16 @@ export class Titlebar extends GlobalTitlebar {
 
   private createTitleBar(): void {
     let titlebarChildren: Node[] = [];
+    let div;
 
     document.body.classList.add(platform == 'win32' ? 'windows' : platform == 'linux' ? 'linux' : 'mac');
     
-    let div = this.$('#content-after-titlebar', { 'style': 'top:30px;right:0;bottom:0;left:0;position:absolute;overflow:auto;' });
+    if (this.options.menu !== null) {
+      div = this.$('#content-after-titlebar', { 'style': 'top:56px; right:0; bottom:0; left:0; position:absolute; overflow:auto;' });
+    } else {
+      div = this.$('#content-after-titlebar', { 'style': 'top:30px; right:0; bottom:0; left:0; position:absolute; overflow:auto;' });
+    }
+
     while (document.body.firstChild) div.appendChild(document.body.firstChild);
     document.body.appendChild(div);
     
@@ -82,7 +91,8 @@ export class Titlebar extends GlobalTitlebar {
     }
 
     if (this.options.menu) {
-      titlebarChildren.push(this.$('.menubar', { 'role': 'menubar' }));
+      titlebarChildren.push(this.$('.window-menu-separator', { 'style': `background: ${this.options.menuSeparatorColor}; width: 100%; height: 1px; top: 30px; position: absolute;` }))
+      titlebarChildren.push(this.$('.window-menu', { 'id': 'window-menu', 'style': `background: ${this.options.menuBackgroundColor}; padding-left: ${this.options.menuLeftPadding}; width: 100%; height: 25px; top: 31px; position: absolute;` }))
     }
 
     if (platform !== 'darwin') {
@@ -105,7 +115,10 @@ export class Titlebar extends GlobalTitlebar {
         ...titlebarChildren)
     );
 
-    if (this.options.menu) this.setMenu(this.options.menu);
+    if (this.options.menu) {
+      document.getElementById("window-menu")!.appendChild(this.$('.menubar', { 'role': 'menubar' }))
+      this.setMenu(this.options.menu);
+    }
   }
 
   private setStyles(): void {

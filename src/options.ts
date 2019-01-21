@@ -54,4 +54,16 @@ export interface TitlebarConstructorOptions {
    * The background color when the mouse is over the item
    */
   menuItemHoverColor?: string;
+  /**
+   * The background color of menu panel.
+   */
+  menuBackgroundColor?: string;
+  /**
+   * The color of menu separator.
+   */
+  menuSeparatorColor?: string;
+  /**
+   * Menu padding from left window border.
+   */
+  menuLeftPadding?: string;
 }
