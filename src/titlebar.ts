@@ -7,6 +7,7 @@ import { TitlebarConstructorOptions } from './options';
 import { GlobalTitlebar } from './global';
 
 const Color = require('color');
+const allowAlign = ['left', 'center', 'right'];
 
 export class Titlebar extends GlobalTitlebar {
   private currentWindow: BrowserWindow;
@@ -20,7 +21,8 @@ export class Titlebar extends GlobalTitlebar {
     maximizable: true,
     closeable: true,
     order: 'normal',
-    menuItemHoverColor: 'rgba(0, 0, 0, .14)'
+    menuItemHoverColor: 'rgba(0, 0, 0, .14)',
+    titleHorizontalAlignment: 'center'
   };
 
   /**
@@ -59,11 +61,29 @@ export class Titlebar extends GlobalTitlebar {
 
     titlebarChildren.push(this.$('.window-appicon'));
 
+    if (allowAlign.some(x => x === this.options.titleHorizontalAlignment)) {
+      if (this.options.icon === null) {
+        if (this.options.titleHorizontalAlignment == 'left' && this.options.order !== "reverse") {
+          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: left; padding-left: 15px` }))
+        } else if (this.options.titleHorizontalAlignment == 'right' && this.options.order == "reverse" || this.options.order == "firstButtons") {
+          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: right; padding-right: 15px` }))
+        } else {
+          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: ${this.options.titleHorizontalAlignment};` }))
+        }
+      } else {
+        if (this.options.titleHorizontalAlignment == 'right' && this.options.order == "firstButtons") {
+          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: right; padding-right: 15px` }))
+        } else {
+          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: ${this.options.titleHorizontalAlignment};` }))
+        }
+      }
+    } else {
+      titlebarChildren.push(this.$('.window-title', { 'style': 'text-align: center;' }))
+    }
+
     if (this.options.menu) {
       titlebarChildren.push(this.$('.menubar', { 'role': 'menubar' }));
     }
-
-    titlebarChildren.push(this.$('.window-title'));
 
     if (platform !== 'darwin') {
       titlebarChildren.push(this.$('.window-controls-container', {},
@@ -236,6 +256,38 @@ export class Titlebar extends GlobalTitlebar {
       const newTheme = this.$('style#icons-style');
       newTheme.textContent = theme.textContent;
       document.head.appendChild(newTheme);
+    }
+  }
+
+  /**
+  * set horizontal alignment of the window title
+  */
+  setHorizontalAlignment(side: String) {
+    const wTitle = document.querySelector(".window-title") as HTMLElement;
+
+    if (wTitle) {
+      if (allowAlign.some(x => x === side)) {
+        if (this.options.icon === null) {
+          if (side == "left" && this.options.order !== "reverse") {
+            wTitle.style.textAlign = "left";
+            wTitle.style.paddingLeft = "15px";
+          } else if ((side == "right" && this.options.order == "reverse") || this.options.order == "firstButtons") {
+            wTitle.style.textAlign = "right";
+            wTitle.style.paddingRight = "15px";
+          } else {
+            wTitle.style.textAlign = String(side);
+          }
+        } else {
+          if (this.options.titleHorizontalAlignment == "right" && this.options.order == "firstButtons") {
+            wTitle.style.textAlign = "right";
+            wTitle.style.paddingRight = "15px";
+          } else {
+            wTitle.style.textAlign = String(side);
+          }
+        }
+      } else {
+        wTitle.style.textAlign = "center";
+      }
     }
   }
 

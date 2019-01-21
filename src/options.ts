@@ -44,7 +44,12 @@ export interface TitlebarConstructorOptions {
    * Set the order of the elements on the title bar.
    * *The default value is normal*
    */
-  order?: ('normal' | 'reverse' | 'firstButtons');
+  order?: "normal" | "reverse" | "firstButtons";
+  /**
+   * Set horizontal alignment of the window title.
+   * *The default value is center*
+   */
+  titleHorizontalAlignment?: "left" | "center" | "right";
   /**
    * The background color when the mouse is over the item
    */
