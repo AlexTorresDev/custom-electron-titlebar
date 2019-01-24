@@ -1,4 +1,3 @@
-/* Titlebar */
 .titlebar {
   position: absolute;
   top: 0;
@@ -30,14 +29,13 @@
 	}
 	
 	.window-title {
-		flex: 0 1 auto;
-		font-size: 12px;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		padding-top: 3px;
-		width: 100%;
-		zoom: 1;
+    font-size: 12px;
+    display: inline-block;
+    vertical-align: middle;
+    padding-top: 3px;
+    line-height: normal;
+    z-index: 99;
+    width: 100%;
   }
   
   .window-controls-container {
