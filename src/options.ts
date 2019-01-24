@@ -53,7 +53,7 @@ export interface TitlebarConstructorOptions {
   /**
    * Order of the elements on the title bar, default value is `default`.
    */
-  menuBackgroundColor?: string;
+  order: "default" | "inverted";
   /**
    * The shadow of the titlebar. This property is similar to box-shadow.
    */
