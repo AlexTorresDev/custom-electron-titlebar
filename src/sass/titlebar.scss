@@ -37,7 +37,18 @@
     z-index: 99;
     width: 100%;
   }
-  
+
+  .window-appicon {
+    width: 35px;
+    height: 100%;
+    position: relative;
+    z-index: 99;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 16px;
+    flex-shrink: 0;
+  }
+
   .window-controls-container {
     display: flex;
     flex-grow: 0;
