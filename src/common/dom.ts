@@ -834,6 +834,12 @@ export function isHTMLElement(o: any): o is HTMLElement {
 }
 
 export const EventType = {
+	// Window
+	MINIMIZE: 'minimize' as 'minimize',
+	MAXIMIZE: 'maximize' as 'maximize',
+	UNMAXIMIZE: 'unmaximize' as 'unmaximize',
+	ENTER_FULLSCREEN: 'enter-full-screen' as 'enter-full-screen',
+	LEAVE_FULLSCREEN: 'leave-full-screen' as 'leave-full-screen',
 	// Mouse
 	CLICK: 'click' as 'click',
 	DBLCLICK: 'dblclick' as 'dblclick',

@@ -122,11 +122,19 @@ export class Titlebar extends Themebar {
 			this.onBlur();
 		});
 
-		this.currentWindow.on('enter-full-screen', () => {
+		this.currentWindow.on(EventType.MAXIMIZE, () => {
+			this.onDidChangeMaximized(true);
+		});
+
+		this.currentWindow.on(EventType.UNMAXIMIZE, () => {
+			this.onDidChangeMaximized(false);
+		});
+
+		this.currentWindow.on(EventType.ENTER_FULLSCREEN, () => {
 			this.onDidChangeFullscreen(true);
 		});
 
-		this.currentWindow.on('leave-full-screen', e => {
+		this.currentWindow.on(EventType.LEAVE_FULLSCREEN, () => {
 			this.onDidChangeFullscreen(false);
 		});
 	}
@@ -328,8 +336,10 @@ export class Titlebar extends Themebar {
 		if (!isMacintosh) {
 			if (fullscreen) {
 				hide(this.titlebar);
+				this.container.style.top = '0px';
 			} else {
 				show(this.titlebar);
+				this.container.style.top = `${this.titlebar.getBoundingClientRect().bottom}px`;
 			}
 		}
 	}
