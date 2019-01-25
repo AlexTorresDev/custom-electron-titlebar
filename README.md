@@ -1,14 +1,39 @@
 # Custom Electron Titlebar
 
-This is an typescript / javascript library for electron that allows you to configure a fully customizable title bar.
+This project is an typescript / javascript library for electron that allows you to configure a fully customizable title bar.
 
-![Windows](screenshots/windows.png)
+[![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
-## Whats new? v2.1.0
-- **Now the menu is working.**
+![Preview 1](screenshots/window_1.png)
+
+![Preview 2](screenshots/window_2.png)
+
+![Preview 3](screenshots/window_3.png)
+
+## Whats new?
+
+### Version 3.0.0
+- The entire project code was redesigned.
+- New methods are added.
+- Bugs fixed [#3](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/3), [#4](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/4) and [#5](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/5)
+- Change `TitlebarConstructorOptions` for `TitlebarOptions`.
+- Added several improvements of [#9](https://github.com/AlexTorresSk/custom-electron-titlebar/pull/9)
+- Now you can manipulate the menu using the keyboard.
+
+### Version 2
+- TitleBar is changed to Titlebar.
+- TitleBarIconStyle is changed to Themebar.
 - Fixed the error of [#2](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/2) when the main electron file is `.ts`
 - Changed `Themebar.win()` to `Themebar.win`
 - Changed `Themebar.mac()` to `Themebar.mac`
+
+### Version 1
+- You can select the style of icons between windows and mac.
+- You can sort the items in the title bar.
+- You can add a shadow under the title bar.
+- Now all the icons are shown, but those that are defined as false are disabled and are clearer.
+- Bug fixes for options
 
 ## Install
 
@@ -20,12 +45,13 @@ or use the base project [custom-electron-titlebar-quickstart](https://github.com
 
 ## Usage
 
-In your renderer file or in html add:
+In your renderer file or in a script tag of your html add:
 
 ```js
 const customTitlebar = require('custom-electron-titlebar');
 
-new customTitlebar.Titlebar('#444', {
+new customTitlebar.Titlebar({
+	backgroundColor: customTitlebar.Color.fromHex('#444'),
 	icon: 'appicon.svg',
 	minimizable: false
 });
@@ -33,56 +59,55 @@ new customTitlebar.Titlebar('#444', {
 
 > if you are using _typescript_
 ```ts
-import { Titlebar, Themebar } from 'custom-electron-titlebar'
+import { Titlebar, Themebar, Color } from 'custom-electron-titlebar'
 
-new Titlebar('#ECECEC', {
+new Titlebar({
+	backgroundColor: Color.fromHex('#ECECEC');
 	icon: 'appicon.png'
 });
 ```
 
-The parameter `backgroundColor: string` is require, this can be rgba(), hls(), rgb(), hexadecimal.
-(View [Set Background](#set-background) for more details).
+The parameter `backgroundColor: Color` is require, this should be `Color` type.
+(View [Update Background](#update-background) for more details).
 
 ## Options
 
-The interface [`TitleBarConstructorOptions`](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/src/options.ts) is managed, which has the following configurable options for the title bar. This parameter is optional.
+The interface [`TitleBarOptions`] is managed, which has the following configurable options for the title bar. Some parameters are optional.
 
-| Parameter          | Type             | Description                                                                           | Default                   |
-| ------------------ | ---------------- | ------------------------------------------------------------------------------------- | ------------------------- |
-| icon               | string           | The icon shown on the left side of the title bar.                                     | Empty                     |
-| iconsStyle         | HTMLStyleElement | Style of the icons.                                                                   | TitleBarIconStyle.win()   |
-| shadow             | string           | The shadow of the titlebar. **This property is equal to box-shadow**                  | Empty                     |
-| menu               | Electron.Menu    | The menu to show in the title bar.                                                    | Menu.getApplicationMenu() |
-| drag               | boolean          | Define whether or not you can drag the window by holding the click on the title bar.  | true                      |
-| minimizable        | boolean          | Define if the minimize window button is displayed.                                    | true                      |
-| maximizable        | boolean          | Define if the maximize and restore window buttons are displayed.                      | true                      |
-| closeable          | boolean          | Define if the close window button is displayed.                                       | true                      |
-| order              | string           | Set the order of the elements on the title bar. (`normal`, `reverse`, `firstButtons`) | normal                    |
-| menuItemHoverColor | string           | The background color when the mouse is over the item                                  | rgba(0, 0, 0, .14)           |
+| Parameter                | Type             | Description                                                                           | Default                   |
+| ------------------------ | ---------------- | ------------------------------------------------------------------------------------- | ------------------------- |
+| backgroundColor          | Color            | The background color of the titlebar.                                                 | #444444     |
+| icon                     | string           | The icon shown on the left side of the title bar.                                     | null                      |
+| iconsTheme               | Theme            | Style of the icons.                                                                   | Themebar.win              |
+| shadow                   | boolean          | The shadow of the titlebar.                                                           | false                     |
+| drag                     | boolean          | Define whether or not you can drag the window by holding the click on the title bar.  | true                      |
+| minimizable              | boolean          | Define if the minimize window button is displayed.                                    | true                      |
+| maximizable              | boolean          | Define if the maximize and restore window buttons are displayed.                      | true                      |
+| closeable                | boolean          | Define if the close window button is displayed.                                       | true                      |
+| order                    | string           | Set the order of the elements on the title bar. (`inverted`, `first-buttons`)         | null                      |
+| titleHorizontalAlignment | string           | Set horizontal alignment of the window title. (`left`, `center`, `right`)             | center                    |
+| menu                     | Electron.Menu    | The menu to show in the title bar.                                                    | Menu.getApplicationMenu() |
+| menuPosition             | string           | The position of menubar on titlebar.                                                  | left 											|
+| enableMnemonics          | boolean 					| Enable the mnemonics on menubar and menu items.																				| true											|
+| itemBackgroundColor      | Color            | The background color when the mouse is over the item.                                 | rgba(0, 0, 0, .14)        |
 
 ## Methods
 
-### Set Background
+### Update Background
 
 When this method is executed, as well as when the title bar is created, it is checked whether the color is light or dark, so that the color of the icons adapts to the background of the title bar.
 
 ```js
-const customTitlebar = require('custom-electron-titlebar');
-
-const titlebar = new customTitlebar.Titlebar('rgba(0, 0, 0, .7)');
-
-titlebar.setBackground('#444444');
+titlebar.updateBackground(new Color(new RGBA(0, 0, 0, .7)));
 ```
+
+To assign colors you can use the following options Color.fromHex (), `new Color(new RGBA(r, g, b, a))`, `new Color(new HSLA(h, s, l, a))`, `new Color(new HSVA(h, s, v, a))` or `Color.BLUE`, `Color.RED`, etc.
 
 ### Update Title
 
 This method updated the title of the title bar, If you change the content of the `title` tag, you should call this method for update the title.
 
 ```js
-const customTitlebar = require('custom-electron-titlebar');
-
-const titlebar = new customTitlebar.Titlebar('rgba(0, 0, 0, .7)');
-
 document.title = 'My new title';
 titlebar.updateTitle();
 
@@ -90,16 +115,21 @@ titlebar.updateTitle();
 titlebar.updateTitle('New Title');
 ```
 
-### Set Menu
+if this method is called and the title parameter is added, the title of the document is changed to that of the parameter.
+
+### Update Icon
+
+With this method you can update the icon. This method receives the url of the image _(it is advisable to use transparent image formats)_
+
+```js
+titlebar.updateIcon('./images/my-icon.svg');
+```
+
+### Update Menu
 
 This method updates or creates the menu, to create the menu use remote.Menu and remote.MenuItem.
 
 ```js
-const { Menu, MenuItem } = require('electron').remote;
-const customTitlebar = require('custom-electron-titlebar');
-
-const titlebar = new customTitlebar.Titlebar('rgba(0, 0, 0, .7)');
-
 const menu = new Menu();
 menu.append(new MenuItem({
 	label: 'Item 1',
@@ -137,25 +167,41 @@ menu.append(new MenuItem({
 	]
 }));
 
-titlebar.setMenu(menu);
+titlebar.updateMenu(menu);
 ```
 
-### Set Theme Icons
-You can create your custom theme for the icons, to get an idea of this see the [windows or mac](https://github.com/AlexTorresSk/custom-electron-titlebar/tree/master/src/themebar.ts) theme file.
+### Update Menu Position
+
+You can change the position of the menu bar. `left` and `bottom` are allowed.
 
 ```js
-const fs = require('fs');
-const customTitlebar = require('custom-electron-titlebar');
-
-const titlebar = new customTitlebar.Titlebar('rgba(0, 0, 0, .7)');
-
-const theme = document.createElement('style');
-theme.textContent = fs.readFileSync('url of css file', 'utf8');
-/* or
-theme.textContent = `
-	...style on css
-`;
-*/
-
-titlebar.setThemeIcons(theme);
+titlebar.updateMenuPosition('bottom');
 ```
+
+### Set Horizontal Alignment
+
+> setHorizontalAlignment method was contributed by [@MairwunNx](https://github.com/MairwunNx) :punch:
+
+`left`, `center` and `right` are allowed
+
+```js
+titlebar.setHorizontalAlignment('right');
+```
+
+### Dispose
+
+This method removes the title bar completely and all recorded events.
+
+```js
+titlebar.dispose();
+```
+
+## Contributing
+
+Many thanks to contributor [**Pavel Erokhin** (@MairwunNx)](https://github.com/MairwunNx) and to all the people who support this project through issues and pull request.
+
+**Note:** If you want to contribute with this project, all the issues and pull request are welcome.
+
+## License
+
+This project is under the [MIT](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE) license.

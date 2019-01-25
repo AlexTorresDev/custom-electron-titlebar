@@ -1,448 +1,503 @@
-import { remote, BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Event } from 'electron';
-import * as path from 'path';
-import * as fs from 'fs';
-import { platform } from 'process';
-import { Themebar } from './index';
-import { TitlebarConstructorOptions } from './options';
-import { GlobalTitlebar } from './global';
+/*--------------------------------------------------------------------------------------------------------
+ *  This file has been modified by @AlexTorresSk (http://github.com/AlexTorresSk)
+ *  to work in custom-electron-titlebar.
+ * 
+ *  The original copy of this file and its respective license are in https://github.com/Microsoft/vscode/
+ * 
+ *  Copyright (c) 2018 Alex Torres
+ *  Licensed under the MIT License. See License in the project root for license information.
+ *-------------------------------------------------------------------------------------------------------*/
 
-const Color = require('color');
-const allowAlign = ['left', 'center', 'right'];
+import { isMacintosh, isWindows, isLinux } from './common/platform';
+import { Color, RGBA } from './common/color';
+import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from './common/dom';
+import { Menubar, MenubarOptions } from './menubar';
+import { remote, BrowserWindow } from 'electron';
+import { CssStyle, Theme, Themebar } from './themebar';
 
-export class Titlebar extends GlobalTitlebar {
-  private currentWindow: BrowserWindow;
+const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');
+const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
+const INACTIVE_FOREGROUND = Color.fromHex('#EEEEEE');
+const ACTIVE_FOREGROUND = Color.fromHex('#FFFFFF');
 
-  private defaultOptions: TitlebarConstructorOptions = {
-    icon: '',
-    iconsStyle: Themebar.win,
-    menu: remote.Menu.getApplicationMenu(),
-    drag: true,
-    minimizable: true,
-    maximizable: true,
-    closeable: true,
-    order: 'normal',
-    menuItemHoverColor: 'rgba(0, 0, 0, .14)',
-    titleHorizontalAlignment: 'center'
-  };
+export interface TitlebarOptions extends MenubarOptions {
+	/**
+	 * The background color of the titlebar.
+	 */
+	backgroundColor: Color;
+	/**
+	 * The icon shown on the left side of the title bar.
+	 */
+	icon?: string;
+	/**
+	 * Style of the icons.
+	 * You can create your custom style using [`Theme`](https://github.com/AlexTorresSk/custom-electron-titlebar/custom-icons)
+	 */
+	iconsTheme?: Theme;
+	/**
+	 * The shadow color of the titlebar.
+	 */
+	shadow?: boolean;
+	/**
+	 * Define if the minimize window button is displayed.
+	 * *The default is true*
+	 */
+	minimizable?: boolean;
+	/**
+	 * Define if the maximize and restore window buttons are displayed.
+	 * *The default is true*
+	 */
+	maximizable?: boolean;
+	/**
+	 * Define if the close window button is displayed.
+	 * *The default is true*
+	 */
+	closeable?: boolean;
+	/**
+	 * Set the order of the elements on the title bar. You can use `inverted`, `first-buttons` or don't add for.
+	 * *The default is normal*
+	 */
+	order?: "inverted" | "first-buttons";
+	/**
+	 * Set horizontal alignment of the window title.
+	 * *The default value is center*
+	 */
+	titleHorizontalAlignment?: "left" | "center" | "right";
+}
 
-  /**
-   * Background color of the title bar
+const defaultOptions: TitlebarOptions = {
+	backgroundColor: Color.fromHex('#444444'),
+	iconsTheme: Themebar.win,
+	shadow: false,
+	menu: remote.Menu.getApplicationMenu(),
+	minimizable: true,
+	maximizable: true,
+	closeable: true,
+	enableMnemonics: true
+};
+
+export class Titlebar extends Themebar {
+
+	private titlebar: HTMLElement;
+	private title: HTMLElement;
+	private dragRegion: HTMLElement;
+	private appIcon: HTMLElement;
+	private menubarContainer: HTMLElement;
+	private windowControls: HTMLElement;
+	private maxRestoreControl: HTMLElement;
+	private container: HTMLElement;
+
+	private resizer: {
+		top: HTMLElement;
+		left: HTMLElement;
+	}
+
+	private isInactive: boolean;
+
+	private currentWindow: BrowserWindow;
+	private _options: TitlebarOptions;
+	private menubar: Menubar;
+
+	constructor(options?: TitlebarOptions) {
+		super();
+
+		this.currentWindow = remote.getCurrentWindow();
+
+		this._options = { ...defaultOptions, ...options };
+
+		this.registerListeners();
+		this.createTitlebar();
+		this.updateStyles();
+		this.registerTheme(this._options.iconsTheme);
+	}
+
+	private registerListeners() {
+		this.currentWindow.on(EventType.FOCUS, () => {
+			this.onDidChangeWindowFocus(true);
+			this.onFocus();
+		});
+
+		this.currentWindow.on(EventType.BLUR, () => {
+			this.onDidChangeWindowFocus(false);
+			this.onBlur();
+		});
+
+		this.currentWindow.on('enter-full-screen', () => {
+			this.onDidChangeFullscreen(true);
+		});
+
+		this.currentWindow.on('leave-full-screen', e => {
+			this.onDidChangeFullscreen(false);
+		});
+	}
+
+	private createTitlebar() {
+		// Content container
+		this.container = $('div.container-after-titlebar');
+		this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? '60px' : '30px';
+		this.container.style.right = '0';
+		this.container.style.bottom = '0';
+		this.container.style.left = '0';
+		this.container.style.position = 'absolute';
+		this.container.style.overflow = 'auto';
+
+		while (document.body.firstChild) {
+			append(this.container, document.body.firstChild);
+		}
+
+		append(document.body, this.container);
+
+		document.body.style.overflow = 'hidden';
+		document.body.style.margin = '0';
+
+		// Titlebar
+		this.titlebar = $('div.titlebar');
+		addClass(this.titlebar, isWindows ? 'windows' : isLinux ? 'linux' : 'mac');
+
+		if (this._options.order) {
+			addClass(this.titlebar, this._options.order);
+		}
+
+		if (this._options.shadow) {
+			this.titlebar.style.boxShadow = `0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 1px 3px 0 rgba(0, 0, 0, .12)`;
+		}
+
+		this.dragRegion = append(this.titlebar, $('div.titlebar-drag-region'));
+
+		// App Icon (Windows/Linux)
+		if (!isMacintosh && this._options.icon) {
+			this.appIcon = append(this.titlebar, $('div.window-appicon'));
+			this.updateIcon(this._options.icon);
+		}
+
+		// Menubar
+		this.menubarContainer = append(this.titlebar, $('div.menubar'));
+		this.menubarContainer.setAttribute('role', 'menubar');
+
+		if (this._options.menu) {
+			this.updateMenu(this._options.menu);
+			this.updateMenuPosition(this._options.menuPosition);
+		}
+
+		// Title
+		this.title = append(this.titlebar, $('div.window-title'));
+
+		if (!isMacintosh) {
+			this.title.style.cursor = 'default';
+		}
+
+		this.updateTitle();
+		this.setHorizontalAlignment(this._options.titleHorizontalAlignment);
+
+		// Maximize/Restore on doubleclick
+		if (isMacintosh) {
+			let isMaximized = this.currentWindow.isMaximized();
+			this._register(addDisposableListener(this.titlebar, EventType.DBLCLICK, () => {
+				isMaximized = !isMaximized;
+				this.onDidChangeMaximized(isMaximized);
+			}));
+		}
+
+		// Window Controls (Windows/Linux)
+		if (!isMacintosh) {
+			this.windowControls = append(this.titlebar, $('div.window-controls-container'));
+
+			// Minimize
+			const minimizeIconContainer = append(this.windowControls, $('div.window-icon-bg'));
+			const minimizeIcon = append(minimizeIconContainer, $('div.window-icon'));
+			addClass(minimizeIcon, 'window-minimize');
+
+			if (!this._options.minimizable) {
+				addClass(minimizeIconContainer, 'inactive');
+			} else {
+				this._register(addDisposableListener(minimizeIcon, EventType.CLICK, e => {
+					this.currentWindow.minimize();
+				}));
+			}
+
+			// Restore
+			const restoreIconContainer = append(this.windowControls, $('div.window-icon-bg'));
+			this.maxRestoreControl = append(restoreIconContainer, $('div.window-icon'));
+			addClass(this.maxRestoreControl, 'window-max-restore');
+
+			if (!this._options.maximizable) {
+				addClass(restoreIconContainer, 'inactive');
+			} else {
+				this._register(addDisposableListener(this.maxRestoreControl, EventType.CLICK, e => {
+					if (this.currentWindow.isMaximized()) {
+						this.currentWindow.unmaximize();
+						this.onDidChangeMaximized(false);
+					} else {
+						this.currentWindow.maximize();
+						this.onDidChangeMaximized(true);
+					}
+				}));
+			}
+
+			// Close
+			const closeIconContainer = append(this.windowControls, $('div.window-icon-bg'));
+			addClass(closeIconContainer, 'window-close-bg');
+			const closeIcon = append(closeIconContainer, $('div.window-icon'));
+			addClass(closeIcon, 'window-close');
+
+			if (!this._options.closeable) {
+				addClass(closeIconContainer, 'inactive');
+			} else {
+				this._register(addDisposableListener(closeIcon, EventType.CLICK, e => {
+					this.currentWindow.close();
+				}));
+			}
+
+			// Resizer
+			this.resizer = {
+				top: append(this.titlebar, $('div.resizer.top')),
+				left: append(this.titlebar, $('div.resizer.left'))
+			}
+
+			this.onDidChangeMaximized(this.currentWindow.isMaximized());
+		}
+
+		prepend(document.body, this.titlebar);
+	}
+
+	private onBlur(): void {
+		this.isInactive = true;
+		this.updateStyles();
+	}
+
+	private onFocus(): void {
+		this.isInactive = false;
+		this.updateStyles();
+	}
+
+	private onMenubarVisibilityChanged(visible: boolean) {
+		if (isWindows || isLinux) {
+			// Hide title when toggling menu bar
+			if (visible) {
+				// Hack to fix issue #52522 with layered webkit-app-region elements appearing under cursor
+				hide(this.dragRegion);
+				setTimeout(() => show(this.dragRegion), 50);
+			}
+		}
+	}
+
+	private onMenubarFocusChanged(focused: boolean) {
+		if (isWindows || isLinux) {
+			if (focused) {
+				hide(this.dragRegion);
+			} else {
+				show(this.dragRegion);
+			}
+		}
+	}
+
+	private onDidChangeWindowFocus(hasFocus: boolean): void {
+		if (this.titlebar) {
+			if (hasFocus) {
+				removeClass(this.titlebar, 'inactive');
+			} else {
+				addClass(this.titlebar, 'inactive');
+				if (this.menubar) {
+					this.menubar.blur();
+				}
+			}
+		}
+	}
+
+	private onDidChangeMaximized(maximized: boolean) {
+		if (this.maxRestoreControl) {
+			if (maximized) {
+				removeClass(this.maxRestoreControl, 'window-maximize');
+				addClass(this.maxRestoreControl, 'window-unmaximize');
+			} else {
+				removeClass(this.maxRestoreControl, 'window-unmaximize');
+				addClass(this.maxRestoreControl, 'window-maximize');
+			}
+		}
+
+		if (this.resizer) {
+			if (maximized) {
+				hide(...[this.resizer.top, this.resizer.left]);
+			} else {
+				show(...[this.resizer.top, this.resizer.left]);
+			}
+		}
+	}
+
+	private onDidChangeFullscreen(fullscreen: boolean) {
+		if (!isMacintosh) {
+			if (fullscreen) {
+				hide(this.titlebar);
+			} else {
+				show(this.titlebar);
+			}
+		}
+	}
+
+	private updateStyles() {
+		if (this.titlebar) {
+			if (this.isInactive) {
+				addClass(this.titlebar, 'inactive');
+			} else {
+				removeClass(this.titlebar, 'inactive');
+			}
+
+			const titleBackground = this.isInactive ? this._options.backgroundColor.lighten(.3) : this._options.backgroundColor;
+			this.titlebar.style.backgroundColor = titleBackground.toString();
+
+			if (titleBackground.isLighter()) {
+				addClass(this.titlebar, 'light');
+
+				const titleForeground = this.isInactive ? INACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND_DARK;
+				this.titlebar.style.color = titleForeground.toString();
+			} else {
+				removeClass(this.titlebar, 'light');
+
+				const titleForeground = this.isInactive ? INACTIVE_FOREGROUND : ACTIVE_FOREGROUND;
+				this.titlebar.style.color = titleForeground.toString();
+			}
+
+			const backgroundColor = this._options.backgroundColor.darken(.16);
+			const foregroundColor = backgroundColor.isLighter() ? INACTIVE_FOREGROUND_DARK : INACTIVE_FOREGROUND;
+			const bgColor = !this._options.itemBackgroundColor ||
+				this._options.itemBackgroundColor.equals(backgroundColor) ? new Color(new RGBA(0, 0, 0, .14)) : this._options.itemBackgroundColor;
+			const fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND;
+
+			this.menubar.setStyles({
+				backgroundColor: backgroundColor,
+				foregroundColor: foregroundColor,
+				selectionBackgroundColor: bgColor,
+				selectionForegroundColor: fgColor,
+				separatorColor: foregroundColor
+			});
+		}
+	}
+
+	/**
+	 * get the options of the titlebar
+	 */
+	public get options(): TitlebarOptions {
+		return this._options;
+	}
+
+	/**
+   * Update the background color of the title bar
+   * @param backgroundColor The color for the background
    */
-  backgroundColor: string;
-  /**
-   * Options of the title bar
-   */
-  options: TitlebarConstructorOptions;
+	updateBackground(backgroundColor: Color) {
+		this._options.backgroundColor = backgroundColor;
+		this.updateStyles();
+	}
 
-  constructor(backgroundColor: string, options?: TitlebarConstructorOptions) {
-    super();
-    this.currentWindow = remote.getCurrentWindow();
-    this.backgroundColor = backgroundColor;
-    this.options = {...this.defaultOptions, ...options};
-
-    this.createTitleBar();
-    this.setStyles();
-    this.addEvents();
-    this.updateTitle();
-  }
-
-  private createTitleBar(): void {
-    let titlebarChildren: Node[] = [];
-
-    document.body.classList.add(platform == 'win32' ? 'windows' : platform == 'linux' ? 'linux' : 'mac');
-    
-    let div = this.$('#content-after-titlebar', { 'style': 'top:30px;right:0;bottom:0;left:0;position:absolute;overflow:auto;' });
-    while (document.body.firstChild) div.appendChild(document.body.firstChild);
-    document.body.appendChild(div);
-    
-    if (this.options.drag) {
-      titlebarChildren.push(this.$('.titlebar-drag-region'));
-    }
-
-    titlebarChildren.push(this.$('.window-appicon'));
-
-    if (allowAlign.some(x => x === this.options.titleHorizontalAlignment)) {
-      if (this.options.icon === null) {
-        if (this.options.titleHorizontalAlignment == 'left' && this.options.order !== "reverse") {
-          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: left; padding-left: 15px` }))
-        } else if (this.options.titleHorizontalAlignment == 'right' && this.options.order == "reverse" || this.options.order == "firstButtons") {
-          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: right; padding-right: 15px` }))
-        } else {
-          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: ${this.options.titleHorizontalAlignment};` }))
-        }
-      } else {
-        if (this.options.titleHorizontalAlignment == 'right' && this.options.order == "firstButtons") {
-          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: right; padding-right: 15px` }))
-        } else {
-          titlebarChildren.push(this.$('.window-title', { 'style': `text-align: ${this.options.titleHorizontalAlignment};` }))
-        }
-      }
-    } else {
-      titlebarChildren.push(this.$('.window-title', { 'style': 'text-align: center;' }))
-    }
-
-    if (this.options.menu) {
-      titlebarChildren.push(this.$('.menubar', { 'role': 'menubar' }));
-    }
-
-    if (platform !== 'darwin') {
-      titlebarChildren.push(this.$('.window-controls-container', {},
-        ...[
-          this.$(`.window-icon-bg${!this.options.minimizable ? '.inactive' : ''}`, {}, this.$('.window-icon.window-minimize')),
-          this.$(`.window-icon-bg${!this.options.maximizable ? '.inactive' : ''}`, {},
-            this.$(`.window-icon ${this.currentWindow.isMaximized() ? 'window-unmaximize' : 'window-maximize'}`)
-          ),
-          this.$(`.window-icon-bg.window-close-bg${!this.options.closeable ? '.inactive' : ''}`, {}, this.$('.window-icon.window-close'))
-        ]
-      ));
-    }
-
-    titlebarChildren.push(this.$('.resizer', { 'style': `display:${this.currentWindow.isMaximized() ? 'none': 'block'}` }));
-
-    document.body.prepend(
-      this.$(`#titlebar.titlebar.${this.options.order}`,
-        this.options.shadow ? { 'style': `box-shadow:${this.options.shadow};` } : {},
-        ...titlebarChildren)
-    );
-
-    if (this.options.menu) this.setMenu(this.options.menu);
-  }
-
-  private setStyles(): void {
-    document.head.appendChild(this.$('style.titlebar-style', {}, `
-      ${fs.readFileSync(path.resolve(path.resolve(path.dirname(require.resolve('./index')), 'css'), 'titlebar.css'), 'utf8')}
-      ${this.options.icon ? `.titlebar > .window-appicon {
-        width: 35px;
-        height: 100%;
-        position: relative;
-        z-index: 99;
-        background-image: url("${this.options.icon}");
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: 16px;
-        flex-shrink: 0;
-      }` : ''}
-    `));
-
-    this.setBackground(this.backgroundColor);
-    if (this.options.iconsStyle) this.setThemeIcons(this.options.iconsStyle);
-
-    document.body.style.margin = '0';
-    document.body.style.overflow = 'hidden';
-
-    if(this.currentWindow.isFullScreen) document.body.classList.add('fullscreen');
-  }
-
-  private addEvents(): void {
-    // Minimize button
-    const minimizeButton = document.querySelector('.window-minimize');
-    if(minimizeButton && this.options.minimizable) minimizeButton.addEventListener('click', () => {
-      this.currentWindow.minimize();
-    });
-
-    // Maximize and Unmaximize button
-    document.querySelectorAll('.window-maximize, .window-unmaximize').forEach((elem: Element) => {
-      if(this.options.maximizable) elem.addEventListener('click', () => {
-        if(!this.currentWindow.isMaximized()) this.currentWindow.maximize();
-        else this.currentWindow.unmaximize();
-      });
-    });
-
-    // Close button
-    const closeButton = document.querySelector('.window-close');
-    if(closeButton && this.options.closeable) closeButton.addEventListener('click', () => {
-      this.currentWindow.close();
-    });
-
-    this.currentWindow.on('maximize', () => {
-      showHide('.window-maximize', false);
-    });
-
-    this.currentWindow.on('unmaximize', () => {
-      showHide('.window-unmaximize', true);
-    });
-
-    this.currentWindow.on('blur', () => {
-      const titlebar = document.getElementById('titlebar');
-
-      if(titlebar) {
-        titlebar.style.backgroundColor = Color(titlebar.style.backgroundColor).alpha(0.9);
-        titlebar.style.color = Color(titlebar.style.color).alpha(0.9);
-      }
-    });
-
-    this.currentWindow.on('focus', () => {
-      this.setBackground(this.backgroundColor);
-    });
-
-    this.currentWindow.on('enter-full-screen', () => {
-      document.body.classList.add('fullscreen');
-    });
-
-    this.currentWindow.on('leave-full-screen', () => {
-      document.body.classList.remove('fullscreen');
-    });
-  }
-
-  /**
+	/**
    * Update the title of the title bar.
-   * You can use this method if change the content of `<title>` tag on your html
-   * @param title The title of the title bar and document
+   * You can use this method if change the content of `<title>` tag on your html.
+   * @param title The title of the title bar and document.
    */
-  updateTitle(title?: string): void {
-    const wTitle = document.querySelector('.window-title');
-    
-    if(title) document.title = title;
-    if(wTitle) wTitle.innerHTML = document.title;
-  }
+	updateTitle(title?: string) {
+		if (this.title) {
+			if (title) {
+				document.title = title;
+			} else {
+				title = document.title;
+			}
 
-  /**
-   * Change the background color of the title bar
-   * @param color The color for the background
-   */
-  setBackground(color: string): void {
-    this.backgroundColor = color;
-    const titlebar = document.getElementById('titlebar');
+			this.title.innerText = title;
+		}
+	}
 
-    if (titlebar) {
-      titlebar.style.backgroundColor = color;
-      titlebar.style.color = Color(color).isDark() && color !== 'transparent' ? '#ffffff' : '#333333';;
+	/**
+	 * It method set new icon to title-bar-icon of title-bar.
+	 * @param path path to icon
+	 */
+	updateIcon(path: string) {
+		if (path === null || path === '') {
+			return;
+		}
 
-      if (!Color(color).isDark() || color === 'transparent') {
-        titlebar.classList.add('light');
-      } else {
-        titlebar.classList.remove('light');
-      }
-    }
+		if (this.appIcon) {
+			this.appIcon.style.backgroundImage = `url("${path}")`;
+		}
+	}
 
-    this.setColors(color);
-  }
+	/**
+	 * Update the default menu or set a new menu.
+	 * @param menu The menu.
+	 */
+	// Menu enhancements, moved menu to bottom of window-titlebar. (by @MairwunNx) https://github.com/AlexTorresSk/custom-electron-titlebar/pull/9
+	updateMenu(menu: Electron.Menu) {
+		if (!isMacintosh) {
+			if (this.menubar) {
+				this.menubar.dispose();
+				this._options.menu = menu;
+			}
 
-  /**
-   * Set the menu for the titlebar
-   */
-  setMenu(menu: Menu): void {
-    const menubar = document.querySelector('.menubar');
+			this.menubar = new Menubar(this.menubarContainer, this._options);
+			this.menubar.setupMenubar();
 
-    if (menubar) {
-      menubar.innerHTML = '';
+			if (!isMacintosh) {
+				this._register(this.menubar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e)));
+				this._register(this.menubar.onFocusStateChange(e => this.onMenubarFocusChanged(e)));
+			}
 
-      (menu.items as Array<MenuItemConstructorOptions>).forEach(item => {
-        let menuButton = this.$('.menubar-menu-button', {
-          'role': 'menuitem',
-          'aria-label': cleanMnemonic(`${item.label}`),
-          'aria-keyshortcuts': item.accelerator
-        }, this.getLabelFormat(`${item.label}`));
-        
-        let submenu = item.submenu as Menu;
-        if (submenu && submenu.items.length) this.createSubmenu(menuButton, submenu.items, false);
-        menubar.appendChild(menuButton);
-      });
-    }
+			this.updateStyles();
+		}
+	}
 
-    this.setColors(this.backgroundColor);
+	/**
+	 * Update the position of menubar.
+	 * @param menuPosition The position of the menu `left` or `bottom`.
+	 */
+	updateMenuPosition(menuPosition: "left" | "bottom") {
+		this._options.menuPosition = menuPosition;
+		this.titlebar.style.height = this._options.menuPosition && this._options.menuPosition === 'bottom' ? '60px' : '30px';
+		this.titlebar.style.webkitFlexWrap = this._options.menuPosition && this._options.menuPosition === 'bottom' ? 'wrap' : null;
+		this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? '60px' : '30px';
 
-    if(this.options.menuItemHoverColor) setEvents(this.options.menuItemHoverColor);
-  }
+		if (this._options.menuPosition === 'bottom') {
+			addClass(this.menubarContainer, 'bottom');
+		} else {
+			removeClass(this.menubarContainer, 'bottom');
+		}
+	}
 
-  /**
-   * set theme for the icons of the title bar
-   */
-  setThemeIcons(theme: HTMLStyleElement): void {
-    const currentTheme = document.querySelector('#icons-style');
-    if(currentTheme) {
-      currentTheme.textContent = theme.textContent;
-    } else {
-      const newTheme = this.$('style#icons-style');
-      newTheme.textContent = theme.textContent;
-      document.head.appendChild(newTheme);
-    }
-  }
+	/**
+	 * Horizontal alignment of the title.
+	 * @param side `left`, `center` or `right`.
+	 */
+	// Add ability to customize title-bar title. (by @MairwunNx) https://github.com/AlexTorresSk/custom-electron-titlebar/pull/8
+	setHorizontalAlignment(side: "left" | "center" | "right") {
+		if (this.title) {
+			if (side === 'left' || (side === 'right' && this._options.order === 'inverted')) {
+				this.title.style.marginLeft = '8px';
+				this.title.style.marginRight = 'auto';
+			}
 
-  /**
-  * set horizontal alignment of the window title
-  */
-  setHorizontalAlignment(side: String) {
-    const wTitle = document.querySelector(".window-title") as HTMLElement;
+			if (side === 'right' || (side === 'left' && this._options.order === 'inverted')) {
+				this.title.style.marginRight = '8px';
+				this.title.style.marginLeft = 'auto';
+			}
 
-    if (wTitle) {
-      if (allowAlign.some(x => x === side)) {
-        if (this.options.icon === null) {
-          if (side == "left" && this.options.order !== "reverse") {
-            wTitle.style.textAlign = "left";
-            wTitle.style.paddingLeft = "15px";
-          } else if ((side == "right" && this.options.order == "reverse") || this.options.order == "firstButtons") {
-            wTitle.style.textAlign = "right";
-            wTitle.style.paddingRight = "15px";
-          } else {
-            wTitle.style.textAlign = String(side);
-          }
-        } else {
-          if (this.options.titleHorizontalAlignment == "right" && this.options.order == "firstButtons") {
-            wTitle.style.textAlign = "right";
-            wTitle.style.paddingRight = "15px";
-          } else {
-            wTitle.style.textAlign = String(side);
-          }
-        }
-      } else {
-        wTitle.style.textAlign = "center";
-      }
-    }
-  }
+			if (side === 'center' || side === undefined) {
+				this.title.style.marginRight = 'auto';
+				this.title.style.marginLeft = 'auto';
+			}
+		}
+	}
 
-  /**
-   * Format a label
-   * @param label Label to format
-   */
-  private getLabelFormat(label: string): HTMLElement {
-    const titleElement = this.$('.menubar-menu-title', { 'aria-hidden': true });
-    titleElement.innerHTML = label.indexOf('&') !== -1 ?
-      label.replace(/\(&{1,2}(.)\)|&{1,2}(.)/, '<mnemonic aria-hidden="true">$2</mnemonic>') :
-      cleanMnemonic(label);
-    
-    return titleElement;
-  }
+	/**
+	 * Remove the titlebar and all methods.
+	 */
+	dispose() {
+		this.menubar.dispose();
+		super.dispose();
+		removeNode(this.titlebar);
+		
+		while (this.container.firstChild) {
+			append(document.body, this.container.firstChild);
+		}
+		
+		removeNode(this.container);
+	}
 
-  private createSubmenu(element: Element, items: Array<MenuItem>, isSubmenu: boolean): void {
-    let event: Event;
-    const list: Array<Node> = [];
-  
-    (items as Array<MenuItemConstructorOptions>).forEach(item => {
-      let child = this.$(`li.action-item.${item.type === 'separator' || !item.enabled ? 'disable' : ''}`);
-  
-      if(item.type === 'separator') {
-        child.appendChild(this.$('a.action-label.icon.separator.disabled'));
-      } else {
-        const children = [
-          this.$('span.menu-item-check', { 'role': 'none' }),
-          this.$('span.action-label', { 'aria-label': `${item.label}` }, this.getLabelFormat(`${item.label}`)),
-          item.submenu ? this.$('span.submenu-indicator') : this.$('span.keybinding', {}, `${item.accelerator ? item.accelerator : ''}`)
-        ];
-        const menuItem = this.$(`a.action-menu-item.${item.checked ? 'checked': ''}`, { 'role': 'menuitem', 'aria-checked': item.checked }, ...children);
-        child.addEventListener('click', () => {
-          if(item.type === 'checkbox') {
-            menuItem.setAttribute('aria-checked', `${item.checked}`);
-            menuItem.classList.toggle('checked');
-          }
-          if(item.click) item.click(item as MenuItem, remote.getCurrentWindow(), event);
-        });
-        child.appendChild(menuItem);
-      }
-  
-      if(item.submenu || item.type === 'submenu') {
-        const submenu = item.submenu as Menu;
-        if (submenu.items.length) this.createSubmenu(child, submenu.items, true);
-        element.appendChild(child);
-      }
-  
-      list.push(child);
-    });
-  
-    element.appendChild(this.$(`${isSubmenu ? '.submenu.context-view' : ''}.menubar-menu-items-holder.menu-container`, {},
-      this.$('ul.actions-container', { 'role': 'menu' }, ...list))
-    );
-  }
-}
-
-function showHide(_class: string, _resizer: boolean): void {
-  const element = document.querySelector(_class);
-  const wResizer = document.querySelector<HTMLDivElement>('.resizer');
-  
-  if(element) {
-    element.classList.add(_class == '.window-maximize' ? 'window-unmaximize' : 'window-maximize');
-    element.classList.remove(_class == '.window-maximize' ? 'window-maximize' : 'window-unmaximize');
-  }
-  
-  if (wResizer) wResizer.style.display = _resizer ? 'block' : 'none';
-}
-
-function setEvents(hoverColor: string) {
-  let openedMenu: boolean = false;
-  let selectElementMenu: HTMLElement;
-  let pressed = false;
-  const drag = document.querySelector<HTMLElement>('.titlebar-drag-region');
-
-  // Event to menubar items
-  document.querySelectorAll<HTMLElement>('.menubar-menu-button').forEach((elem) => {
-    elem.addEventListener('click', () => {
-      if(drag && !openedMenu) drag.style.display = 'none';
-      if(drag && openedMenu) drag.removeAttribute('style');
-      (elem.lastChild as HTMLElement).style.left = `${elem.getBoundingClientRect().left}px`;
-      elem.classList.toggle('open');
-      selectElementMenu = elem;
-      openedMenu = !openedMenu;
-    });
-
-    elem.addEventListener('mouseover', () => {
-      if(openedMenu) {
-        selectElementMenu.classList.remove('open');
-        (elem.lastChild as HTMLElement).style.left = `${elem.getBoundingClientRect().left}px`;
-        elem.classList.add('open');
-        selectElementMenu = elem;
-      }
-    });
-  });
-
-  // Event to click outside of menu
-  const container = document.getElementById('content-after-titlebar');
-  if(container) container.addEventListener('click', () => {
-    if(openedMenu) {
-      if(drag) drag.removeAttribute('style');
-      selectElementMenu.classList.remove('open');
-      openedMenu = false;
-    }
-  });
-
-  // Event to menu items
-  document.querySelectorAll('.menubar .action-item:not(.disable)').forEach((elem) => {
-    elem.addEventListener('mouseover', () => {
-      const contentColor = Color(hoverColor).isDark() && hoverColor !== 'transparent' ? '#ffffff' : '#333333';
-      (elem.childNodes[0] as HTMLElement).style.backgroundColor = hoverColor;
-      (elem.childNodes[0] as HTMLElement).style.color = contentColor;
-      (elem.childNodes[0].firstChild as HTMLElement).style.backgroundColor = contentColor;
-      if(!(elem.childNodes[0].lastChild as HTMLElement).classList.contains('keybinding')) {
-        (elem.childNodes[0].lastChild as HTMLElement).style.backgroundColor = contentColor;
-      }
-
-      if((elem.childNodes[0].lastChild as HTMLElement).classList.contains('submenu-indicator')) {
-        (elem.lastChild as HTMLElement).style.left = `${elem.getBoundingClientRect().width}px`;
-        (elem.lastChild as HTMLElement).classList.add('open');
-      }
-    });
-
-    elem.addEventListener('mouseleave', () => {
-      (elem.childNodes[0] as HTMLElement).removeAttribute('style');
-      (elem.childNodes[0].firstChild as HTMLElement).removeAttribute('style');
-      (elem.childNodes[0].lastChild as HTMLElement).removeAttribute('style');
-
-      if((elem.childNodes[0].lastChild as HTMLElement).classList.contains('submenu-indicator')) {
-        (elem.lastChild as HTMLElement).classList.remove('open');
-      }
-    });
-  });
-
-  // Alt key event
-  document.addEventListener('keydown', event => {
-    pressed = !pressed;
-    document.querySelectorAll<HTMLElement>('mnemonic').forEach((elem: HTMLElement) => {
-      if(event.altKey) elem.style.textDecoration = pressed ? 'underline' : '';
-    });
-  });
-}
-
-/**
- * Clean a label
- * @param label Label to clean
- */
-function cleanMnemonic(label: string): string {
-  const regex = /\(&{1,2}(.)\)|&{1,2}(.)/;
-
-  const matches = regex.exec(label);
-  
-  if (!matches) {
-    return label;
-  }
-
-  return label.replace(regex, matches[0].charAt(0) === '&' ? '$2' : '').trim();
 }

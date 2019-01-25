@@ -9,7 +9,7 @@ function createWindow () {
   mainWindow.loadURL(url.format(path.join(__dirname, 'index.html')));
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.once('ready-to-show', () => mainWindow.show());
 

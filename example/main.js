@@ -8,7 +8,7 @@ function createWindow() {
     mainWindow = new electron_1.BrowserWindow({ width: 800, height: 600, show: false, frame: false });
     mainWindow.loadURL(url.format(path.join(__dirname, 'index.html')));
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
     mainWindow.once('ready-to-show', function () { return mainWindow.show(); });
     mainWindow.on('closed', function () {
         mainWindow = null;
