@@ -373,13 +373,15 @@ export class Titlebar extends Themebar {
 				this._options.itemBackgroundColor.equals(backgroundColor) ? new Color(new RGBA(0, 0, 0, .14)) : this._options.itemBackgroundColor;
 			const fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND;
 
-			this.menubar.setStyles({
-				backgroundColor: backgroundColor,
-				foregroundColor: foregroundColor,
-				selectionBackgroundColor: bgColor,
-				selectionForegroundColor: fgColor,
-				separatorColor: foregroundColor
-			});
+			if (this.menubar) {
+				this.menubar.setStyles({
+					backgroundColor: backgroundColor,
+					foregroundColor: foregroundColor,
+					selectionBackgroundColor: bgColor,
+					selectionForegroundColor: fgColor,
+					separatorColor: foregroundColor
+				});
+			}
 		}
 	}
 
@@ -445,12 +447,12 @@ export class Titlebar extends Themebar {
 			this.menubar = new Menubar(this.menubarContainer, this._options);
 			this.menubar.setupMenubar();
 
-			if (!isMacintosh) {
-				this._register(this.menubar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e)));
-				this._register(this.menubar.onFocusStateChange(e => this.onMenubarFocusChanged(e)));
-			}
+			this._register(this.menubar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e)));
+			this._register(this.menubar.onFocusStateChange(e => this.onMenubarFocusChanged(e)));
 
 			this.updateStyles();
+		} else {
+			remote.Menu.setApplicationMenu(menu);
 		}
 	}
 
