@@ -451,6 +451,8 @@ export class Titlebar extends Themebar {
 			this._register(this.menubar.onFocusStateChange(e => this.onMenubarFocusChanged(e)));
 
 			this.updateStyles();
+		} else {
+			remote.Menu.setApplicationMenu(menu);
 		}
 	}
 
