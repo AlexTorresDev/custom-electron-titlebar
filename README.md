@@ -11,30 +11,6 @@ This project is a typescript library for electron that allows you to configure a
 
 ![Preview 3](screenshots/window_3.png)
 
-## Whats new?
-
-### Version 3.0.0
-- The entire project code was redesigned.
-- New methods are added.
-- Bugs fixed [#3](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/3), [#4](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/4) and [#5](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/5)
-- Change `TitlebarConstructorOptions` for `TitlebarOptions`.
-- Added several improvements of [#9](https://github.com/AlexTorresSk/custom-electron-titlebar/pull/9)
-- Now you can manipulate the menu using the keyboard.
-
-### Version 2
-- TitleBar is changed to Titlebar.
-- TitleBarIconStyle is changed to Themebar.
-- Fixed the error of [#2](https://github.com/AlexTorresSk/custom-electron-titlebar/issues/2) when the main electron file is `.ts`
-- Changed `Themebar.win()` to `Themebar.win`
-- Changed `Themebar.mac()` to `Themebar.mac`
-
-### Version 1
-- You can select the style of icons between windows and mac.
-- You can sort the items in the title bar.
-- You can add a shadow under the title bar.
-- Now all the icons are shown, but those that are defined as false are disabled and are clearer.
-- Bug fixes for options
-
 ## Install
 
 ```
@@ -198,9 +174,8 @@ titlebar.dispose();
 
 ## Contributing
 
-Many thanks to contributor [**Pavel Erokhin** (@MairwunNx)](https://github.com/MairwunNx) and to all the people who support this project through issues and pull request.
-
-**Note:** If you want to contribute with this project, all the issues and pull request are welcome.
+Many thanks to all the people who support this project through issues and pull request.
+If you want to contribute with this project, all the issues and pull request are welcome.
 
 ## License
 
