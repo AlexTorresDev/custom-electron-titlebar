@@ -13,7 +13,6 @@ import { MenuItemConstructorOptions, BrowserWindow, remote } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
-import { setImmediate } from '../common/platform';
 
 export interface IMenuItem extends MenuItemConstructorOptions {
 	render(element: HTMLElement): void;

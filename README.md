@@ -27,19 +27,16 @@ In your renderer file or in a script tag of your html add:
 const customTitlebar = require('custom-electron-titlebar');
 
 new customTitlebar.Titlebar({
-	backgroundColor: customTitlebar.Color.fromHex('#444'),
-	icon: 'appicon.svg',
-	minimizable: false
+	backgroundColor: customTitlebar.Color.fromHex('#444')
 });
 ```
 
 > if you are using _typescript_
 ```ts
-import { Titlebar, Themebar, Color } from 'custom-electron-titlebar'
+import { Titlebar, Color } from 'custom-electron-titlebar'
 
 new Titlebar({
-	backgroundColor: Color.fromHex('#ECECEC');
-	icon: 'appicon.png'
+	backgroundColor: Color.fromHex('#ECECEC')
 });
 ```
 
@@ -112,7 +109,7 @@ menu.append(new MenuItem({
 	submenu: [
 		{
 			label: 'Subitem 1',
-			click() { console.log('Click on subitem 1') }
+			click: () => console.log('Click on subitem 1')
 		},
 		{
 			type: 'separator'
@@ -136,7 +133,7 @@ menu.append(new MenuItem({
 			submenu: [
 				{
 					label: 'Submenu &item 1',
-					acelerator: 'Ctrl+T'
+					accelerator: 'Ctrl+T'
 				}
 			]
 		}

@@ -13,7 +13,7 @@ import { Color, RGBA } from './common/color';
 import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from './common/dom';
 import { Menubar, MenubarOptions } from './menubar';
 import { remote, BrowserWindow } from 'electron';
-import { CssStyle, Theme, Themebar } from './themebar';
+import { Theme, Themebar } from './themebar';
 
 const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');
 const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
@@ -31,7 +31,7 @@ export interface TitlebarOptions extends MenubarOptions {
 	icon?: string;
 	/**
 	 * Style of the icons.
-	 * You can create your custom style using [`Theme`](https://github.com/AlexTorresSk/custom-electron-titlebar/custom-icons)
+	 * You can create your custom style using [`Theme`](https://github.com/AlexTorresSk/custom-electron-titlebar/THEMES.md)
 	 */
 	iconsTheme?: Theme;
 	/**

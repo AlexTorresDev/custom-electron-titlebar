@@ -10,7 +10,7 @@
 
 import { Color } from './common/color';
 import { MenuItemConstructorOptions, remote } from 'electron';
-import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode, isAncestor } from './common/dom';
+import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode, isAncestor, EventLike, EventHelper } from './common/dom';
 import { Menu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu/menu';
 import { StandardKeyboardEvent } from './browser/keyboardEvent';
 import { KeyCodeUtils, KeyCode } from './common/keyCodes';
@@ -43,7 +43,8 @@ export interface MenubarOptions {
 	itemBackgroundColor?: Color;
 }
 
-interface CustomItem extends MenuItemConstructorOptions {
+interface CustomItem {
+	menuItem: MenuItemConstructorOptions;
 	buttonElement: HTMLElement;
 	titleElement: HTMLElement;
 	submenu: Electron.Menu;
@@ -248,7 +249,9 @@ export class Menubar extends Disposable {
 				if (this.isOpen && !this.isCurrentMenu(menuIndex)) {
 					this.menuItems[menuIndex].buttonElement.focus();
 					this.cleanupMenu();
-					this.showMenu(menuIndex, false);
+					if (this.menuItems[menuIndex].submenu) {
+						this.showMenu(menuIndex, false);
+					}
 				} else if (this.isFocused && !this.isOpen) {
 					this.focusedMenu = { index: menuIndex };
 					buttonElement.focus();
@@ -256,11 +259,21 @@ export class Menubar extends Disposable {
 			}));
 
 			this.menuItems.push({
+				menuItem: menubarMenu,
 				submenu: menubarMenu.submenu as Electron.Menu,
 				buttonElement: buttonElement,
 				titleElement: titleElement
 			});
 		});
+	}
+
+	private onClick(menuIndex: number) {
+		let electronEvent: Electron.Event;
+		const item = this.menuItems[menuIndex].menuItem;
+
+		if (item.click) {
+			item.click(item as Electron.MenuItem, remote.getCurrentWindow(), electronEvent);
+		}
 	}
 
 	public get onVisibilityChange(): Event<boolean> {
@@ -358,8 +371,8 @@ export class Menubar extends Disposable {
 					}
 				}
 
-
 				break;
+			
 			case MenubarState.VISIBLE:
 				if (!isVisible) {
 					this.showMenubar();
@@ -383,6 +396,7 @@ export class Menubar extends Disposable {
 				}
 
 				break;
+			
 			case MenubarState.FOCUSED:
 				if (!isVisible) {
 					this.showMenubar();
@@ -395,15 +409,20 @@ export class Menubar extends Disposable {
 				if (this.focusedMenu) {
 					this.menuItems[this.focusedMenu.index].buttonElement.focus();
 				}
+
 				break;
+			
 			case MenubarState.OPEN:
 				if (!isVisible) {
 					this.showMenubar();
 				}
 
 				if (this.focusedMenu) {
-					this.showMenu(this.focusedMenu.index, this.openedViaKeyboard);
+					if (this.menuItems[this.focusedMenu.index].submenu) {
+						this.showMenu(this.focusedMenu.index, this.openedViaKeyboard);
+					}
 				}
+
 				break;
 		}
 
@@ -448,7 +467,9 @@ export class Menubar extends Disposable {
 
 		if (this.isOpen) {
 			this.cleanupMenu();
-			this.showMenu(newFocusedIndex);
+			if (this.menuItems[newFocusedIndex].submenu) {
+				this.showMenu(newFocusedIndex);
+			}
 		} else if (this.isFocused) {
 			this.focusedMenu.index = newFocusedIndex;
 			this.menuItems[newFocusedIndex].buttonElement.focus();
@@ -468,7 +489,9 @@ export class Menubar extends Disposable {
 
 		if (this.isOpen) {
 			this.cleanupMenu();
-			this.showMenu(newFocusedIndex);
+			if (this.menuItems[newFocusedIndex].submenu) {
+				this.showMenu(newFocusedIndex);
+			}
 		} else if (this.isFocused) {
 			this.focusedMenu.index = newFocusedIndex;
 			this.menuItems[newFocusedIndex].buttonElement.focus();
@@ -502,12 +525,21 @@ export class Menubar extends Disposable {
 				this.setUnfocusedState();
 			} else {
 				this.cleanupMenu();
-				this.showMenu(menuIndex, this.openedViaKeyboard);
+				if (this.menuItems[menuIndex].submenu) {
+					this.showMenu(menuIndex, this.openedViaKeyboard);
+				} else {
+					this.onClick(menuIndex);
+				}
 			}
 		} else {
 			this.focusedMenu = { index: menuIndex };
 			this.openedViaKeyboard = !clicked;
-			this.focusState = MenubarState.OPEN;
+
+			if (this.menuItems[menuIndex].submenu) {
+				this.focusState = MenubarState.OPEN;
+			} else {
+				this.onClick(menuIndex);
+			}
 		}
 	}
 

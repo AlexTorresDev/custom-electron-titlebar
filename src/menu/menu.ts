@@ -332,7 +332,6 @@ export class Menu extends Disposable {
 		do {
 			this.focusedItem = (this.focusedItem + 1) % this.items.length;
 			item = this.items[this.focusedItem];
-			console.log('item', item, item.isEnabled());
 		} while (this.focusedItem !== startIndex && !item.isEnabled());
 
 		if (this.focusedItem === startIndex && !item.isEnabled()) {
