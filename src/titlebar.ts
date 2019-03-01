@@ -335,11 +335,9 @@ export class Titlebar extends Themebar {
 	private onDidChangeFullscreen(fullscreen: boolean) {
 		if (!isMacintosh) {
 			if (fullscreen) {
-				hide(this.titlebar);
-				this.container.style.top = '0px';
+				hide(this.appIcon, this.title, this.windowControls);
 			} else {
-				show(this.titlebar);
-				this.container.style.top = `${this.titlebar.getBoundingClientRect().bottom}px`;
+				show(this.appIcon, this.title, this.windowControls);
 			}
 		}
 	}
@@ -504,11 +502,11 @@ export class Titlebar extends Themebar {
 		this.menubar.dispose();
 		super.dispose();
 		removeNode(this.titlebar);
-		
+
 		while (this.container.firstChild) {
 			append(document.body, this.container.firstChild);
 		}
-		
+
 		removeNode(this.container);
 	}
 

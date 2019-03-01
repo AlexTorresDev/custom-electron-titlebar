@@ -442,12 +442,6 @@ export class Menubar extends Disposable {
 	}
 
 	private setUnfocusedState(): void {
-		if (remote.getCurrentWindow().isFullScreen()) {
-			this.focusState = MenubarState.HIDDEN;
-		} else {
-			this.focusState = MenubarState.VISIBLE;
-		}
-
 		this.ignoreNextMouseUp = false;
 		this.mnemonicsInUse = false;
 		this.updateMnemonicVisibility(false);
