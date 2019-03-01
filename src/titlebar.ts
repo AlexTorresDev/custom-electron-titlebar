@@ -325,9 +325,9 @@ export class Titlebar extends Themebar {
 
 		if (this.resizer) {
 			if (maximized) {
-				hide(...[this.resizer.top, this.resizer.left]);
+				hide(this.resizer.top, this.resizer.left);
 			} else {
-				show(...[this.resizer.top, this.resizer.left]);
+				show(this.resizer.top, this.resizer.left);
 			}
 		}
 	}
