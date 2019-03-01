@@ -28,6 +28,7 @@ electron_1.app.on('activate', function () {
 var template = [
     {
         label: 'Edit',
+        enabled: false,
         submenu: [
             { role: 'undo' },
             { role: 'redo' },
@@ -62,6 +63,7 @@ var template = [
             {
                 label: 'Toggle Full Screen',
                 type: 'checkbox',
+                enabled: false,
                 click: function () { mainWindow.setFullScreen(!mainWindow.isFullScreen()); }
             }
         ]

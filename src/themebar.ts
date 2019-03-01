@@ -13,7 +13,7 @@ class ThemingRegistry extends Disposable {
 
     constructor() {
         super();
-        
+
         this.theming = [];
     }
 
@@ -82,7 +82,7 @@ export class Themebar extends ThemingRegistry {
             }
             `);
         });
-        
+
         // Drag region
         this.registerTheme((collector: CssStyle) => {
             collector.addRule(`
@@ -98,7 +98,7 @@ export class Themebar extends ThemingRegistry {
             }
             `);
         });
-        
+
         // icon app
         this.registerTheme((collector: CssStyle) => {
             collector.addRule(`
@@ -114,7 +114,7 @@ export class Themebar extends ThemingRegistry {
             }
             `);
         });
-        
+
         // Menubar
         this.registerTheme((collector: CssStyle) => {
             collector.addRule(`
@@ -144,9 +144,13 @@ export class Themebar extends ThemingRegistry {
                 outline: 0;
             }
 
-            .menubar .menubar-menu-button:focus,
-			.menubar .menubar-menu-button.open,
-			.menubar .menubar-menu-button:hover {
+            .menubar .menubar-menu-button.disabled {
+                opacity: 0.4;
+            }
+
+            .menubar .menubar-menu-button:not(.disabled):focus,
+			.menubar .menubar-menu-button:not(.disabled).open,
+			.menubar .menubar-menu-button:not(.disabled):hover {
 				background-color: rgba(255, 255, 255, .1);
 			}
 	
@@ -287,7 +291,7 @@ export class Themebar extends ThemingRegistry {
             }
             `);
         });
-        
+
         // Title
         this.registerTheme((collector: CssStyle) => {
             collector.addRule(`
@@ -302,7 +306,7 @@ export class Themebar extends ThemingRegistry {
             }
             `);
         });
-        
+
         // Window controls
         this.registerTheme((collector: CssStyle) => {
             collector.addRule(`
@@ -346,7 +350,7 @@ export class Themebar extends ThemingRegistry {
 
     protected registerTheme(theme: Theme) {
         this.onThemeChange(theme);
-    
+
         let cssRules: string[] = [];
         let hasRule: { [rule: string]: boolean } = {};
         let ruleCollector = {
@@ -357,9 +361,9 @@ export class Themebar extends ThemingRegistry {
                 }
             }
         };
-    
+
         this.getTheming().forEach(p => p(ruleCollector));
-    
+
         _applyRules(cssRules.join('\n'), 'titlebar-style');
     }
 

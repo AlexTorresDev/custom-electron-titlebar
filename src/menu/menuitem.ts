@@ -78,8 +78,9 @@ export class MenuItem extends Disposable implements IMenuItem {
 		}));
 
 		this._register(addDisposableListener(this.container, EventType.CLICK, e => {
-			EventHelper.stop(e, true);
-			this.onClick(e);
+			if (this.item.enabled) {
+				this.onClick(e);
+			}
 		}));
 
 		this._register(addDisposableListener(this.container, EventType.DBLCLICK, e => {

@@ -188,6 +188,9 @@ export class Menubar extends Disposable {
 			const cleanMenuLabel = cleanMnemonic(menubarMenu.label);
 
 			const buttonElement = $('div.menubar-menu-button', { 'role': 'menuitem', 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
+			if (!menubarMenu.enabled) {
+				addClass(buttonElement, 'disabled');
+			}
 			const titleElement = $('div.menubar-menu-title', { 'role': 'none', 'aria-hidden': true });
 
 			buttonElement.appendChild(titleElement);
@@ -204,66 +207,68 @@ export class Menubar extends Disposable {
 
 			this.updateLabels(titleElement, buttonElement, menubarMenu.label);
 
-			this._register(addDisposableListener(buttonElement, EventType.KEY_UP, (e) => {
-				let event = new StandardKeyboardEvent(e as KeyboardEvent);
-				let eventHandled = true;
+			if (menubarMenu.enabled) {
+				this._register(addDisposableListener(buttonElement, EventType.KEY_UP, (e) => {
+					let event = new StandardKeyboardEvent(e as KeyboardEvent);
+					let eventHandled = true;
 
-				if ((event.equals(KeyCode.DownArrow) || event.equals(KeyCode.Enter)) && !this.isOpen) {
-					this.focusedMenu = { index: menuIndex };
-					this.openedViaKeyboard = true;
-					this.focusState = MenubarState.OPEN;
-				} else {
-					eventHandled = false;
-				}
+					if ((event.equals(KeyCode.DownArrow) || event.equals(KeyCode.Enter)) && !this.isOpen) {
+						this.focusedMenu = { index: menuIndex };
+						this.openedViaKeyboard = true;
+						this.focusState = MenubarState.OPEN;
+					} else {
+						eventHandled = false;
+					}
 
-				if (eventHandled) {
-					event.preventDefault();
-					event.stopPropagation();
-				}
-			}));
+					if (eventHandled) {
+						event.preventDefault();
+						event.stopPropagation();
+					}
+				}));
 
-			this._register(addDisposableListener(buttonElement, EventType.MOUSE_DOWN, (e) => {
-				if (!this.isOpen) {
-					// Open the menu with mouse down and ignore the following mouse up event
-					this.ignoreNextMouseUp = true;
-					this.onMenuTriggered(menuIndex, true);
-				} else {
-					this.ignoreNextMouseUp = false;
-				}
-
-				e.preventDefault();
-				e.stopPropagation();
-			}));
-
-			this._register(addDisposableListener(buttonElement, EventType.MOUSE_UP, () => {
-				if (!this.ignoreNextMouseUp) {
-					if (this.isFocused) {
+				this._register(addDisposableListener(buttonElement, EventType.MOUSE_DOWN, (e) => {
+					if (!this.isOpen) {
+						// Open the menu with mouse down and ignore the following mouse up event
+						this.ignoreNextMouseUp = true;
 						this.onMenuTriggered(menuIndex, true);
+					} else {
+						this.ignoreNextMouseUp = false;
 					}
-				} else {
-					this.ignoreNextMouseUp = false;
-				}
-			}));
 
-			this._register(addDisposableListener(buttonElement, EventType.MOUSE_ENTER, () => {
-				if (this.isOpen && !this.isCurrentMenu(menuIndex)) {
-					this.menuItems[menuIndex].buttonElement.focus();
-					this.cleanupMenu();
-					if (this.menuItems[menuIndex].submenu) {
-						this.showMenu(menuIndex, false);
+					e.preventDefault();
+					e.stopPropagation();
+				}));
+
+				this._register(addDisposableListener(buttonElement, EventType.MOUSE_UP, () => {
+					if (!this.ignoreNextMouseUp) {
+						if (this.isFocused) {
+							this.onMenuTriggered(menuIndex, true);
+						}
+					} else {
+						this.ignoreNextMouseUp = false;
 					}
-				} else if (this.isFocused && !this.isOpen) {
-					this.focusedMenu = { index: menuIndex };
-					buttonElement.focus();
-				}
-			}));
+				}));
 
-			this.menuItems.push({
-				menuItem: menubarMenu,
-				submenu: menubarMenu.submenu as Electron.Menu,
-				buttonElement: buttonElement,
-				titleElement: titleElement
-			});
+				this._register(addDisposableListener(buttonElement, EventType.MOUSE_ENTER, () => {
+					if (this.isOpen && !this.isCurrentMenu(menuIndex)) {
+						this.menuItems[menuIndex].buttonElement.focus();
+						this.cleanupMenu();
+						if (this.menuItems[menuIndex].submenu) {
+							this.showMenu(menuIndex, false);
+						}
+					} else if (this.isFocused && !this.isOpen) {
+						this.focusedMenu = { index: menuIndex };
+						buttonElement.focus();
+					}
+				}));
+
+				this.menuItems.push({
+					menuItem: menubarMenu,
+					submenu: menubarMenu.submenu as Electron.Menu,
+					buttonElement: buttonElement,
+					titleElement: titleElement
+				});
+			}
 		});
 	}
 
@@ -372,7 +377,7 @@ export class Menubar extends Disposable {
 				}
 
 				break;
-			
+
 			case MenubarState.VISIBLE:
 				if (!isVisible) {
 					this.showMenubar();
@@ -396,7 +401,7 @@ export class Menubar extends Disposable {
 				}
 
 				break;
-			
+
 			case MenubarState.FOCUSED:
 				if (!isVisible) {
 					this.showMenubar();
@@ -411,7 +416,7 @@ export class Menubar extends Disposable {
 				}
 
 				break;
-			
+
 			case MenubarState.OPEN:
 				if (!isVisible) {
 					this.showMenubar();
@@ -442,6 +447,7 @@ export class Menubar extends Disposable {
 	}
 
 	private setUnfocusedState(): void {
+		this.focusState = MenubarState.VISIBLE;
 		this.ignoreNextMouseUp = false;
 		this.mnemonicsInUse = false;
 		this.updateMnemonicVisibility(false);
@@ -522,7 +528,9 @@ export class Menubar extends Disposable {
 				if (this.menuItems[menuIndex].submenu) {
 					this.showMenu(menuIndex, this.openedViaKeyboard);
 				} else {
-					this.onClick(menuIndex);
+					if (this.menuItems[menuIndex].menuItem.enabled) {
+						this.onClick(menuIndex);
+					}
 				}
 			}
 		} else {
@@ -532,7 +540,9 @@ export class Menubar extends Disposable {
 			if (this.menuItems[menuIndex].submenu) {
 				this.focusState = MenubarState.OPEN;
 			} else {
-				this.onClick(menuIndex);
+				if (this.menuItems[menuIndex].menuItem.enabled) {
+					this.onClick(menuIndex);
+				}
 			}
 		}
 	}

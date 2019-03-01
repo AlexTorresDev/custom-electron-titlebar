@@ -35,6 +35,7 @@ app.on('activate', () => {
 const template: MenuItemConstructorOptions[] = [
   {
     label: 'Edit',
+    enabled: false,
     submenu: [
       {role: 'undo'},
       {role: 'redo'},
@@ -69,6 +70,7 @@ const template: MenuItemConstructorOptions[] = [
       {
         label: 'Toggle Full Screen',
         type: 'checkbox',
+        enabled: false,
         click() { mainWindow.setFullScreen(!mainWindow.isFullScreen()) }
       }
     ]
