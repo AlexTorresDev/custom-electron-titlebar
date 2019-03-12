@@ -332,9 +332,9 @@ export class Menu extends Disposable {
 		do {
 			this.focusedItem = (this.focusedItem + 1) % this.items.length;
 			item = this.items[this.focusedItem];
-		} while (this.focusedItem !== startIndex && !item.isEnabled());
+		} while ((this.focusedItem !== startIndex && !item.isEnabled()) || item.isSeparator());
 
-		if (this.focusedItem === startIndex && !item.isEnabled()) {
+		if ((this.focusedItem === startIndex && !item.isEnabled()) || item.isSeparator()) {
 			this.focusedItem = undefined;
 		}
 
@@ -357,9 +357,9 @@ export class Menu extends Disposable {
 			}
 
 			item = this.items[this.focusedItem];
-		} while (this.focusedItem !== startIndex && !item.isEnabled());
+		} while ((this.focusedItem !== startIndex && !item.isEnabled()) || item.isSeparator());
 
-		if (this.focusedItem === startIndex && !item.isEnabled()) {
+		if ((this.focusedItem === startIndex && !item.isEnabled()) || item.isSeparator()) {
 			this.focusedItem = undefined;
 		}
 

@@ -17,6 +17,7 @@ import { Disposable } from "../common/lifecycle";
 export interface IMenuItem extends MenuItemConstructorOptions {
 	render(element: HTMLElement): void;
 	isEnabled(): boolean;
+	isSeparator(): boolean;
 	focus(): void;
 	blur(): void;
 	dispose(): void;
@@ -66,6 +67,10 @@ export class MenuItem extends Disposable implements IMenuItem {
 
 	isEnabled(): boolean {
 		return this.item.enabled;
+	}
+
+	isSeparator(): boolean {
+		return this.item.type === 'separator';
 	}
 
 	render(container: HTMLElement): void {
