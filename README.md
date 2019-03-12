@@ -1,9 +1,9 @@
-# Custom Electron Titlebar
+# CET (before, Custom Electron Titlebar)
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
-[![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
+[![LICENSE](https://img.shields.io/github/license/Inceldes/cet.svg)](https://github.com/Inceldes/cet/blob/master/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/cet.svg)](https://npmjs.org/package/@inceldes/cet)
 
 ![Preview 1](screenshots/window_1.png)
 
@@ -13,18 +13,26 @@ This project is a typescript library for electron that allows you to configure a
 
 ## Install
 
+If you were using `custom-electron-titlebar` uninstall using:
+
 ```
-npm i custom-electron-titlebar
+npm remove custom-electron-titlebar
 ```
 
-or use the base project [custom-electron-titlebar-quickstart](https://github.com/AlexTorresSk/custom-electron-titlebar-quickstart)
+Then install the new package
+
+```
+npm i @inceldes/cet
+```
+
+or use the base project [cet-quickstart](https://github.com/AlexTorresSk/cet-quickstart)
 
 ## Usage
 
 In your renderer file or in a script tag of your html add:
 
 ```js
-const customTitlebar = require('custom-electron-titlebar');
+const customTitlebar = require('@inceldes/cet');
 
 new customTitlebar.Titlebar({
 	backgroundColor: customTitlebar.Color.fromHex('#444')
@@ -33,7 +41,7 @@ new customTitlebar.Titlebar({
 
 > if you are using _typescript_
 ```ts
-import { Titlebar, Color } from 'custom-electron-titlebar'
+import { Titlebar, Color } from '@inceldes/cet'
 
 new Titlebar({
 	backgroundColor: Color.fromHex('#ECECEC')
@@ -54,9 +62,9 @@ The interface [`TitleBarOptions`] is managed, which has the following configurab
 | iconsTheme               | Theme            | Style of the icons.                                                                   | Themebar.win              |
 | shadow                   | boolean          | The shadow of the titlebar.                                                           | false                     |
 | drag                     | boolean          | Define whether or not you can drag the window by holding the click on the title bar.  | true                      |
-| minimizable              | boolean          | Define if the minimize window button is displayed.                                    | true                      |
-| maximizable              | boolean          | Define if the maximize and restore window buttons are displayed.                      | true                      |
-| closeable                | boolean          | Define if the close window button is displayed.                                       | true                      |
+| minimizable              | boolean          | Enables or disables the option to minimize the window by clicking on the corresponding button in the title bar.                                    | true                      |
+| maximizable              | boolean          | Enables or disables the option to maximize and un-maximize the window by clicking on the corresponding button in the title bar.                      | true                      |
+| closeable                | boolean          | Enables or disables the option of the close window by clicking on the corresponding button in the title bar.                                       | true                      |
 | order                    | string           | Set the order of the elements on the title bar. (`inverted`, `first-buttons`)         | null                      |
 | titleHorizontalAlignment | string           | Set horizontal alignment of the window title. (`left`, `center`, `right`)             | center                    |
 | menu                     | Electron.Menu    | The menu to show in the title bar.                                                    | Menu.getApplicationMenu() |
@@ -176,4 +184,4 @@ If you want to contribute with this project, all the issues and pull request are
 
 ## License
 
-This project is under the [MIT](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE) license.
+This project is under the [MIT](https://github.com/Inceldes/cet/blob/master/LICENSE) license.
