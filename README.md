@@ -1,9 +1,9 @@
-# Custom Electron Titlebar
+# CET (before: Custom Electron Titlebar)
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
-[![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
+[![LICENSE](https://img.shields.io/github/license/Inceldes/CET.svg)](https://github.com/Inceldes/CET/blob/master/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/CET.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
 ![Preview 1](screenshots/window_1.png)
 
