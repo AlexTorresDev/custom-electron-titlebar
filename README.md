@@ -184,8 +184,4 @@ If you want to contribute with this project, all the issues and pull request are
 
 ## License
 
-<<<<<<< HEAD
 This project is under the [MIT](https://github.com/Inceldes/cet/blob/master/LICENSE) license.
-=======
-This project is under the [MIT](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE) license.
->>>>>>> 4031133b260a8eb5207e3c4e7c5c6600fa0173e9

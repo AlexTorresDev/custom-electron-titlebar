@@ -1,5 +1,5 @@
 {
-  "name": "@inceldes/CET",
+  "name": "@inceldes/cet",
   "version": "1.0.0",
   "description": "CET is a library for electron that allows you to configure a fully customizable title bar.",
   "main": "lib/index.js",
@@ -8,11 +8,11 @@
     "start": "tsc ./example/main && tsc ./example/renderer && electron ./example/main.js",
     "build": "tsc"
   },
-  "author": "Alex Torres",
+  "author": "Inceldes",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Inceldes/CET.git"
+    "url": "git+https://github.com/Inceldes/cet.git"
   },
   "keywords": [
     "typescript",
@@ -23,9 +23,9 @@
     "linux"
   ],
   "bugs": {
-    "url": "https://github.com/Inceldes/CET/issues"
+    "url": "https://github.com/Inceldes/cet/issues"
   },
-  "homepage": "https://github.com/Inceldes/CET#readme",
+  "homepage": "https://github.com/Inceldes/cet#readme",
   "directories": {
     "example": "example",
     "lib": "lib"
