@@ -20,6 +20,10 @@ const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
 const INACTIVE_FOREGROUND = Color.fromHex('#EEEEEE');
 const ACTIVE_FOREGROUND = Color.fromHex('#FFFFFF');
 
+const BOTTOM_TITLEBAR_HEIGHT = '60px'
+const TOP_TITLEBAR_HEIGHT_MAC = '22px'
+const TOP_TITLEBAR_HEIGHT_WIN = '30px'
+
 export interface TitlebarOptions extends MenubarOptions {
 	/**
 	 * The background color of the titlebar.
@@ -142,7 +146,11 @@ export class Titlebar extends Themebar {
 	private createTitlebar() {
 		// Content container
 		this.container = $('div.container-after-titlebar');
-		this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? '60px' : '30px';
+		if (isMacintosh) {
+			this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
+		} else {
+			this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
+		}
 		this.container.style.right = '0';
 		this.container.style.bottom = '0';
 		this.container.style.left = '0';
@@ -461,9 +469,14 @@ export class Titlebar extends Themebar {
 	 */
 	updateMenuPosition(menuPosition: "left" | "bottom") {
 		this._options.menuPosition = menuPosition;
-		this.titlebar.style.height = this._options.menuPosition && this._options.menuPosition === 'bottom' ? '60px' : '30px';
+		if (isMacintosh) {
+			this.titlebar.style.height = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
+			this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
+		} else {
+			this.titlebar.style.height = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
+			this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
+		}
 		this.titlebar.style.webkitFlexWrap = this._options.menuPosition && this._options.menuPosition === 'bottom' ? 'wrap' : null;
-		this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? '60px' : '30px';
 
 		if (this._options.menuPosition === 'bottom') {
 			addClass(this.menubarContainer, 'bottom');
