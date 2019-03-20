@@ -148,6 +148,7 @@ export class Titlebar extends Themebar {
 		this.container.style.left = '0';
 		this.container.style.position = 'absolute';
 		this.container.style.overflow = 'auto';
+		this.container.style.height = '100%';
 
 		while (document.body.firstChild) {
 			append(this.container, document.body.firstChild);
