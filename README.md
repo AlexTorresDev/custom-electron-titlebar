@@ -3,7 +3,7 @@
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
 [![LICENSE](https://img.shields.io/github/license/Inceldes/cet.svg)](https://github.com/Inceldes/cet/blob/master/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/cet.svg)](https://npmjs.org/package/@inceldes/cet)
+[![NPM Version](https://img.shields.io/npm/v/@inceldes/cet.svg)](https://npmjs.org/package/@inceldes/cet)
 
 ![Preview 1](screenshots/window_1.png)
 
