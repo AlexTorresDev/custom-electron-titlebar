@@ -146,10 +146,20 @@ export class Titlebar extends Themebar {
 	private createTitlebar() {
 		// Content container
 		this.container = $('div.container-after-titlebar');
+		let topTitleBarHeight = '0px'
 		if (isMacintosh) {
-			this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
+			topTitleBarHeight = TOP_TITLEBAR_HEIGHT_MAC;
 		} else {
-			this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
+			topTitleBarHeight = TOP_TITLEBAR_HEIGHT_WIN;
+		}
+		if (this._options.menuPosition === 'bottom'){
+			this.container.style.top = '0px';
+			this.container.style.bottom = BOTTOM_TITLEBAR_HEIGHT;
+			this.container.style.marginBottom = '-' + BOTTOM_TITLEBAR_HEIGHT;
+		} else{
+			this.container.style.top = topTitleBarHeight;
+			this.container.style.bottom = '0px';
+			this.container.style.marginTop = '-' + topTitleBarHeight;
 		}
 		this.container.style.right = '0';
 		this.container.style.bottom = '0';
