@@ -1,9 +1,9 @@
-# CET (before, Custom Electron Titlebar)
+# Custom Electron Titlebar
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
-[![LICENSE](https://img.shields.io/github/license/Inceldes/cet.svg)](https://github.com/Inceldes/cet/blob/master/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/cet.svg)](https://npmjs.org/package/@inceldes/cet)
+[![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/@alextorressk/custom-electron-titlebar)
 
 ![Preview 1](screenshots/window_1.png)
 
@@ -13,16 +13,14 @@ This project is a typescript library for electron that allows you to configure a
 
 ## Install
 
-If you were using `custom-electron-titlebar` uninstall using:
-
 ```
-npm remove custom-electron-titlebar
+npm i custom-electron-titlebar
 ```
 
-Then install the new package
+Or
 
 ```
-npm i @inceldes/cet
+npm install custom-electron-titlebar@latest
 ```
 
 or use the base project [cet-quickstart](https://github.com/AlexTorresSk/cet-quickstart)
@@ -32,7 +30,7 @@ or use the base project [cet-quickstart](https://github.com/AlexTorresSk/cet-qui
 In your renderer file or in a script tag of your html add:
 
 ```js
-const customTitlebar = require('@inceldes/cet');
+const customTitlebar = require('custom-electron-titlebar');
 
 new customTitlebar.Titlebar({
 	backgroundColor: customTitlebar.Color.fromHex('#444')
@@ -41,7 +39,7 @@ new customTitlebar.Titlebar({
 
 > if you are using _typescript_
 ```ts
-import { Titlebar, Color } from '@inceldes/cet'
+import { Titlebar, Color } from 'custom-electron-titlebar'
 
 new Titlebar({
 	backgroundColor: Color.fromHex('#ECECEC')
@@ -184,4 +182,4 @@ If you want to contribute with this project, all the issues and pull request are
 
 ## License
 
-This project is under the [MIT](https://github.com/Inceldes/cet/blob/master/LICENSE) license.
+This project is under the [MIT](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE) license.

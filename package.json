@@ -1,7 +1,7 @@
 {
-  "name": "@inceldes/cet",
-  "version": "1.0.1",
-  "description": "CET is a library for electron that allows you to configure a fully customizable title bar.",
+  "name": "custom-electron-titlebar",
+  "version": "3.0.6",
+  "description": "Custom Electron Titlebar is a library for electron that allows you to configure a fully customizable title bar.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Inceldes/cet.git"
+    "url": "git+https://github.com/AlexTorresSk/custom-electron-titlebar.git"
   },
   "keywords": [
     "typescript",
@@ -23,9 +23,9 @@
     "linux"
   ],
   "bugs": {
-    "url": "https://github.com/Inceldes/cet/issues"
+    "url": "https://github.com/AlexTorresSk/custom-electron-titlebar/issues"
   },
-  "homepage": "https://github.com/Inceldes/cet#readme",
+  "homepage": "https://github.com/AlexTorresSk/custom-electron-titlebar#readme",
   "directories": {
     "example": "example",
     "lib": "lib"
