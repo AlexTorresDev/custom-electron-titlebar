@@ -1063,15 +1063,19 @@ export function join(nodes: Node[], separator: Node | string): Node[] {
 
 export function show(...elements: HTMLElement[]): void {
 	for (let element of elements) {
-		element.style.display = '';
-		element.removeAttribute('aria-hidden');
+		if (element) {
+			element.style.display = '';
+			element.removeAttribute('aria-hidden');
+		}
 	}
 }
 
 export function hide(...elements: HTMLElement[]): void {
 	for (let element of elements) {
-		element.style.display = 'none';
-		element.setAttribute('aria-hidden', 'true');
+		if (element) {
+			element.style.display = 'none';
+			element.setAttribute('aria-hidden', 'true');
+		}
 	}
 }
 
