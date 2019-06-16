@@ -9,10 +9,11 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { MenuItemConstructorOptions, BrowserWindow, remote } from "electron";
+import { MenuItemConstructorOptions, BrowserWindow, remote, Accelerator } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
+import { isMacintosh } from "../common/platform";
 
 export interface IMenuItem extends MenuItemConstructorOptions {
 	render(element: HTMLElement): void;
@@ -112,7 +113,7 @@ export class MenuItem extends Disposable implements IMenuItem {
 		this.labelElement = append(this.itemElement, $('span.action-label'));
 
 		if (this.item.label && this.item.accelerator) {
-			append(this.itemElement, $('span.keybinding')).textContent = this.item.accelerator.toString();
+			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(this.item.accelerator);
 		}
 
 		this.updateLabel();
@@ -184,7 +185,7 @@ export class MenuItem extends Disposable implements IMenuItem {
 			title = this.item.label;
 
 			if (this.item.accelerator) {
-				title = this.item.accelerator.toString();
+				title = parseAccelerator(this.item.accelerator);
 			}
 		}
 
@@ -245,4 +246,18 @@ export class MenuItem extends Disposable implements IMenuItem {
 		this.menuStyle = style;
 		this.applyStyle();
 	}
+}
+
+function parseAccelerator(a: Accelerator): string {
+	var accelerator = a.toString();
+
+	if (!isMacintosh) {
+		accelerator = accelerator.replace(/(Cmd)|(Command)/gi, '');
+	} else {
+		accelerator = accelerator.replace(/(Ctrl)|(Control)/gi, '');
+	}
+
+	accelerator = accelerator.replace(/(Or)/gi, '');
+
+	return accelerator;
 }

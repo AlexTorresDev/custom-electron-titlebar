@@ -28,12 +28,12 @@ electron_1.app.on('activate', function () {
 var template = [
     {
         label: 'Edit',
-        enabled: false,
+        //enabled: false,
         submenu: [
-            { role: 'undo' },
+            { role: 'undo', accelerator: 'CommandOrControl+Z' },
             { role: 'redo' },
             { type: 'separator' },
-            { role: 'cut' },
+            { role: 'cut', accelerator: 'CmdOrCtrl+X' },
             { role: 'copy' },
             { role: 'paste' },
             { role: 'pasteandmatchstyle' },
