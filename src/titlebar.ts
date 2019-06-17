@@ -147,8 +147,8 @@ export class Titlebar extends Themebar {
 		// Content container
 		this.container = $('div.container-after-titlebar');
 		if (this._options.menuPosition === 'bottom'){
-			this.container.style.top = '0px';
-			this.container.style.bottom = BOTTOM_TITLEBAR_HEIGHT;
+			this.container.style.top = BOTTOM_TITLEBAR_HEIGHT;
+			this.container.style.bottom = '0px';
 		} else{
 			this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN;
 			this.container.style.bottom = '0px';
