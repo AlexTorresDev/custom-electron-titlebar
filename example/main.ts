@@ -71,6 +71,7 @@ const template: MenuItemConstructorOptions[] = [
         label: 'Toggle Full Screen',
         type: 'checkbox',
         enabled: false,
+        accelerator: 'F11',
         click() { mainWindow.setFullScreen(!mainWindow.isFullScreen()) }
       }
     ]
@@ -87,6 +88,7 @@ const template: MenuItemConstructorOptions[] = [
     submenu: [
       {
         label: 'Learn More',
+        accelerator: 'CtrlOrCmd+E',
         click() { require('electron').shell.openExternal('https://electronjs.org') }
       }
     ]

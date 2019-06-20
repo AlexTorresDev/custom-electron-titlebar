@@ -1,9 +1,9 @@
 /*--------------------------------------------------------------------------------------------------------
  *  This file has been modified by @AlexTorresSk (http://github.com/AlexTorresSk)
  *  to work in custom-electron-titlebar.
- * 
+ *
  *  The original copy of this file and its respective license are in https://github.com/Microsoft/vscode/
- * 
+ *
  *  Copyright (c) 2018 Alex Torres
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
@@ -112,10 +112,7 @@ export class MenuItem extends Disposable implements IMenuItem {
 
 		this.labelElement = append(this.itemElement, $('span.action-label'));
 
-		if (this.item.label && this.item.accelerator) {
-			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(this.item.accelerator);
-		}
-
+		this.setAccelerator();
 		this.updateLabel();
 		this.updateTooltip();
 		this.updateEnabled();
@@ -151,6 +148,68 @@ export class MenuItem extends Disposable implements IMenuItem {
 		}
 
 		this.applyStyle();
+	}
+
+	setAccelerator(): void {
+		var accelerator = null;
+
+		if (this.item.role) {
+			switch(this.item.role.toLocaleLowerCase()) {
+				case 'undo':
+					accelerator = 'CtrlOrCmd+Z';
+					break;
+				case 'redo':
+					accelerator = 'CtrlOrCmd+Y';
+					break;
+				case 'cut':
+					accelerator = 'CtrlOrCmd+X';
+					break;
+				case 'copy':
+					accelerator = 'CtrlOrCmd+C';
+					break;
+				case 'paste':
+					accelerator = 'CtrlOrCmd+V';
+					break;
+				case 'selectall':
+					accelerator = 'CtrlOrCmd+A';
+					break;
+				case 'minimize':
+					accelerator = 'CtrlOrCmd+M';
+					break;
+				case 'close':
+					accelerator = 'CtrlOrCmd+W';
+					break;
+				case 'reload':
+					accelerator = 'CtrlOrCmd+R';
+					break;
+				case 'forcereload':
+					accelerator = 'CtrlOrCmd+Mayus+R';
+					break;
+				case 'toggledevtools':
+					accelerator = 'CtrlOrCmd+Mayus+I';
+					break;
+				case 'togglefullscreen':
+					accelerator = 'F11';
+					break;
+				case 'resetzoom':
+					accelerator = 'CtrlOrCmd+0';
+					break;
+				case 'zoomin':
+					accelerator = 'CtrlOrCmd+Mayus+=';
+					break;
+				case 'zoomout':
+					accelerator = 'CtrlOrCmd+-';
+					break;
+			}
+		}
+
+		if (this.item.label && this.item.accelerator) {
+			accelerator = this.item.accelerator;
+		}
+
+		if (accelerator !== null) {
+			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(accelerator);
+		}
 	}
 
 	updateLabel(): void {
