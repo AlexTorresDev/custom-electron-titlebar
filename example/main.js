@@ -28,7 +28,6 @@ electron_1.app.on('activate', function () {
 var template = [
     {
         label: 'Edit',
-        enabled: false,
         submenu: [
             { role: 'undo' },
             { role: 'redo' },
@@ -61,11 +60,8 @@ var template = [
             { role: 'zoomout' },
             { type: 'separator' },
             {
-                label: 'Toggle Full Screen',
-                type: 'checkbox',
-                enabled: false,
-                accelerator: 'F11',
-                click: function () { mainWindow.setFullScreen(!mainWindow.isFullScreen()); }
+                role: 'togglefullscreen',
+                enabled: false
             }
         ]
     },
@@ -81,7 +77,6 @@ var template = [
         submenu: [
             {
                 label: 'Learn More',
-                accelerator: 'CtrlOrCmd+E',
                 click: function () { require('electron').shell.openExternal('https://electronjs.org'); }
             }
         ]

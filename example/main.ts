@@ -35,7 +35,6 @@ app.on('activate', () => {
 const template: MenuItemConstructorOptions[] = [
   {
     label: 'Edit',
-    enabled: false,
     submenu: [
       {role: 'undo'},
       {role: 'redo'},
@@ -68,11 +67,8 @@ const template: MenuItemConstructorOptions[] = [
       {role: 'zoomout'},
       {type: 'separator'},
       {
-        label: 'Toggle Full Screen',
-        type: 'checkbox',
+        role: 'togglefullscreen',
         enabled: false,
-        accelerator: 'F11',
-        click() { mainWindow.setFullScreen(!mainWindow.isFullScreen()) }
       }
     ]
   },
@@ -88,7 +84,6 @@ const template: MenuItemConstructorOptions[] = [
     submenu: [
       {
         label: 'Learn More',
-        accelerator: 'CtrlOrCmd+E',
         click() { require('electron').shell.openExternal('https://electronjs.org') }
       }
     ]
