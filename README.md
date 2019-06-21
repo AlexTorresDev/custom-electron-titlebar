@@ -3,7 +3,7 @@
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/@alextorressk/custom-electron-titlebar)
+[![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
 ![Preview 1](screenshots/window_1.png)
 
@@ -55,7 +55,7 @@ The interface [`TitleBarOptions`] is managed, which has the following configurab
 
 | Parameter                | Type             | Description                                                                           | Default                   |
 | ------------------------ | ---------------- | ------------------------------------------------------------------------------------- | ------------------------- |
-| backgroundColor          | Color            | The background color of the titlebar.                                                 | #444444     |
+| backgroundColor **(required)** | Color            | The background color of the titlebar.                                                 | #444444     |
 | icon                     | string           | The icon shown on the left side of the title bar.                                     | null                      |
 | iconsTheme               | Theme            | Style of the icons.                                                                   | Themebar.win              |
 | shadow                   | boolean          | The shadow of the titlebar.                                                           | false                     |
@@ -80,7 +80,7 @@ When this method is executed, as well as when the title bar is created, it is ch
 titlebar.updateBackground(new Color(new RGBA(0, 0, 0, .7)));
 ```
 
-To assign colors you can use the following options Color.fromHex (), `new Color(new RGBA(r, g, b, a))`, `new Color(new HSLA(h, s, l, a))`, `new Color(new HSVA(h, s, v, a))` or `Color.BLUE`, `Color.RED`, etc.
+To assign colors you can use the following options: `Color.fromHex()`, `new Color(new RGBA(r, g, b, a))`, `new Color(new HSLA(h, s, l, a))`, `new Color(new HSVA(h, s, v, a))` or `Color.BLUE`, `Color.RED`, etc.
 
 ### Update Title
 
