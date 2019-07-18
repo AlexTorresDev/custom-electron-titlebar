@@ -35,16 +35,18 @@ export class MenuItem extends Disposable implements IMenuItem {
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
 	private mnemonic: KeyCode;
+	private closeSubMenu: () => void;
 
 	private event: Electron.Event;
 	private currentWindow: BrowserWindow;
 
-	constructor(item: IMenuItem, options: IMenuOptions = {}) {
+	constructor(item: IMenuItem, options: IMenuOptions = {}, closeSubMenu = () => {}) {
 		super();
 
 		this.item = item;
 		this.options = options;
 		this.currentWindow = remote.getCurrentWindow();
+		this.closeSubMenu = closeSubMenu;
 
 		// Set mnemonic
 		if (this.item.label && options.enableMnemonics) {
@@ -131,6 +133,7 @@ export class MenuItem extends Disposable implements IMenuItem {
 			this.item.checked = !this.item.checked;
 			this.updateChecked();
 		}
+		this.closeSubMenu();
 	}
 
 	focus(): void {

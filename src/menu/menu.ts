@@ -1,9 +1,9 @@
 /*--------------------------------------------------------------------------------------------------------
  *  This file has been modified by @AlexTorresSk (http://github.com/AlexTorresSk)
  *  to work in custom-electron-titlebar.
- * 
+ *
  *  The original copy of this file and its respective license are in https://github.com/Microsoft/vscode/
- * 
+ *
  *  Copyright (c) 2018 Alex Torres
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
@@ -52,6 +52,7 @@ export class Menu extends Disposable {
 	private menuContainer: HTMLElement;
 	private mnemonics: Map<KeyCode, Array<MenuItem>>;
 	private options: IMenuOptions;
+	private closeSubMenu: () => void;
 
 	private triggerKeys: ActionTrigger = {
 		keys: [KeyCode.Enter, KeyCode.Space],
@@ -65,11 +66,12 @@ export class Menu extends Disposable {
 	private _onDidCancel = this._register(new Emitter<void>());
 	get onDidCancel(): Event<void> { return this._onDidCancel.event; }
 
-	constructor(container: HTMLElement, options: IMenuOptions = {}) {
+	constructor(container: HTMLElement, options: IMenuOptions = {}, closeSubMenu = () => {}) {
 		super();
 
 		this.menuContainer = container;
 		this.options = options;
+		this.closeSubMenu = closeSubMenu;
 		this.items = [];
 		this.focusedItem = undefined;
 		this.mnemonics = new Map<KeyCode, Array<MenuItem>>();
@@ -271,7 +273,7 @@ export class Menu extends Disposable {
 				}
 			} else {
 				const menuItemOptions: IMenuOptions = { enableMnemonics: this.options.enableMnemonics };
-				item = new MenuItem(menuItem, menuItemOptions);
+				item = new MenuItem(menuItem, menuItemOptions, this.closeSubMenu);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();

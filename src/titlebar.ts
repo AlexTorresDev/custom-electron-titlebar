@@ -1,9 +1,9 @@
 /*--------------------------------------------------------------------------------------------------------
  *  This file has been modified by @AlexTorresSk (http://github.com/AlexTorresSk)
  *  to work in custom-electron-titlebar.
- * 
+ *
  *  The original copy of this file and its respective license are in https://github.com/Microsoft/vscode/
- * 
+ *
  *  Copyright (c) 2018 Alex Torres
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
@@ -113,6 +113,12 @@ export class Titlebar extends Themebar {
 		this.createTitlebar();
 		this.updateStyles();
 		this.registerTheme(this._options.iconsTheme);
+	}
+
+	private closeMenu = () => {
+		if (this.menubar) {
+			this.menubar.blur();
+		}
 	}
 
 	private registerListeners() {
@@ -314,9 +320,7 @@ export class Titlebar extends Themebar {
 				removeClass(this.titlebar, 'inactive');
 			} else {
 				addClass(this.titlebar, 'inactive');
-				if (this.menubar) {
-					this.menubar.blur();
-				}
+				this.closeMenu();
 			}
 		}
 	}
@@ -451,7 +455,7 @@ export class Titlebar extends Themebar {
 				this._options.menu = menu;
 			}
 
-			this.menubar = new Menubar(this.menubarContainer, this._options);
+			this.menubar = new Menubar(this.menubarContainer, this._options, this.closeMenu);
 			this.menubar.setupMenubar();
 
 			this._register(this.menubar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e)));
