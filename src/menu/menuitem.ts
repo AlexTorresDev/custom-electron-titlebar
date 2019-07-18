@@ -117,6 +117,7 @@ export class MenuItem extends Disposable implements IMenuItem {
 		this.updateTooltip();
 		this.updateEnabled();
 		this.updateChecked();
+		this.updateVisibility();
 	}
 
 	onClick(event: EventLike) {
@@ -259,6 +260,12 @@ export class MenuItem extends Disposable implements IMenuItem {
 			this.container.tabIndex = 0;
 		} else {
 			addClass(this.container, 'disabled');
+		}
+	}
+
+	updateVisibility() {
+		if (this.item.visible === false && this.itemElement) {
+			this.itemElement.remove();
 		}
 	}
 
