@@ -69,6 +69,7 @@ The interface [`TitleBarOptions`] is managed, which has the following configurab
 | menuPosition             | string           | The position of menubar on titlebar.                                                  | left 											|
 | enableMnemonics          | boolean 					| Enable the mnemonics on menubar and menu items.																				| true											|
 | itemBackgroundColor      | Color            | The background color when the mouse is over the item.                                 | rgba(0, 0, 0, .14)        |
+| overflow                 | string            | The overflow of the container
 
 ## Methods
 
