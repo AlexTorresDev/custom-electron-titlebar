@@ -1,9 +1,9 @@
 /*--------------------------------------------------------------------------------------------------------
  *  This file has been modified by @AlexTorresSk (http://github.com/AlexTorresSk)
  *  to work in custom-electron-titlebar.
- * 
+ *
  *  The original copy of this file and its respective license are in https://github.com/Microsoft/vscode/
- * 
+ *
  *  Copyright (c) 2018 Alex Torres
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
@@ -82,13 +82,14 @@ export class Menubar extends Disposable {
 	private _onFocusStateChange: Emitter<boolean>;
 
 	private menuStyle: IMenuStyle;
+	private closeSubMenu: () => void;
 
-	constructor(private container: HTMLElement, private options?: MenubarOptions) {
+	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => {}) {
 		super();
 
 		this.menuItems = [];
 		this.mnemonics = new Map<KeyCode, number>();
-
+		this.closeSubMenu = closeSubMenu;
 		this._focusState = MenubarState.VISIBLE;
 
 		this._onVisibilityChange = this._register(new Emitter<boolean>());
@@ -626,7 +627,7 @@ export class Menubar extends Disposable {
 			ariaLabel: customMenu.buttonElement.attributes['aria-label'].value
 		};
 
-		let menuWidget = new Menu(menuHolder, menuOptions);
+		let menuWidget = new Menu(menuHolder, menuOptions, this.closeSubMenu);
 		menuWidget.createMenu(customMenu.submenu.items as IMenuItem[]);
 		menuWidget.style(this.menuStyle);
 
