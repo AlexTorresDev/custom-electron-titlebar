@@ -67,6 +67,11 @@ export interface TitlebarOptions extends MenubarOptions {
 	 * *The default value is center*
 	 */
 	titleHorizontalAlignment?: "left" | "center" | "right";
+	/**
+	 * Sets the value for the overflow of the window
+	 * *The default value is auto*
+	 */
+	overflow?: "auto" | "hidden" | "visible";
 }
 
 const defaultOptions: TitlebarOptions = {
@@ -77,7 +82,8 @@ const defaultOptions: TitlebarOptions = {
 	minimizable: true,
 	maximizable: true,
 	closeable: true,
-	enableMnemonics: true
+	enableMnemonics: true,
+	overflow: "auto"
 };
 
 export class Titlebar extends Themebar {
@@ -156,7 +162,7 @@ export class Titlebar extends Themebar {
 		this.container.style.right = '0';
 		this.container.style.left = '0';
 		this.container.style.position = 'absolute';
-		this.container.style.overflow = 'auto';
+		this.container.style.overflow = this._options.overflow;
 
 		while (document.body.firstChild) {
 			append(this.container, document.body.firstChild);
