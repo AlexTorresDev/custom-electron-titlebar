@@ -187,10 +187,10 @@ export class MenuItem extends Disposable implements IMenuItem {
 					accelerator = 'CtrlOrCmd+R';
 					break;
 				case 'forcereload':
-					accelerator = 'CtrlOrCmd+Mayus+R';
+					accelerator = 'CtrlOrCmd+Shift+R';
 					break;
 				case 'toggledevtools':
-					accelerator = 'CtrlOrCmd+Mayus+I';
+					accelerator = 'CtrlOrCmd+Shift+I';
 					break;
 				case 'togglefullscreen':
 					accelerator = 'F11';
@@ -199,7 +199,7 @@ export class MenuItem extends Disposable implements IMenuItem {
 					accelerator = 'CtrlOrCmd+0';
 					break;
 				case 'zoomin':
-					accelerator = 'CtrlOrCmd+Mayus+=';
+					accelerator = 'CtrlOrCmd+Shift+=';
 					break;
 				case 'zoomout':
 					accelerator = 'CtrlOrCmd+-';
