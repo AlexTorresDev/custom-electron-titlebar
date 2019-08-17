@@ -27,7 +27,7 @@ or use the base project [cet-quickstart](https://github.com/AlexTorresSk/cet-qui
 
 ## Usage
 
-In your renderer file or in a script tag of your html add:
+In your renderer file or in an HTML script tag add:
 
 ```js
 const customTitlebar = require('custom-electron-titlebar');
@@ -46,7 +46,7 @@ new Titlebar({
 });
 ```
 
-The parameter `backgroundColor: Color` is require, this should be `Color` type.
+The parameter `backgroundColor: Color` is required, this should be `Color` type.
 (View [Update Background](#update-background) for more details).
 
 ## Options
