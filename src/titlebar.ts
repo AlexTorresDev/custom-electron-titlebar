@@ -68,10 +68,15 @@ export interface TitlebarOptions extends MenubarOptions {
 	 */
 	titleHorizontalAlignment?: "left" | "center" | "right";
 	/**
-	 * Sets the value for the overflow of the window
+	 * Sets the value for the overflow of the window.
 	 * *The default value is auto*
 	 */
 	overflow?: "auto" | "hidden" | "visible";
+	/**
+	 * When the close button is clicked, the window is hidden instead of closed.
+	 * *The default is false*
+	 */
+	hideWhenClickingClose?: boolean
 }
 
 const defaultOptions: TitlebarOptions = {
@@ -83,7 +88,8 @@ const defaultOptions: TitlebarOptions = {
 	maximizable: true,
 	closeable: true,
 	enableMnemonics: true,
-	overflow: "auto"
+	overflow: "auto",
+	hideWhenClickingClose: false
 };
 
 export class Titlebar extends Themebar {
@@ -273,7 +279,11 @@ export class Titlebar extends Themebar {
 				addClass(closeIconContainer, 'inactive');
 			} else {
 				this._register(addDisposableListener(closeIcon, EventType.CLICK, e => {
-					this.currentWindow.close();
+					if (this._options.hideWhenClickingClose) {
+						this.currentWindow.hide()
+					} else {
+						this.currentWindow.close()
+					}
 				}));
 			}
 
