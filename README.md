@@ -2,6 +2,8 @@
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
+### **It is a library for electron, it cannot be used on a basic website.**
+
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
