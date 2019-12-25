@@ -199,7 +199,7 @@ export class Themebar extends ThemingRegistry {
                 flex: 1 1 auto;
                 display: -ms-flexbox;
                 display: flex;
-                height: 2em;
+                height: 2.5em;
                 align-items: center;
                 position: relative;
             }
@@ -216,7 +216,7 @@ export class Themebar extends ThemingRegistry {
         
             .menubar-menu-container .action-label:not(.separator),
             .menubar-menu-container .keybinding {
-                padding: 0 2em;
+                padding: 0 2em 0 1em;
             }
             
             .menubar-menu-container .keybinding,
@@ -283,9 +283,26 @@ export class Themebar extends ThemingRegistry {
                 -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E") no-repeat 50% 56%/15px 15px;
                 mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E") no-repeat 50% 56%/15px 15px;
                 width: 2em;
+                height: 1em;
+                margin: 0 0 0 1.1em;
+            }
+
+            .menubar-menu-container .menu-item-icon {
+                width: 18px;
+                height: 18px;
+                margin: 0 0 0 1.5em;
+            }
+
+            .menubar-menu-container .menu-item-icon img {
+                display: inherit;
+                width: 100%;
                 height: 100%;
             }
             
+            .menubar-menu-container .action-menu-item.checked .menu-item-icon {
+                visibility: hidden;
+            }
+
             .menubar-menu-container .action-menu-item.checked .menu-item-check {
                 visibility: visible;
             }

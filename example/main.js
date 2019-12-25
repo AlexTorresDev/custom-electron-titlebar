@@ -27,7 +27,7 @@ electron_1.app.on('activate', function () {
 });
 var template = [
     {
-        label: 'Edit',
+        label: '&Edit',
         submenu: [
             { role: 'undo' },
             { role: 'redo' },
@@ -76,7 +76,8 @@ var template = [
         role: 'help',
         submenu: [
             {
-                label: 'Learn More',
+                label: 'Le&arn More',
+                icon: __dirname + '/images/icon.png',
                 click: function () { require('electron').shell.openExternal('https://electronjs.org'); }
             }
         ]

@@ -34,7 +34,7 @@ app.on('activate', () => {
 
 const template: MenuItemConstructorOptions[] = [
   {
-    label: 'Edit',
+    label: '&Edit',
     submenu: [
       {role: 'undo'},
       {role: 'redo'},
@@ -83,7 +83,8 @@ const template: MenuItemConstructorOptions[] = [
     role: 'help',
     submenu: [
       {
-        label: 'Learn More',
+        label: 'Le&arn More',
+        icon: __dirname + '/images/icon.png',
         click() { require('electron').shell.openExternal('https://electronjs.org') }
       }
     ]

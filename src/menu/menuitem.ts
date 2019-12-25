@@ -9,7 +9,7 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { MenuItemConstructorOptions, BrowserWindow, remote, Accelerator } from "electron";
+import { MenuItemConstructorOptions, BrowserWindow, remote, Accelerator, NativeImage } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
@@ -34,13 +34,14 @@ export class MenuItem extends Disposable implements IMenuItem {
 	private item: IMenuItem;
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
+	private iconElement: HTMLElement;
 	private mnemonic: KeyCode;
 	private closeSubMenu: () => void;
 
 	private event: Electron.Event;
 	private currentWindow: BrowserWindow;
 
-	constructor(item: IMenuItem, options: IMenuOptions = {}, closeSubMenu = () => {}) {
+	constructor(item: IMenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }) {
 		super();
 
 		this.item = item;
@@ -112,10 +113,14 @@ export class MenuItem extends Disposable implements IMenuItem {
 		this.checkElement = append(this.itemElement, $('span.menu-item-check'));
 		this.checkElement.setAttribute('role', 'none');
 
+		this.iconElement = append(this.itemElement, $('span.menu-item-icon'));
+		this.iconElement.setAttribute('role', 'none');
+
 		this.labelElement = append(this.itemElement, $('span.action-label'));
 
 		this.setAccelerator();
 		this.updateLabel();
+		this.updateIcon();
 		this.updateTooltip();
 		this.updateEnabled();
 		this.updateChecked();
@@ -158,7 +163,7 @@ export class MenuItem extends Disposable implements IMenuItem {
 		var accelerator = null;
 
 		if (this.item.role) {
-			switch(this.item.role.toLocaleLowerCase()) {
+			switch (this.item.role.toLocaleLowerCase()) {
 				case 'undo':
 					accelerator = 'CtrlOrCmd+Z';
 					break;
@@ -236,6 +241,19 @@ export class MenuItem extends Disposable implements IMenuItem {
 			}
 
 			this.labelElement.innerHTML = label.trim();
+		}
+	}
+
+	updateIcon(): void {
+		let icon: string | NativeImage | null = null;
+
+		if (this.item.icon) {
+			icon = this.item.icon;
+		}
+
+		if (icon) {
+			const iconE = append(this.iconElement, $('img'));
+			iconE.setAttribute('src', icon.toString());
 		}
 	}
 
