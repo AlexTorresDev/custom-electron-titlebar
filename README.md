@@ -2,6 +2,8 @@
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
+### **It is a library for electron, it cannot be used on a basic website.**
+
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
@@ -27,7 +29,7 @@ or use the base project [cet-quickstart](https://github.com/AlexTorresSk/cet-qui
 
 ## Usage
 
-In your renderer file or in a script tag of your html add:
+In your renderer file or in an HTML script tag add:
 
 ```js
 const customTitlebar = require('custom-electron-titlebar');
@@ -46,7 +48,7 @@ new Titlebar({
 });
 ```
 
-The parameter `backgroundColor: Color` is require, this should be `Color` type.
+The parameter `backgroundColor: Color` is required, this should be `Color` type.
 (View [Update Background](#update-background) for more details).
 
 ## Options
@@ -69,6 +71,7 @@ The interface [`TitleBarOptions`] is managed, which has the following configurab
 | menuPosition             | string           | The position of menubar on titlebar.                                                  | left 											|
 | enableMnemonics          | boolean 					| Enable the mnemonics on menubar and menu items.																				| true											|
 | itemBackgroundColor      | Color            | The background color when the mouse is over the item.                                 | rgba(0, 0, 0, .14)        |
+| hideWhenClickingClose | boolean | When the close button is clicked, the window is hidden instead of closed. | false |
 | overflow                 | string            | The overflow of the container (`auto`, `visible`, `hidden`)         | auto
 
 ## Methods
