@@ -224,7 +224,7 @@ export class Themebar extends ThemingRegistry {
                 display: inline-block;
                 -ms-flex: 2 1 auto;
                 flex: 2 1 auto;
-                padding: 0 1em;
+                padding: 0 2em 0 1em;
                 text-align: right;
                 font-size: 12px;
                 line-height: 1;
@@ -235,7 +235,7 @@ export class Themebar extends ThemingRegistry {
                 -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.52 12.364L9.879 7 4.52 1.636l.615-.615L11.122 7l-5.986 5.98-.615-.616z' fill='%23000'/%3E%3C/svg%3E") no-repeat right center/13px 13px;
                 mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.52 12.364L9.879 7 4.52 1.636l.615-.615L11.122 7l-5.986 5.98-.615-.616z' fill='%23000'/%3E%3C/svg%3E") no-repeat right center/13px 13px;
                 font-size: 60%;
-                margin: 0 1.3em;
+                margin: 0 2em 0 1em;
             }
             
             .menubar-menu-container .action-item.disabled .action-menu-item,
@@ -290,7 +290,7 @@ export class Themebar extends ThemingRegistry {
             .menubar-menu-container .menu-item-icon {
                 width: 18px;
                 height: 18px;
-                margin: 0 0 0 1.5em;
+                margin: 0 0 0 1.1em;
             }
 
             .menubar-menu-container .menu-item-icon img {

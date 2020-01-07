@@ -1,12 +1,13 @@
 {
   "name": "custom-electron-titlebar",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Custom Electron Titlebar is a library for electron that allows you to configure a fully customizable title bar.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "start": "tsc ./example/main && tsc ./example/renderer && electron ./example/main.js",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc ./example/main && tsc ./example/renderer && electron ./example/main.js",
+    "start": "npm run build && npm run dev"
   },
   "author": "Alex Torres <alextorressk@gmail.com>",
   "license": "MIT",
@@ -32,7 +33,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "electron": "^4.2.8",
-    "typescript": "^3.5.3"
+    "electron": "^7.1.7",
+    "typescript": "^3.7.4"
   }
 }

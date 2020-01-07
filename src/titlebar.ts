@@ -20,9 +20,9 @@ const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
 const INACTIVE_FOREGROUND = Color.fromHex('#EEEEEE');
 const ACTIVE_FOREGROUND = Color.fromHex('#FFFFFF');
 
-const BOTTOM_TITLEBAR_HEIGHT = '60px'
-const TOP_TITLEBAR_HEIGHT_MAC = '22px'
-const TOP_TITLEBAR_HEIGHT_WIN = '30px'
+const BOTTOM_TITLEBAR_HEIGHT = '60px';
+const TOP_TITLEBAR_HEIGHT_MAC = '22px';
+const TOP_TITLEBAR_HEIGHT_WIN = '30px';
 
 export interface TitlebarOptions extends MenubarOptions {
 	/**
@@ -114,6 +114,8 @@ export class Titlebar extends Themebar {
 	private _options: TitlebarOptions;
 	private menubar: Menubar;
 
+	private events: { [k: string]: Function; };
+
 	constructor(options?: TitlebarOptions) {
 		super();
 
@@ -125,6 +127,10 @@ export class Titlebar extends Themebar {
 		this.createTitlebar();
 		this.updateStyles();
 		this.registerTheme(this._options.iconsTheme);
+
+		window.addEventListener('beforeunload', () => {
+			this.removeListeners();
+		});
 	}
 
 	private closeMenu = () => {
@@ -134,40 +140,44 @@ export class Titlebar extends Themebar {
 	}
 
 	private registerListeners() {
-		this.currentWindow.on(EventType.FOCUS, () => {
+		this.events = {};
+
+		this.events[EventType.FOCUS] = () => {
 			this.onDidChangeWindowFocus(true);
 			this.onFocus();
-		});
+		};
 
-		this.currentWindow.on(EventType.BLUR, () => {
+		this.events[EventType.BLUR] = () => {
 			this.onDidChangeWindowFocus(false);
 			this.onBlur();
-		});
+		};
 
-		this.currentWindow.on(EventType.MAXIMIZE, () => {
-			this.onDidChangeMaximized(true);
-		});
+		this.events[EventType.MAXIMIZE] = () => this.onDidChangeMaximized(true);
+		this.events[EventType.UNMAXIMIZE] = () => this.onDidChangeMaximized(false);
+		this.events[EventType.ENTER_FULLSCREEN] = () => this.onDidChangeFullscreen(true);
+		this.events[EventType.LEAVE_FULLSCREEN] = () => this.onDidChangeFullscreen(false);
 
-		this.currentWindow.on(EventType.UNMAXIMIZE, () => {
-			this.onDidChangeMaximized(false);
-		});
+		for (const k in this.events) {
+			this.currentWindow.on(k as any, this.events[k]);
+		}
+	}
 
-		this.currentWindow.on(EventType.ENTER_FULLSCREEN, () => {
-			this.onDidChangeFullscreen(true);
-		});
+	// From https://github.com/panjiang/custom-electron-titlebar/commit/825bff6b15e9223c1160208847b4c5010610bcf7
+	private removeListeners() {
+		for (const k in this.events) {
+			this.currentWindow.removeListener(k as any, this.events[k]);
+		}
 
-		this.currentWindow.on(EventType.LEAVE_FULLSCREEN, () => {
-			this.onDidChangeFullscreen(false);
-		});
+		this.events = {};
 	}
 
 	private createTitlebar() {
 		// Content container
 		this.container = $('div.container-after-titlebar');
-		if (this._options.menuPosition === 'bottom'){
+		if (this._options.menuPosition === 'bottom') {
 			this.container.style.top = BOTTOM_TITLEBAR_HEIGHT;
 			this.container.style.bottom = '0px';
-		} else{
+		} else {
 			this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN;
 			this.container.style.bottom = '0px';
 		}
@@ -530,11 +540,11 @@ export class Titlebar extends Themebar {
 	}
 
 	/**
-	 * Remove the titlebar and all methods.
+	 * Remove the titlebar, menubar and all methods.
 	 */
 	dispose() {
-		this.menubar.dispose();
-		super.dispose();
+		if (this.menubar) this.menubar.dispose();
+
 		removeNode(this.titlebar);
 
 		while (this.container.firstChild) {
@@ -542,6 +552,10 @@ export class Titlebar extends Themebar {
 		}
 
 		removeNode(this.container);
+
+		this.removeListeners();
+
+		super.dispose();
 	}
 
 }

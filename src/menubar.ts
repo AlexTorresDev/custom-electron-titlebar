@@ -9,12 +9,11 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { Color } from './common/color';
-import { MenuItemConstructorOptions, remote } from 'electron';
+import { remote, MenuItem, Menu } from 'electron';
 import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode, isAncestor, EventLike, EventHelper } from './common/dom';
-import { Menu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu/menu';
+import { CETMenu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu/menu';
 import { StandardKeyboardEvent } from './browser/keyboardEvent';
 import { KeyCodeUtils, KeyCode } from './common/keyCodes';
-import { IMenuItem } from './menu/menuitem';
 import { Disposable, IDisposable, dispose } from './common/lifecycle';
 import { Event, Emitter } from './common/event';
 import { domEvent } from './browser/event';
@@ -26,7 +25,7 @@ export interface MenubarOptions {
 	 * You can use `Menu` or not add this option and the menu created in the main process will be taken.
 	 * The default menu is taken from the [`Menu.getApplicationMenu()`](https://electronjs.org/docs/api/menu#menugetapplicationmenu)
 	 */
-	menu?: Electron.Menu | null;
+	menu?: Menu | null;
 	/**
 	 * The position of menubar on titlebar.
 	 * *The default is left*
@@ -44,10 +43,10 @@ export interface MenubarOptions {
 }
 
 interface CustomItem {
-	menuItem: MenuItemConstructorOptions;
+	menuItem: MenuItem;
 	buttonElement: HTMLElement;
 	titleElement: HTMLElement;
-	submenu: Electron.Menu;
+	submenu: Menu;
 }
 
 enum MenubarState {
@@ -64,7 +63,7 @@ export class Menubar extends Disposable {
 	private focusedMenu: {
 		index: number;
 		holder?: HTMLElement;
-		widget?: Menu;
+		widget?: CETMenu;
 	} | undefined;
 
 	private focusToReturn: HTMLElement | undefined;
@@ -84,7 +83,7 @@ export class Menubar extends Disposable {
 	private menuStyle: IMenuStyle;
 	private closeSubMenu: () => void;
 
-	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => {}) {
+	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => { }) {
 		super();
 
 		this.menuItems = [];
@@ -179,7 +178,7 @@ export class Menubar extends Disposable {
 	}
 
 	setupMenubar(): void {
-		const topLevelMenus = this.options.menu.items as MenuItemConstructorOptions[];
+		const topLevelMenus = this.options.menu.items;
 
 		this._register(this.onFocusStateChange(e => this._onFocusStateChange.fire(e)));
 		this._register(this.onVisibilityChange(e => this._onVisibilityChange.fire(e)));
@@ -265,7 +264,7 @@ export class Menubar extends Disposable {
 
 				this.menuItems.push({
 					menuItem: menubarMenu,
-					submenu: menubarMenu.submenu as Electron.Menu,
+					submenu: menubarMenu.submenu,
 					buttonElement: buttonElement,
 					titleElement: titleElement
 				});
@@ -278,7 +277,7 @@ export class Menubar extends Disposable {
 		const item = this.menuItems[menuIndex].menuItem;
 
 		if (item.click) {
-			item.click(item as Electron.MenuItem, remote.getCurrentWindow(), electronEvent);
+			item.click(item as MenuItem, remote.getCurrentWindow(), electronEvent);
 		}
 	}
 
@@ -627,8 +626,8 @@ export class Menubar extends Disposable {
 			ariaLabel: customMenu.buttonElement.attributes['aria-label'].value
 		};
 
-		let menuWidget = new Menu(menuHolder, menuOptions, this.closeSubMenu);
-		menuWidget.createMenu(customMenu.submenu.items as IMenuItem[]);
+		let menuWidget = new CETMenu(menuHolder, menuOptions, this.closeSubMenu);
+		menuWidget.createMenu(customMenu.submenu.items);
 		menuWidget.style(this.menuStyle);
 
 		this._register(menuWidget.onDidCancel(() => {

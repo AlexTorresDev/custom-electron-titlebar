@@ -13,10 +13,11 @@ import { addClass, addDisposableListener, EventType, isAncestor, hasClass, appen
 import { KeyCode, KeyCodeUtils, KeyMod } from "../common/keyCodes";
 import { isLinux } from "../common/platform";
 import { StandardKeyboardEvent } from "../browser/keyboardEvent";
-import { IMenuItem, MenuItem } from "./menuitem";
+import { IMenuItem, CETMenuItem } from "./menuitem";
 import { Disposable, dispose, IDisposable } from "../common/lifecycle";
 import { Event, Emitter } from "../common/event";
 import { RunOnceScheduler } from "../common/async";
+import { MenuItem, Menu } from "electron";
 
 export const MENU_MNEMONIC_REGEX: RegExp = /\(&{1,2}(.)\)|&{1,2}(.)/;
 export const MENU_ESCAPED_MNEMONIC_REGEX: RegExp = /(?:&amp;){1,2}(.)/;
@@ -35,8 +36,8 @@ export interface IMenuStyle {
 }
 
 interface ISubMenuData {
-	parent: Menu;
-	submenu?: Menu;
+	parent: CETMenu;
+	submenu?: CETMenu;
 }
 
 interface ActionTrigger {
@@ -44,13 +45,13 @@ interface ActionTrigger {
 	keyDown: boolean;
 }
 
-export class Menu extends Disposable {
+export class CETMenu extends Disposable {
 
 	items: IMenuItem[];
 
 	private focusedItem?: number;
 	private menuContainer: HTMLElement;
-	private mnemonics: Map<KeyCode, Array<MenuItem>>;
+	private mnemonics: Map<KeyCode, Array<CETMenuItem>>;
 	private options: IMenuOptions;
 	private closeSubMenu: () => void;
 
@@ -66,7 +67,7 @@ export class Menu extends Disposable {
 	private _onDidCancel = this._register(new Emitter<void>());
 	get onDidCancel(): Event<void> { return this._onDidCancel.event; }
 
-	constructor(container: HTMLElement, options: IMenuOptions = {}, closeSubMenu = () => {}) {
+	constructor(container: HTMLElement, options: IMenuOptions = {}, closeSubMenu = () => { }) {
 		super();
 
 		this.menuContainer = container;
@@ -74,7 +75,7 @@ export class Menu extends Disposable {
 		this.closeSubMenu = closeSubMenu;
 		this.items = [];
 		this.focusedItem = undefined;
-		this.mnemonics = new Map<KeyCode, Array<MenuItem>>();
+		this.mnemonics = new Map<KeyCode, Array<CETMenuItem>>();
 
 		this._register(addDisposableListener(this.menuContainer, EventType.KEY_DOWN, e => {
 			const event = new StandardKeyboardEvent(e);
@@ -238,8 +239,8 @@ export class Menu extends Disposable {
 		return this.menuContainer;
 	}
 
-	createMenu(items: IMenuItem[]) {
-		items.forEach((menuItem: IMenuItem) => {
+	createMenu(items: MenuItem[]) {
+		items.forEach((menuItem: MenuItem) => {
 			const itemElement = document.createElement('li');
 			itemElement.className = 'action-item';
 			itemElement.setAttribute('role', 'presentation');
@@ -250,18 +251,18 @@ export class Menu extends Disposable {
 				e.stopPropagation();
 			}));
 
-			let item: MenuItem | null = null;
+			let item: CETMenuItem | null = null;
 
 			if (menuItem.type === 'separator') {
 				item = new Separator(menuItem, this.options);
 			} else if (menuItem.type === 'submenu' || menuItem.submenu) {
-				const submenuItems = (menuItem.submenu as Electron.Menu).items as IMenuItem[];
+				const submenuItems = (menuItem.submenu as Menu).items;
 				item = new Submenu(menuItem, submenuItems, this.parentData, this.options);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
 					if (mnemonic && item.isEnabled()) {
-						let actionItems: MenuItem[] = [];
+						let actionItems: CETMenuItem[] = [];
 						if (this.mnemonics.has(mnemonic)) {
 							actionItems = this.mnemonics.get(mnemonic)!;
 						}
@@ -273,12 +274,12 @@ export class Menu extends Disposable {
 				}
 			} else {
 				const menuItemOptions: IMenuOptions = { enableMnemonics: this.options.enableMnemonics };
-				item = new MenuItem(menuItem, menuItemOptions, this.closeSubMenu);
+				item = new CETMenuItem(menuItem, menuItemOptions, this.closeSubMenu);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
 					if (mnemonic && item.isEnabled()) {
-						let actionItems: MenuItem[] = [];
+						let actionItems: CETMenuItem[] = [];
 						if (this.mnemonics.has(mnemonic)) {
 							actionItems = this.mnemonics.get(mnemonic)!;
 						}
@@ -395,7 +396,7 @@ export class Menu extends Disposable {
 
 		// trigger action
 		const item = this.items[this.focusedItem];
-		if (item instanceof MenuItem) {
+		if (item instanceof CETMenuItem) {
 			item.onClick(event);
 		}
 	}
@@ -424,7 +425,7 @@ export class Menu extends Disposable {
 
 		if (this.items) {
 			this.items.forEach(item => {
-				if (item instanceof MenuItem || item instanceof Separator) {
+				if (item instanceof CETMenuItem || item instanceof Separator) {
 					item.style(style);
 				}
 			});
@@ -452,9 +453,9 @@ export class Menu extends Disposable {
 
 }
 
-class Submenu extends MenuItem {
+class Submenu extends CETMenuItem {
 
-	private mysubmenu: Menu | null;
+	private mysubmenu: CETMenu | null;
 	private submenuContainer: HTMLElement | undefined;
 	private submenuIndicator: HTMLElement;
 	private submenuDisposables: IDisposable[] = [];
@@ -462,7 +463,7 @@ class Submenu extends MenuItem {
 	private showScheduler: RunOnceScheduler;
 	private hideScheduler: RunOnceScheduler;
 
-	constructor(item: IMenuItem, private submenuItems: IMenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions) {
+	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions) {
 		super(item, submenuOptions);
 
 		this.showScheduler = new RunOnceScheduler(() => {
@@ -556,7 +557,7 @@ class Submenu extends MenuItem {
 			this.submenuContainer = append(this.container, $('ul.submenu'));
 			addClasses(this.submenuContainer, 'menubar-menu-container');
 
-			this.parentData.submenu = new Menu(this.submenuContainer, this.submenuOptions);
+			this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuOptions);
 			this.parentData.submenu.createMenu(this.submenuItems);
 
 			if (this.menuStyle) {
@@ -654,11 +655,11 @@ class Submenu extends MenuItem {
 	}
 }
 
-class Separator extends MenuItem {
+class Separator extends CETMenuItem {
 
 	private separatorElement: HTMLElement;
 
-	constructor(item: IMenuItem, options: IMenuOptions) {
+	constructor(item: MenuItem, options: IMenuOptions) {
 		super(item, options);
 	}
 

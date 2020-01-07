@@ -27,7 +27,7 @@ npm install custom-electron-titlebar@latest
 
 ## Usage
 
-In your renderer file or in an HTML script tag add:
+In your **renderer** file or in an **HTML script tag** add:
 
 ```js
 const customTitlebar = require('custom-electron-titlebar');
