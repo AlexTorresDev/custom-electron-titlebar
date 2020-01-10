@@ -177,6 +177,23 @@ This method removes the title bar completely and all recorded events.
 titlebar.dispose();
 ```
 
+## css classes
+The following css classes exist and can be used to customize the titlebar
+
+| Class name | Description |
+| ------------- | ------------- |
+| .titlebar | Description missing  |
+| .window-appicon  | Description missing  |
+| .window-controls-container  | Description missing  |
+| .resizer top  | Description missing  |
+| ..resizer left  | Description missing  |
+| .menubar  | Description missing  |
+| .menubar-menu-button  | Description missing  |
+| .menubar-menu-button open  | Description missing  |
+| .menubar-menu-title  | Description missing  |
+| .action-item  | Description missing  |
+| .action-menu-item  | Description missing  |
+
 ## Contributing
 
 Many thanks to all the people who support this project through issues and pull request.
