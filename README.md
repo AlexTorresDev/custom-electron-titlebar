@@ -184,15 +184,16 @@ The following css classes exist and can be used to customize the titlebar
 | ------------- | ------------- |
 | .titlebar | Description missing  |
 | .window-appicon  | Description missing  |
-| .window-controls-container  | Description missing  |
-| .resizer top  | Description missing  |
+| .window-title | Styles the window title (Example: font-size) |
+| .window-controls-container  | Styles the window controls section  |
+| .resizer top  | Description missing |
 | ..resizer left  | Description missing  |
 | .menubar  | Description missing  |
-| .menubar-menu-button  | Description missing  |
+| .menubar-menu-button  | Styles the main menu elements (Example: color)   |
 | .menubar-menu-button open  | Description missing  |
 | .menubar-menu-title  | Description missing  |
-| .action-item  | Description missing  |
-| .action-menu-item  | Description missing  |
+| .action-item  | Description missing |
+| .action-menu-item  | Styles action menu elements (Example: color) |
 
 ## Contributing
 
