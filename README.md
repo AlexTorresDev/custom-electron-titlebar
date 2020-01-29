@@ -53,24 +53,25 @@ The parameter `backgroundColor: Color` is required, this should be `Color` type.
 
 The interface [`TitleBarOptions`] is managed, which has the following configurable options for the title bar. Some parameters are optional.
 
-| Parameter                | Type             | Description                                                                           | Default                   |
-| ------------------------ | ---------------- | ------------------------------------------------------------------------------------- | ------------------------- |
-| backgroundColor **(required)** | Color            | The background color of the titlebar.                                                 | #444444     |
-| icon                     | string           | The icon shown on the left side of the title bar.                                     | null                      |
-| iconsTheme               | Theme            | Style of the icons.                                                                   | Themebar.win              |
-| shadow                   | boolean          | The shadow of the titlebar.                                                           | false                     |
-| drag                     | boolean          | Define whether or not you can drag the window by holding the click on the title bar.  | true                      |
-| minimizable              | boolean          | Enables or disables the option to minimize the window by clicking on the corresponding button in the title bar.                                    | true                      |
-| maximizable              | boolean          | Enables or disables the option to maximize and un-maximize the window by clicking on the corresponding button in the title bar.                      | true                      |
-| closeable                | boolean          | Enables or disables the option of the close window by clicking on the corresponding button in the title bar.                                       | true                      |
-| order                    | string           | Set the order of the elements on the title bar. (`inverted`, `first-buttons`)         | null                      |
-| titleHorizontalAlignment | string           | Set horizontal alignment of the window title. (`left`, `center`, `right`)             | center                    |
-| menu                     | Electron.Menu    | The menu to show in the title bar.                                                    | Menu.getApplicationMenu() |
-| menuPosition             | string           | The position of menubar on titlebar.                                                  | left 											|
-| enableMnemonics          | boolean 					| Enable the mnemonics on menubar and menu items.																				| true											|
-| itemBackgroundColor      | Color            | The background color when the mouse is over the item.                                 | rgba(0, 0, 0, .14)        |
-| hideWhenClickingClose | boolean | When the close button is clicked, the window is hidden instead of closed. | false |
-| overflow                 | string            | The overflow of the container (`auto`, `visible`, `hidden`)         | auto
+| Parameter                      | Type             | Description                                                                                                                     | Default                   |
+| ------------------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| backgroundColor **(required)** | Color            | The background color of the titlebar.                                                                                           | #444444                   |
+| icon                           | string           | The icon shown on the left side of the title bar.                                                                               | null                      |
+| iconsTheme                     | Theme            | Style of the icons.                                                                                                             | Themebar.win              |
+| shadow                         | boolean          | The shadow of the titlebar.                                                                                                     | false                     |
+| drag                           | boolean          | Define whether or not you can drag the window by holding the click on the title bar.                                            | true                      |
+| minimizable                    | boolean          | Enables or disables the option to minimize the window by clicking on the corresponding button in the title bar.                 | true                      |
+| maximizable                    | boolean          | Enables or disables the option to maximize and un-maximize the window by clicking on the corresponding button in the title bar. | true                      |
+| closeable                      | boolean          | Enables or disables the option of the close window by clicking on the corresponding button in the title bar.                    | true                      |
+| order                          | string           | Set the order of the elements on the title bar. (`inverted`, `first-buttons`)                                                   | null                      |
+| titleHorizontalAlignment       | string           | Set horizontal alignment of the window title. (`left`, `center`, `right`)                                                       | center                    |
+| menu                           | Electron.Menu    | The menu to show in the title bar.                                                                                              | Menu.getApplicationMenu() |
+| menuPosition                   | string           | The position of menubar on titlebar.                                                                                            | left 					  |
+| enableMnemonics                | boolean 		    | Enable the mnemonics on menubar and menu items.																		          | true                      |
+| itemBackgroundColor            | Color            | The background color when the mouse is over the item.                                                                           | rgba(0, 0, 0, .14)        |
+| hideWhenClickingClose          | boolean          | When the close button is clicked, the window is hidden instead of closed.                                                       | false                     |
+| overflow                       | string           | The overflow of the container (`auto`, `visible`, `hidden`)                                                                     | auto                      |
+| unfocusEffect                  | boolean          | Enables or disables the blur option in the title bar.                                                                           | false                     |
 
 ## Methods
 
@@ -177,23 +178,23 @@ This method removes the title bar completely and all recorded events.
 titlebar.dispose();
 ```
 
-## css classes
-The following css classes exist and can be used to customize the titlebar
+## CSS Classes
+The following CSS classes exist and can be used to customize the titlebar
 
-| Class name | Description |
-| ------------- | ------------- |
-| .titlebar | Description missing  |
-| .window-appicon  | Description missing  |
-| .window-title | Styles the window title (Example: font-size) |
-| .window-controls-container  | Styles the window controls section  |
-| .resizer top  | Description missing |
-| ..resizer left  | Description missing  |
-| .menubar  | Description missing  |
-| .menubar-menu-button  | Styles the main menu elements (Example: color)   |
-| .menubar-menu-button open  | Description missing  |
-| .menubar-menu-title  | Description missing  |
-| .action-item  | Description missing |
-| .action-menu-item  | Styles action menu elements (Example: color) |
+| Class name                  | Description                                     |
+| --------------------------- | ----------------------------------------------- |
+| .titlebar                   | Styles the titlebar.                            |
+| .window-appicon             | Styles the app icon on the titlebar.            |
+| .window-title               | Styles the window title. (Example: font-size)   |
+| .window-controls-container  | Styles the window controls section.             |
+| .resizer top                | Description missing                             |
+| .resizer left               | Description missing                             |
+| .menubar                    | Description missing                             |
+| .menubar-menu-button        | Styles the main menu elements. (Example: color) |
+| .menubar-menu-button open   | Description missing                             |
+| .menubar-menu-title         | Description missing                             |
+| .action-item                | Description missing                             |
+| .action-menu-item           | Styles action menu elements. (Example: color)   |
 
 ## Contributing
 

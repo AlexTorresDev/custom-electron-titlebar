@@ -26,20 +26,20 @@ const TOP_TITLEBAR_HEIGHT_WIN = '30px';
 
 export interface TitlebarOptions extends MenubarOptions {
 	/**
-	 * The background color of the titlebar.
+	 * The background color of titlebar.
 	 */
 	backgroundColor: Color;
 	/**
-	 * The icon shown on the left side of the title bar.
+	 * The icon shown on the left side of titlebar.
 	 */
 	icon?: string;
 	/**
-	 * Style of the icons.
+	 * Style of the icons of titlebar.
 	 * You can create your custom style using [`Theme`](https://github.com/AlexTorresSk/custom-electron-titlebar/THEMES.md)
 	 */
 	iconsTheme?: Theme;
 	/**
-	 * The shadow color of the titlebar.
+	 * The shadow color of titlebar.
 	 */
 	shadow?: boolean;
 	/**
@@ -58,6 +58,16 @@ export interface TitlebarOptions extends MenubarOptions {
 	 */
 	closeable?: boolean;
 	/**
+	 * When the close button is clicked, the window is hidden instead of closed.
+	 * *The default is false*
+	 */
+	hideWhenClickingClose?: boolean;
+	/**
+	 * Enables or disables the blur option in titlebar.
+	 * *The default is true*
+	 */
+	unfocusEffect?: boolean;
+	/**
 	 * Set the order of the elements on the title bar. You can use `inverted`, `first-buttons` or don't add for.
 	 * *The default is normal*
 	 */
@@ -72,11 +82,6 @@ export interface TitlebarOptions extends MenubarOptions {
 	 * *The default value is auto*
 	 */
 	overflow?: "auto" | "hidden" | "visible";
-	/**
-	 * When the close button is clicked, the window is hidden instead of closed.
-	 * *The default is false*
-	 */
-	hideWhenClickingClose?: boolean
 }
 
 const defaultOptions: TitlebarOptions = {
@@ -88,8 +93,9 @@ const defaultOptions: TitlebarOptions = {
 	maximizable: true,
 	closeable: true,
 	enableMnemonics: true,
+	hideWhenClickingClose: false,
+	unfocusEffect: true,
 	overflow: "auto",
-	hideWhenClickingClose: false
 };
 
 export class Titlebar extends Themebar {
@@ -142,16 +148,8 @@ export class Titlebar extends Themebar {
 	private registerListeners() {
 		this.events = {};
 
-		this.events[EventType.FOCUS] = () => {
-			this.onDidChangeWindowFocus(true);
-			this.onFocus();
-		};
-
-		this.events[EventType.BLUR] = () => {
-			this.onDidChangeWindowFocus(false);
-			this.onBlur();
-		};
-
+		this.events[EventType.FOCUS] = () => this.onDidChangeWindowFocus(true);
+		this.events[EventType.BLUR] = () => this.onDidChangeWindowFocus(false);
 		this.events[EventType.MAXIMIZE] = () => this.onDidChangeMaximized(true);
 		this.events[EventType.UNMAXIMIZE] = () => this.onDidChangeMaximized(false);
 		this.events[EventType.ENTER_FULLSCREEN] = () => this.onDidChangeFullscreen(true);
@@ -344,9 +342,11 @@ export class Titlebar extends Themebar {
 		if (this.titlebar) {
 			if (hasFocus) {
 				removeClass(this.titlebar, 'inactive');
+				this.onFocus();
 			} else {
 				addClass(this.titlebar, 'inactive');
 				this.closeMenu();
+				this.onBlur();
 			}
 		}
 	}
@@ -389,25 +389,40 @@ export class Titlebar extends Themebar {
 				removeClass(this.titlebar, 'inactive');
 			}
 
-			const titleBackground = this.isInactive ? this._options.backgroundColor.lighten(.3) : this._options.backgroundColor;
+			const titleBackground = this.isInactive && this._options.unfocusEffect
+				? this._options.backgroundColor.lighten(.45)
+				: this._options.backgroundColor;
+
 			this.titlebar.style.backgroundColor = titleBackground.toString();
+
+			let titleForeground: Color;
 
 			if (titleBackground.isLighter()) {
 				addClass(this.titlebar, 'light');
 
-				const titleForeground = this.isInactive ? INACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND_DARK;
-				this.titlebar.style.color = titleForeground.toString();
+				titleForeground = this.isInactive && this._options.unfocusEffect
+					? INACTIVE_FOREGROUND_DARK
+					: ACTIVE_FOREGROUND_DARK;
 			} else {
 				removeClass(this.titlebar, 'light');
 
-				const titleForeground = this.isInactive ? INACTIVE_FOREGROUND : ACTIVE_FOREGROUND;
-				this.titlebar.style.color = titleForeground.toString();
+				titleForeground = this.isInactive && this._options.unfocusEffect
+					? INACTIVE_FOREGROUND
+					: ACTIVE_FOREGROUND;
 			}
 
+			this.titlebar.style.color = titleForeground.toString();
+
 			const backgroundColor = this._options.backgroundColor.darken(.16);
-			const foregroundColor = backgroundColor.isLighter() ? INACTIVE_FOREGROUND_DARK : INACTIVE_FOREGROUND;
-			const bgColor = !this._options.itemBackgroundColor ||
-				this._options.itemBackgroundColor.equals(backgroundColor) ? new Color(new RGBA(0, 0, 0, .14)) : this._options.itemBackgroundColor;
+
+			const foregroundColor = backgroundColor.isLighter()
+				? INACTIVE_FOREGROUND_DARK
+				: INACTIVE_FOREGROUND;
+
+			const bgColor = !this._options.itemBackgroundColor || this._options.itemBackgroundColor.equals(backgroundColor)
+				? new Color(new RGBA(0, 0, 0, .14))
+				: this._options.itemBackgroundColor;
+
 			const fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND;
 
 			if (this.menubar) {

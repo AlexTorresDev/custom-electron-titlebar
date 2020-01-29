@@ -283,8 +283,8 @@ export class Themebar extends ThemingRegistry {
                 -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E") no-repeat 50% 56%/15px 15px;
                 mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E") no-repeat 50% 56%/15px 15px;
                 width: 2em;
-                height: 1em;
-                margin: 0 0 0 1.1em;
+                height: 2em;
+                margin: 0 0 0 0.7em;
             }
 
             .menubar-menu-container .menu-item-icon {

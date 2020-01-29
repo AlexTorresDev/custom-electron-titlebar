@@ -309,17 +309,38 @@ export class Menubar extends Disposable {
 	private updateLabels(titleElement: HTMLElement, buttonElement: HTMLElement, label: string): void {
 		const cleanMenuLabel = cleanMnemonic(label);
 
-		titleElement.innerHTML = this.options.enableMnemonics ?
-			escape(label).replace(MENU_ESCAPED_MNEMONIC_REGEX, '<mnemonic aria-hidden="true">$1</mnemonic>') :
-			cleanMenuLabel;
+		// Update the button label to reflect mnemonics
+
+		if (this.options.enableMnemonics) {
+			let innerHtml = escape(label);
+
+			// This is global so reset it
+			MENU_ESCAPED_MNEMONIC_REGEX.lastIndex = 0;
+			let escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(innerHtml);
+
+			// We can't use negative lookbehind so we match our negative and skip
+			while (escMatch && escMatch[1]) {
+				escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(innerHtml);
+			}
+
+			if (escMatch) {
+				innerHtml = `${innerHtml.substr(0, escMatch.index)}<mnemonic aria-hidden="true">${escMatch[3]}</mnemonic>${innerHtml.substr(escMatch.index + escMatch[0].length)}`;
+			}
+
+			innerHtml = innerHtml.replace(/&amp;&amp;/g, '&amp;');
+			titleElement.innerHTML = innerHtml;
+		} else {
+			titleElement.innerHTML = cleanMenuLabel.replace(/&&/g, '&');
+		}
 
 		let mnemonicMatches = MENU_MNEMONIC_REGEX.exec(label);
 
+		// Register mnemonics
 		if (mnemonicMatches) {
-			let mnemonic = !!mnemonicMatches[1] ? mnemonicMatches[1] : mnemonicMatches[2];
+			let mnemonic = !!mnemonicMatches[1] ? mnemonicMatches[1] : mnemonicMatches[3];
 
 			if (this.options.enableMnemonics) {
-				buttonElement.setAttribute('aria-keyshortcuts', 'Alt+' + mnemonic.toUpperCase());
+				buttonElement.setAttribute('aria-keyshortcuts', 'Alt+' + mnemonic.toLocaleLowerCase());
 			} else {
 				buttonElement.removeAttribute('aria-keyshortcuts');
 			}

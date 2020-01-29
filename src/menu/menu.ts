@@ -19,8 +19,8 @@ import { Event, Emitter } from "../common/event";
 import { RunOnceScheduler } from "../common/async";
 import { MenuItem, Menu } from "electron";
 
-export const MENU_MNEMONIC_REGEX: RegExp = /\(&{1,2}(.)\)|&{1,2}(.)/;
-export const MENU_ESCAPED_MNEMONIC_REGEX: RegExp = /(?:&amp;){1,2}(.)/;
+export const MENU_MNEMONIC_REGEX = /\(&([^\s&])\)|(^|[^&])&([^\s&])/;
+export const MENU_ESCAPED_MNEMONIC_REGEX = /(&amp;)?(&amp;)([^\s&])/g;
 
 export interface IMenuOptions {
 	ariaLabel?: string;
@@ -684,7 +684,7 @@ export function cleanMnemonic(label: string): string {
 		return label;
 	}
 
-	const mnemonicInText = matches[0].charAt(0) === '&';
+	const mnemonicInText = !matches[1];
 
-	return label.replace(regex, mnemonicInText ? '$2' : '').trim();
+	return label.replace(regex, mnemonicInText ? '$2$3' : '').trim();
 }

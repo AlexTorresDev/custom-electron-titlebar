@@ -224,23 +224,48 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	updateLabel(): void {
 		if (this.item.label) {
 			let label = this.item.label;
+
 			if (label) {
 				const cleanLabel = cleanMnemonic(label);
+
 				if (!this.options.enableMnemonics) {
 					label = cleanLabel;
 				}
 
-				this.labelElement.setAttribute('aria-label', cleanLabel);
+				if (this.labelElement) {
+					this.labelElement.setAttribute('aria-label', cleanLabel.replace(/&&/g, '&'));
+				}
 
 				const matches = MENU_MNEMONIC_REGEX.exec(label);
 
 				if (matches) {
-					label = escape(label).replace(MENU_ESCAPED_MNEMONIC_REGEX, '<u aria-hidden="true">$1</u>');
-					this.itemElement.setAttribute('aria-keyshortcuts', (!!matches[1] ? matches[1] : matches[2]).toLocaleLowerCase());
+					label = escape(label);
+
+					// This is global, reset it
+					MENU_ESCAPED_MNEMONIC_REGEX.lastIndex = 0;
+					let escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(label);
+
+					// We can't use negative lookbehind so if we match our negative and skip
+					while (escMatch && escMatch[1]) {
+						escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(label);
+					}
+
+					if (escMatch) {
+						label = `${label.substr(0, escMatch.index)}<u aria-hidden="true">${escMatch[3]}</u>${label.substr(escMatch.index + escMatch[0].length)}`;
+					}
+
+					label = label.replace(/&amp;&amp;/g, '&amp;');
+					if (this.itemElement) {
+						this.itemElement.setAttribute('aria-keyshortcuts', (!!matches[1] ? matches[1] : matches[3]).toLocaleLowerCase());
+					}
+				} else {
+					label = label.replace(/&&/g, '&');
 				}
 			}
 
-			this.labelElement.innerHTML = label.trim();
+			if (this.labelElement) {
+				this.labelElement.innerHTML = label.trim();
+			}
 		}
 	}
 
