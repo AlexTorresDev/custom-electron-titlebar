@@ -77,10 +77,20 @@ The interface [`TitleBarOptions`] is managed, which has the following configurab
 
 ### Update Background
 
-When this method is executed, as well as when the title bar is created, it is checked whether the color is light or dark, so that the color of the icons adapts to the background of the title bar.
+This change the color of titlebar and it's checked whether the color is light or dark, so that the color of the icons adapts to the background of the title bar.
 
 ```js
 titlebar.updateBackground(new Color(new RGBA(0, 0, 0, .7)));
+```
+
+To assign colors you can use the following options: `Color.fromHex()`, `new Color(new RGBA(r, g, b, a))`, `new Color(new HSLA(h, s, l, a))`, `new Color(new HSVA(h, s, v, a))` or `Color.BLUE`, `Color.RED`, etc.
+
+### Update Items Background Color
+
+This method change background color on hover of items of menubar.
+
+```js
+titlebar.updateItemBGColor(new Color(new RGBA(0, 0, 0, .7)));
 ```
 
 To assign colors you can use the following options: `Color.fromHex()`, `new Color(new RGBA(r, g, b, a))`, `new Color(new HSLA(h, s, l, a))`, `new Color(new HSVA(h, s, v, a))` or `Color.BLUE`, `Color.RED`, etc.

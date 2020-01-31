@@ -445,11 +445,20 @@ export class Titlebar extends Themebar {
 	}
 
 	/**
-   * Update the background color of the title bar
-   * @param backgroundColor The color for the background
-   */
-	updateBackground(backgroundColor: Color) {
+	 * Update the background color of the title bar
+	 * @param backgroundColor The color for the background 
+	 */
+	updateBackground(backgroundColor: Color): void {
 		this._options.backgroundColor = backgroundColor;
+		this.updateStyles();
+	}
+
+	/**
+	 * Update the item background color of the menubar
+	 * @param itemBGColor The color for the item background
+	 */
+	updateItemBGColor(itemBGColor: Color): void {
+		this._options.itemBackgroundColor = itemBGColor;
 		this.updateStyles();
 	}
 
