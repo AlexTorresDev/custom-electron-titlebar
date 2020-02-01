@@ -6,7 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc ./example/main && tsc ./example/renderer && electron ./example/main.js",
+    "dev": "electron example/main.js",
     "start": "npm run build && npm run dev"
   },
   "author": "Alex Torres <alextorressk@gmail.com>",

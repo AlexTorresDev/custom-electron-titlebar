@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Electron Titlebar</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            font-weight: 400;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Hello World!</title>
+  <style>
+    html {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
 </head>
 
 <body>
-    This is a Window Example with <a href="https://github.com/AlexTorresSk/custom-electron-titlebar"
-        target="_blank">Custom Electron Titlebar</a>
-</body>
+  <h1>Hello World!</h1>
+  We are using Node.js <span id="node-version"></span>,
+  Chromium <span id="chrome-version"></span>,
+  and Electron <span id="electron-version"></span>.
 
-<script>
-    require('./renderer.js');
-</script>
+  <!-- You can also require other files to run in this process -->
+  <script src="./renderer.js"></script>
+</body>
 
 </html>

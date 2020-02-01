@@ -19,11 +19,7 @@ This project is a typescript library for electron that allows you to configure a
 npm i custom-electron-titlebar
 ```
 
-Or
-
-```
-npm install custom-electron-titlebar@latest
-```
+or use example folder to init basic electron project with this titlebar.
 
 ## Usage
 
