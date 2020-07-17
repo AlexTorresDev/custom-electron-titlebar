@@ -12,6 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
     icon: url.format(path.join(__dirname, '/images', '/icon.png')),
   });
 
+
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
     if (element) element.innerText = text

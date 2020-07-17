@@ -9,7 +9,7 @@
 import { toDisposable, IDisposable, Disposable } from "./common/lifecycle";
 
 class ThemingRegistry extends Disposable {
-    private theming: Theme[] = [];
+    private readonly theming: Theme[] = [];
 
     constructor() {
         super();
@@ -59,7 +59,7 @@ export class Themebar extends ThemingRegistry {
                 z-index: 99999;
             }
         
-            .titlebar.windows, .titlebar.linux {
+            .titlebar.cet-windows, .titlebar.cet-linux {
                 padding: 0;
                 height: 30px;
                 line-height: 30px;
@@ -344,18 +344,18 @@ export class Themebar extends ThemingRegistry {
         // Resizer
         this.registerTheme((collector: CssStyle) => {
             collector.addRule(`
-            .titlebar.windows .resizer, .titlebar.linux .resizer {
+            .titlebar.cet-windows .resizer, .titlebar.cet-linux .resizer {
                 -webkit-app-region: no-drag;
                 position: absolute;
             }
         
-            .titlebar.windows .resizer.top, .titlebar.linux .resizer.top {
+            .titlebar.cet-windows .resizer.top, .titlebar.cet-linux .resizer.top {
                 top: 0;
                 width: 100%;
                 height: 6px;
             }
         
-            .titlebar.windows .resizer.left, .titlebar.linux .resizer.left {
+            .titlebar.cet-windows .resizer.left, .titlebar.cet-linux .resizer.left {
                 top: 0;
                 left: 0;
                 width: 6px;
@@ -397,8 +397,8 @@ export class Themebar extends ThemingRegistry {
             .titlebar .window-controls-container .window-icon-bg .window-icon {
                 height: 100%;
                 width: 100%;
-                -webkit-mask-size: 23.1% !important;
-                mask-size: 23.1% !important;
+                -webkit-mask-size: 23.1%;
+                mask-size: 23.1%;
             }
             
             .titlebar .window-controls-container .window-icon-bg .window-icon.window-close {
@@ -557,7 +557,6 @@ function _applyRules(styleSheetContent: string, rulesClassName: string) {
 
     if (themeStyles.length === 0) {
         let styleElement = document.createElement('style');
-        styleElement.type = 'text/css';
         styleElement.className = rulesClassName;
         styleElement.innerHTML = styleSheetContent;
         document.head.appendChild(styleElement);

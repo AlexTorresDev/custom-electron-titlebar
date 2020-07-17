@@ -195,7 +195,7 @@ export class Titlebar extends Themebar {
 
 		// Titlebar
 		this.titlebar = $('div.titlebar');
-		addClass(this.titlebar, isWindows ? 'windows' : isLinux ? 'linux' : 'mac');
+		addClass(this.titlebar, isWindows ? 'cet-windows' : isLinux ? 'cet-linux' : 'cet-mac');
 
 		if (this._options.order) {
 			addClass(this.titlebar, this._options.order);
