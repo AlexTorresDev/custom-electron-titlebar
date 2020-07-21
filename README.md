@@ -51,7 +51,7 @@ The parameter `backgroundColor: Color` is required, this should be `Color` type.
 (View [Update Background](#update-background) for more details).
 
 #### Step 2
-Update the code to launch browser window
+Update the code that launches browser window
 ```js
 var mainWindow = new BrowserWindow({
       width: 1000,
