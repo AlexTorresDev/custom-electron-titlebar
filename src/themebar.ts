@@ -553,7 +553,8 @@ export interface Theme {
 }
 
 function _applyRules(styleSheetContent: string, rulesClassName: string) {
-    let themeStyles = document.head.getElementsByClassName(rulesClassName);
+    let head = document.head || document.getElementsByTagName("head")[0]
+    let themeStyles = head.getElementsByClassName(rulesClassName);
 
     if (themeStyles.length === 0) {
         let styleElement = document.createElement('style');
