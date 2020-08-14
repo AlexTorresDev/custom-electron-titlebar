@@ -4,7 +4,7 @@ This project is a typescript library for electron that allows you to configure a
 
 ### **It is a library for electron, it cannot be used on a basic website.**
 
-**The farewells are sad. But since I don't have time to keep this project, I have decided to archive it. Do not worry about current issues as most of them will be resolved. And in the same way, all those that appear until August 16, 2020 will be resolved.**
+**The farewells are sad. But since I don't have time to keep this project, I have decided to archive it on August 14, 2020.**
 
 **I have to thank the hundreds of people who supported and used custom electron titlebar, without you this would not have been achieved.**
 
