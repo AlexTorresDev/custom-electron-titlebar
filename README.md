@@ -27,6 +27,7 @@ or use example folder to init basic electron project with this titlebar.
 
 ## Usage
 
+#### Step 1
 In your **renderer** file or in an **HTML script tag** add:
 
 ```js
@@ -48,6 +49,16 @@ new Titlebar({
 
 The parameter `backgroundColor: Color` is required, this should be `Color` type.
 (View [Update Background](#update-background) for more details).
+
+#### Step 2
+Update the code that launches browser window
+```js
+var mainWindow = new BrowserWindow({
+      width: 1000,
+      height: 600,
+      titleBarStyle: "hidden", // add this line
+});
+```
 
 ## Options
 
