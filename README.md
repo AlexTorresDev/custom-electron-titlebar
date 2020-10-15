@@ -4,10 +4,6 @@ This project is a typescript library for electron that allows you to configure a
 
 ### **It is a library for electron, it cannot be used on a basic website.**
 
-**The farewells are sad. But since I don't have time to keep this project, I have decided to archive it on August 14, 2020.**
-
-**I have to thank the hundreds of people who supported and used custom electron titlebar, without you this would not have been achieved. For electron 10+ this is the new project: https://github.com/Treverix/custom-electron-titlebar**
-
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
