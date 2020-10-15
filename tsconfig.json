@@ -3,7 +3,7 @@
     "target": "es2016",
     "module": "commonjs",
     "declaration": true,
-    "outDir": "./lib",
+    "outDir": "./lib"
   },
   "include": [
     "src"
