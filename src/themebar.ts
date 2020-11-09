@@ -171,11 +171,27 @@ export class Themebar extends ThemingRegistry {
                 margin: 0 auto;
                 padding: .5em 0;
                 margin-left: 0;
-                overflow: visible;
+                overflow-x: visible;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
                 justify-content: flex-end;
                 white-space: nowrap;
                 box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
                 z-index: 99999;
+            }
+            .menubar-menu-container::-webkit-scrollbar {
+                width: 8px;
+                height: 4px;
+                cursor: pointer;
+                background-color: rbga(0,0,0,0);
+            }
+            .menubar-menu-container::-webkit-scrollbar-track {
+                border: none;
+                background-color: rbga(0,0,0,0);
+            }
+            .menubar-menu-container::-webkit-scrollbar-thumb{
+                border-radius: 10px;
+                background-color: rgba(110, 110, 110, 0.2);
             }
             
             .menubar-menu-container:focus {

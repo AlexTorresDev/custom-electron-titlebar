@@ -632,19 +632,24 @@ export class Menubar extends Disposable {
 
 	private showMenu(menuIndex: number, selectFirst = true): void {
 		const customMenu = this.menuItems[menuIndex];
+		const btnElement = customMenu.buttonElement;
+		const btnRect = btnElement.getBoundingClientRect();
 		const menuHolder = $('ul.menubar-menu-container');
 
-		addClass(customMenu.buttonElement, 'open');
+		addClass(btnElement, 'open');
 		menuHolder.setAttribute('role', 'menu');
 		menuHolder.tabIndex = 0;
-		menuHolder.style.top = `${customMenu.buttonElement.getBoundingClientRect().bottom}px`;
-		menuHolder.style.left = `${customMenu.buttonElement.getBoundingClientRect().left}px`;
+		menuHolder.style.top = `${btnRect.bottom}px`;
+		menuHolder.style.left = `${btnRect.left}px`;
 
-		customMenu.buttonElement.appendChild(menuHolder);
+		btnElement.appendChild(menuHolder);
+
+		// menuHolder.style.maxHeight = `200px`;
+		menuHolder.style.maxHeight = `${Math.max(10, window.innerHeight - btnRect.top - 50)}px`;
 
 		let menuOptions: IMenuOptions = {
 			enableMnemonics: this.mnemonicsInUse && this.options.enableMnemonics,
-			ariaLabel: customMenu.buttonElement.attributes['aria-label'].value
+			ariaLabel: btnElement.attributes['aria-label'].value
 		};
 
 		let menuWidget = new CETMenu(menuHolder, menuOptions, this.closeSubMenu);
