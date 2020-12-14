@@ -20,8 +20,9 @@ const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
 const INACTIVE_FOREGROUND = Color.fromHex('#EEEEEE');
 const ACTIVE_FOREGROUND = Color.fromHex('#FFFFFF');
 
+const IS_MAC_BIGSUR_OR_LATER = isMacintosh && parseInt(process.getSystemVersion().split(".")[0]) >= 11;
 const BOTTOM_TITLEBAR_HEIGHT = '60px';
-const TOP_TITLEBAR_HEIGHT_MAC = '22px';
+const TOP_TITLEBAR_HEIGHT_MAC = IS_MAC_BIGSUR_OR_LATER ? '28px': '22px';
 const TOP_TITLEBAR_HEIGHT_WIN = '30px';
 
 export interface TitlebarOptions extends MenubarOptions {
@@ -227,6 +228,11 @@ export class Titlebar extends Themebar {
 
 		if (!isMacintosh) {
 			this.title.style.cursor = 'default';
+		}
+
+		if (IS_MAC_BIGSUR_OR_LATER) {
+			this.title.style.fontWeight = "600";
+			this.title.style.fontSize = "13px";
 		}
 
 		this.updateTitle();
