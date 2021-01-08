@@ -9,7 +9,7 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { BrowserWindow, remote, Accelerator, NativeImage, MenuItem } from "electron";
+import { BrowserWindow, remote, Accelerator, NativeImage, MenuItem, ipcRenderer } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
@@ -130,9 +130,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
 
-		if (this.item.click) {
-			this.item.click(this.item as MenuItem, this.currentWindow, this.event);
-		}
+    if (this.item.role) {
+      ipcRenderer.send('execute-menu-command', {
+        role: this.item.role
+      })
+    } else if (this.item.click) {
+      this.item.click(this.item, this.currentWindow, this.event);
+    }
 
 		if (this.item.type === 'checkbox') {
 			this.item.checked = !this.item.checked;
