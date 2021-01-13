@@ -253,6 +253,7 @@ export class Titlebar extends Themebar {
 
 			// Minimize
 			const minimizeIconContainer = append(this.windowControls, $('div.window-icon-bg'));
+			minimizeIconContainer.title = "Minimize";
 			const minimizeIcon = append(minimizeIconContainer, $('div.window-icon'));
 			addClass(minimizeIcon, 'window-minimize');
 
@@ -285,6 +286,7 @@ export class Titlebar extends Themebar {
 
 			// Close
 			const closeIconContainer = append(this.windowControls, $('div.window-icon-bg'));
+			closeIconContainer.title = "Close";
 			addClass(closeIconContainer, 'window-close-bg');
 			const closeIcon = append(closeIconContainer, $('div.window-icon'));
 			addClass(closeIcon, 'window-close');
@@ -361,9 +363,11 @@ export class Titlebar extends Themebar {
 		if (this.maxRestoreControl) {
 			if (maximized) {
 				removeClass(this.maxRestoreControl, 'window-maximize');
+				this.maxRestoreControl.title = "Restore Down"
 				addClass(this.maxRestoreControl, 'window-unmaximize');
 			} else {
 				removeClass(this.maxRestoreControl, 'window-unmaximize');
+				this.maxRestoreControl.title = "Maximize"
 				addClass(this.maxRestoreControl, 'window-maximize');
 			}
 		}
