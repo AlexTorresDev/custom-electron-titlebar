@@ -444,6 +444,10 @@ export class Themebar extends ThemingRegistry {
             .titlebar .window-controls-container .window-icon-bg.window-close-bg:hover {
                 background-color: rgba(232, 17, 35, 0.9)!important;
             }
+
+            .titlebar .window-controls-container .window-icon-bg.window-close-bg:active {
+                background-color: rgba(232, 17, 35, 0.5)!important;
+            }
             
             .titlebar .window-controls-container .window-icon-bg.inactive {
                 background-color: transparent!important;
@@ -469,8 +473,16 @@ export class Themebar extends ThemingRegistry {
                 background-color: rgba(255, 255, 255, .1);
             }
 
+            .titlebar .window-controls-container .window-icon-bg:not(.inactive):active {
+                background-color: rgba(255, 255, 255, 0.3);
+            }
+
             .titlebar.light .window-controls-container .window-icon-bg:not(.inactive):hover {
                 background-color: rgba(0, 0, 0, .1);
+            }
+
+            .titlebar.light .window-controls-container .window-icon-bg:not(.inactive):active {
+                background-color: rgba(0, 0, 0, .2);
             }
         `);
         });
