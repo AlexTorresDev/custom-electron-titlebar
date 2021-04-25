@@ -257,7 +257,7 @@ export class CETMenu extends Disposable {
 				item = new Separator(menuItem, this.options);
 			} else if (menuItem.type === 'submenu' || menuItem.submenu) {
 				const submenuItems = (menuItem.submenu as Menu).items;
-				item = new Submenu(menuItem, submenuItems, this.parentData, this.options);
+				item = new Submenu(menuItem, submenuItems, this.parentData, this.options, this.closeSubMenu);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
@@ -462,10 +462,11 @@ class Submenu extends CETMenuItem {
 	private mouseOver: boolean;
 	private showScheduler: RunOnceScheduler;
 	private hideScheduler: RunOnceScheduler;
+	private closeSubmenu: () => void;
 
-	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions) {
+	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions, closeSubmenu = () => {}) {
 		super(item, submenuOptions);
-
+		this.closeSubmenu = closeSubmenu;
 		this.showScheduler = new RunOnceScheduler(() => {
 			if (this.mouseOver) {
 				this.cleanupExistingSubmenu(false);
@@ -557,7 +558,7 @@ class Submenu extends CETMenuItem {
 			this.submenuContainer = append(this.container, $('ul.submenu'));
 			addClasses(this.submenuContainer, 'menubar-menu-container');
 
-			this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuOptions);
+			this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuOptions, this.closeSubmenu);
 			this.parentData.submenu.createMenu(this.submenuItems);
 
 			if (this.menuStyle) {
