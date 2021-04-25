@@ -462,11 +462,9 @@ class Submenu extends CETMenuItem {
 	private mouseOver: boolean;
 	private showScheduler: RunOnceScheduler;
 	private hideScheduler: RunOnceScheduler;
-	private closeSubmenu: () => void;
 
-	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions, closeSubmenu = () => {}) {
-		super(item, submenuOptions);
-		this.closeSubmenu = closeSubmenu;
+	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions, closeSubMenu = () => {}) {
+		super(item, submenuOptions, closeSubMenu);
 		this.showScheduler = new RunOnceScheduler(() => {
 			if (this.mouseOver) {
 				this.cleanupExistingSubmenu(false);
@@ -558,7 +556,7 @@ class Submenu extends CETMenuItem {
 			this.submenuContainer = append(this.container, $('ul.submenu'));
 			addClasses(this.submenuContainer, 'menubar-menu-container');
 
-			this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuOptions, this.closeSubmenu);
+			this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuOptions, this.closeSubMenu);
 			this.parentData.submenu.createMenu(this.submenuItems);
 
 			if (this.menuStyle) {

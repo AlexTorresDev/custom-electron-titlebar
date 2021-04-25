@@ -36,7 +36,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
 	private mnemonic: KeyCode;
-	private closeSubMenu: () => void;
+	protected closeSubMenu: () => void;
 
 	private event: Electron.Event;
 	private currentWindow: BrowserWindow;
