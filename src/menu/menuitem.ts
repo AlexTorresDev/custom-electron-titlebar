@@ -32,6 +32,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	protected itemElement: HTMLElement;
 
 	private item: MenuItem;
+	
+	private accelerator: { modifiers: String[], key: String };
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
@@ -130,10 +132,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
 
-    if (this.item.role) {
-      ipcRenderer.send('execute-menu-command', {
-        role: this.item.role
-      })
+    if (this.item.role && this.accelerator) {
+		this.pressKey(this.accelerator.key, this.accelerator.modifiers);
     } else if (this.item.click) {
       this.item.click(this.item, this.currentWindow, this.event);
     }
@@ -221,9 +221,28 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 
 		if (accelerator !== null) {
+			this.accelerator = this.separateAccelerator(accelerator);
 			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(accelerator);
 		}
 	}
+
+	pressKey(key: String, modifiers: String[] = [] ): void {
+        this.currentWindow.webContents.sendInputEvent({
+            type: "keydown",
+            modifiers,
+            keyCode: key,
+        });
+    }
+
+    separateAccelerator(accelerator: String) : {modifiers: String[], key: String} {
+        const result = parseAccelerator(accelerator).split("+");
+        const output = {modifiers: [], key: ""};
+        for (let i = 0; i < result.length - 1; i++) {
+            output.modifiers.push(result[i]);
+        }
+        output.key = result[result.length - 1];
+        return output;
+    }
 
 	updateLabel(): void {
 		if (this.item.label) {
