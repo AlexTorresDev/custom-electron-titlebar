@@ -140,8 +140,9 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 		if (this.item.type === 'checkbox') {
 			this.updateChecked();
+		} else {
+			this.closeSubMenu();
 		}
-		this.closeSubMenu();
 	}
 
 	focus(): void {
