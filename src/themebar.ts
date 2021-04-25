@@ -172,7 +172,7 @@ export class Themebar extends ThemingRegistry {
                 padding: .5em 0;
                 margin-left: 0;
                 overflow-x: visible;
-                overflow-y: auto;
+                overflow-y: visible;
                 -webkit-overflow-scrolling: touch;
                 justify-content: flex-end;
                 white-space: nowrap;
