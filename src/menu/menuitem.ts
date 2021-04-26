@@ -33,7 +33,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	private item: MenuItem;
 
-	private accelerator: { modifiers: String[], key: String };
+	private accelerator: { modifiers: string[], key: string };
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
@@ -226,7 +226,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	pressKey(key: String, modifiers: String[] = []): void {
+	pressKey(key: string, modifiers: string[] = []): void {
 		this.currentWindow.webContents.sendInputEvent({
 			type: "keydown",
 			modifiers,
@@ -234,14 +234,12 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		});
 	}
 
-	separateAccelerator(accelerator: String): { modifiers: String[], key: String } {
+	separateAccelerator(accelerator: string): { modifiers: string[], key: string } {
 		const result = parseAccelerator(accelerator).split("+");
-		const output = { modifiers: [], key: "" };
-		for (let i = 0; i < result.length - 1; i++) {
-			output.modifiers.push(result[i]);
-		}
-		output.key = result[result.length - 1];
-		return output;
+		return {
+			modifiers: result.slice(0, -1),
+			key: result[result.length - 1]
+		};
 	}
 
 	updateLabel(): void {
