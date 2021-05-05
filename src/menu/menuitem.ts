@@ -355,17 +355,44 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 
 	updateRadioGroup() {
-        for (let menuItem of this.menuContainer) {
-            if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio' && menuItem !== this) {
+		const radioGroup = this.getRadioGroup();
+		for (let i = radioGroup.start; i < radioGroup.end; i++) {
+			const menuItem = this.menuContainer[i];
+			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio' && menuItem !== this) {
                 removeClass(menuItem.itemElement, 'checked');
                 menuItem.itemElement.setAttribute('role', 'menuitem');
                 menuItem.itemElement.setAttribute('aria-checked', 'false');
             }
-        }
+		}
 		addClass(this.itemElement, 'checked');
         this.itemElement.setAttribute('role', 'menuitemcheckbox');
         this.itemElement.setAttribute('aria-checked', 'true');
     }
+
+	getRadioGroup() : {start: number, end: number} {
+		let startIndex = 0;
+		let found = false;
+		let endIndex: number;
+		for (const index in this.menuContainer) {
+			if (this.menuContainer[index] instanceof CETMenuItem) {
+				if (this.menuContainer[index] === this) {
+					found = true;
+					// @ts-ignore -> menuContainer[index] is CETMenuItem
+				}  else if(this.menuContainer[index].item.type === "separator") {
+					if (!found) {
+						startIndex = Number.parseInt(index) + 1;
+					} else {
+						endIndex = Number.parseInt(index);
+						break;
+					}
+				}
+			}
+		}
+		if (endIndex === undefined) {
+			endIndex = this.menuContainer.length;
+		}
+		return {start: startIndex, end: endIndex}
+	}
 
 
 	dispose(): void {

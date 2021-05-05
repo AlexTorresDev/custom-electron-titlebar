@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron')
 const path = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -18,12 +18,105 @@ function createWindow() {
       nodeIntegration: true,
     }
   })
+  const template = [
+    {
+      label: "Options",
+      submenu: [
+        {
+          label: "Quit",
+          click: ()=>{app.quit()}
+        },
+        {
+          label: "Radio1",
+          type: "radio",
+          checked: true
+        },
+        {
+          label: "Radio2",
+          type: "radio",
+        },
+        {
+          label: "Checkbox1",
+          type: "checkbox",
+          checked: true,
+          click: (item) => {
+            console.log("item is checked? "+item.checked);
+          }
+        },
+        {type: "separator"},
+        {
+          label: "Checkbox2",
+          type: "checkbox",
+          checked: false,
+          click: (item) => {
+            console.log("item is checked? "+item.checked);
+          }
+        },
+        {
+          label: "Radio Test",
+          submenu: [
+            {
+              label: "Sample Checkbox",
+              type: "checkbox",
+              checked: true
+            },
+            {
+              label: "Radio1",
+              checked: true,
+              type: "radio"
+            },
+            {
+              label: "Radio2",
+              type: "radio"
+            },
+            {
+              label: "Radio3",
+              type: "radio"
+            },
+            { type: "separator" },
+                        {
+              label: "Radio1",
+              checked: true,
+              type: "radio"
+            },
+            {
+              label: "Radio2",
+              type: "radio"
+            },
+            {
+              label: "Radio3",
+              type: "radio"
+            }
+          ]
+        },
+        {
+          label: "zoomIn",
+          role: "zoomIn"
+        },
+        {
+          label: "zoomOut",
+          role: "zoomOut"
+        },
+        {
+          label: "Radio1",
+          type: "radio"
+        },
+        {
+          label: "Radio2",
+          checked: true,
+          type: "radio"
+        },
+      ]
+    }
+  ];
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
