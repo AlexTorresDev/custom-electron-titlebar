@@ -327,7 +327,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	updateEnabled() {
+	updateEnabled(): void {
 		if (this.item.enabled && this.item.type !== 'separator') {
 			removeClass(this.container, 'disabled');
 			this.container.tabIndex = 0;
@@ -336,13 +336,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	updateVisibility() {
+	updateVisibility(): void {
 		if (this.item.visible === false && this.itemElement) {
 			this.itemElement.remove();
 		}
 	}
 
-	updateChecked() {
+	updateChecked(): void {
 		if (this.item.checked) {
 			addClass(this.itemElement, 'checked');
 			this.itemElement.setAttribute('role', 'menuitemcheckbox');
@@ -354,8 +354,9 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	updateRadioGroup() {
-		const radioGroup = this.getRadioGroup();
+	updateRadioGroup(): void {
+		const radioGroup = getRadioGroup();
+		// remove checked from all *other* radio buttons in group
 		for (let i = radioGroup.start; i < radioGroup.end; i++) {
 			const menuItem = this.menuContainer[i];
 			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio' && menuItem !== this) {
@@ -364,36 +365,35 @@ export class CETMenuItem extends Disposable implements IMenuItem {
                 menuItem.itemElement.setAttribute('aria-checked', 'false');
             }
 		}
+		// set *this* radio button to checked
 		addClass(this.itemElement, 'checked');
         this.itemElement.setAttribute('role', 'menuitemcheckbox');
         this.itemElement.setAttribute('aria-checked', 'true');
-    }
 
-	getRadioGroup() : {start: number, end: number} {
-		let startIndex = 0;
-		let found = false;
-		let endIndex: number;
-		for (const index in this.menuContainer) {
-			if (this.menuContainer[index] instanceof CETMenuItem) {
-				if (this.menuContainer[index] === this) {
-					found = true;
-					// @ts-ignore -> menuContainer[index] is CETMenuItem
-				}  else if(this.menuContainer[index].item.type === "separator") {
-					if (!found) {
-						startIndex = Number.parseInt(index) + 1;
-					} else {
-						endIndex = Number.parseInt(index);
-						break;
+		/** find radioGroup assuming this.type === "radio" 
+		 * @returns radioGroup index's starts with (menuContainer[0] || previous separator +1) && ends with (menuContainer[length] || next separator) */
+		function getRadioGroup(): {start: number, end: number} {
+			let startIndex = 0;
+			let found = false;
+			let endIndex: number;
+			for (const index in this.menuContainer) {
+				if (this.menuContainer[index] instanceof CETMenuItem) {
+					if (this.menuContainer[index] === this) {
+						found = true;
+						// @ts-ignore -> menuContainer[index] is CETMenuItem
+					}  else if(this.menuContainer[index].isSeparator()) {
+						if (!found) {
+							startIndex = Number.parseInt(index) + 1;
+						} else {
+							endIndex = Number.parseInt(index);
+							break;
+						}
 					}
 				}
 			}
+			return {start: startIndex, end: endIndex || this.menuContainer.length}
 		}
-		if (endIndex === undefined) {
-			endIndex = this.menuContainer.length;
-		}
-		return {start: startIndex, end: endIndex}
-	}
-
+    }
 
 	dispose(): void {
 		if (this.itemElement) {
@@ -408,7 +408,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		return this.mnemonic;
 	}
 
-	protected applyStyle() {
+	protected applyStyle(): void {
 		if (!this.menuStyle) {
 			return;
 		}
