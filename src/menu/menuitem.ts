@@ -33,7 +33,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	private item: MenuItem;
 
-	private accelerator: { modifiers: string[], key: string };
+	private radioGroup:  { start: number, end: number }; // used only if item.type === "radio"
+	private accelerator: { modifiers: string[], key: string }; // used only if item.role is defined
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
@@ -234,7 +235,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	pressKey(key: string, modifiers: string[] = []): void {
 		this.currentWindow.webContents.sendInputEvent({
 			type: "keyDown",
-			// @ts-ignore -> modifiers will always be of the right type
+			// @ts-ignore -> modifiers should always be of the right type
 			modifiers,
 			keyCode: key,
 		});
@@ -355,9 +356,11 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 
 	updateRadioGroup(): void {
-		const radioGroup = this.getRadioGroup();
+		if (this.radioGroup === undefined) {
+			this.radioGroup = this.getRadioGroup();
+		}
 		// remove checked from all *other* radio buttons in group
-		for (let i = radioGroup.start; i < radioGroup.end; i++) {
+		for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
 			const menuItem = this.menuContainer[i];
 			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio' && menuItem !== this) {
 				removeClass(menuItem.itemElement, 'checked');
