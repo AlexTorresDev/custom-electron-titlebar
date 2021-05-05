@@ -33,7 +33,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	private item: MenuItem;
 
-	private radioGroup:  { start: number, end: number }; // used only if item.type === "radio"
+	private radioGroup: { start: number, end: number }; // used only if item.type === "radio"
 	private accelerator: { modifiers: string[], key: string }; // used only if item.role is defined
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
@@ -359,22 +359,17 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		if (this.radioGroup === undefined) {
 			this.radioGroup = this.getRadioGroup();
 		}
-		// remove checked from all *other* radio buttons in group
 		for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
 			const menuItem = this.menuContainer[i];
-			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio' && menuItem !== this) {
-				removeClass(menuItem.itemElement, 'checked');
-				menuItem.itemElement.setAttribute('role', 'menuitem');
-				menuItem.itemElement.setAttribute('aria-checked', 'false');
-				// set radioGroup of the other radio buttons since it was already calculated
-				menuItem.radioGroup = this.radioGroup;
+			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio') {
+				// updateChecked() *all* radio buttons in group
+				menuItem.updateChecked();
+				// set the radioGroup property of all the other radio buttons since it was already calculated
+				if (menuItem !== this) {
+					menuItem.radioGroup = this.radioGroup;
+				}
 			}
 		}
-		// set *this* radio button to checked
-		addClass(this.itemElement, 'checked');
-		this.itemElement.setAttribute('role', 'menuitemcheckbox');
-		this.itemElement.setAttribute('aria-checked', 'true');
-
 	}
 
 	/** find radioGroup assuming this.type === "radio" 
