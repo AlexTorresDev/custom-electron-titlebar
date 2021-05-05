@@ -39,17 +39,19 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	private iconElement: HTMLElement;
 	private mnemonic: KeyCode;
 	protected closeSubMenu: () => void;
+	protected menuContainer: IMenuItem[];
 
 	private event: Electron.Event;
 	private currentWindow: BrowserWindow;
 
-	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }) {
+	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => {}, menuContainer: IMenuItem[]) {
 		super();
 
 		this.item = item;
 		this.options = options;
 		this.currentWindow = remote.getCurrentWindow();
 		this.closeSubMenu = closeSubMenu;
+		this.menuContainer = menuContainer;
 
 		// Set mnemonic
 		if (this.item.label && options.enableMnemonics) {
@@ -139,10 +141,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 
 		if (this.item.type === 'checkbox') {
-			this.updateChecked();
-		} else {
-			this.closeSubMenu();
-		}
+            this.updateChecked();
+        } else if(this.item.type === 'radio') {
+            this.updateRadioGroup();
+        } else {
+            this.closeSubMenu();
+        }
+
 	}
 
 	focus(): void {
@@ -228,7 +233,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	pressKey(key: string, modifiers: string[] = []): void {
 		this.currentWindow.webContents.sendInputEvent({
-			type: "keydown",
+			type: "keyDown",
+			// @ts-ignore -> modifiers will always be of the right type
 			modifiers,
 			keyCode: key,
 		});
@@ -347,6 +353,20 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.itemElement.setAttribute('aria-checked', 'false');
 		}
 	}
+
+	updateRadioGroup() {
+        for (let menuItem of this.menuContainer) {
+            if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio' && menuItem !== this) {
+                removeClass(menuItem.itemElement, 'checked');
+                menuItem.itemElement.setAttribute('role', 'menuitem');
+                menuItem.itemElement.setAttribute('aria-checked', 'false');
+            }
+        }
+		addClass(this.itemElement, 'checked');
+        this.itemElement.setAttribute('role', 'menuitemcheckbox');
+        this.itemElement.setAttribute('aria-checked', 'true');
+    }
+
 
 	dispose(): void {
 		if (this.itemElement) {
