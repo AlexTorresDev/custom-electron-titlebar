@@ -64,7 +64,7 @@ const exampleMenuTemplate = () => [
     submenu: [
       {
         label: "Quit",
-        click: () => { app.quit() }
+        click: () => app.quit()
       },
       {
         label: "Radio1",

@@ -44,7 +44,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	private event: Electron.Event;
 	private currentWindow: BrowserWindow;
 
-	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => {}, menuContainer: IMenuItem[]) {
+	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
 		super();
 
 		this.item = item;
@@ -141,12 +141,12 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 
 		if (this.item.type === 'checkbox') {
-            this.updateChecked();
-        } else if(this.item.type === 'radio') {
-            this.updateRadioGroup();
-        } else {
-            this.closeSubMenu();
-        }
+			this.updateChecked();
+		} else if (this.item.type === 'radio') {
+			this.updateRadioGroup();
+		} else {
+			this.closeSubMenu();
+		}
 
 	}
 
@@ -355,45 +355,46 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 
 	updateRadioGroup(): void {
-		const radioGroup = getRadioGroup();
+		const radioGroup = this.getRadioGroup();
 		// remove checked from all *other* radio buttons in group
 		for (let i = radioGroup.start; i < radioGroup.end; i++) {
 			const menuItem = this.menuContainer[i];
 			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio' && menuItem !== this) {
-                removeClass(menuItem.itemElement, 'checked');
-                menuItem.itemElement.setAttribute('role', 'menuitem');
-                menuItem.itemElement.setAttribute('aria-checked', 'false');
-            }
+				removeClass(menuItem.itemElement, 'checked');
+				menuItem.itemElement.setAttribute('role', 'menuitem');
+				menuItem.itemElement.setAttribute('aria-checked', 'false');
+			}
 		}
 		// set *this* radio button to checked
 		addClass(this.itemElement, 'checked');
-        this.itemElement.setAttribute('role', 'menuitemcheckbox');
-        this.itemElement.setAttribute('aria-checked', 'true');
+		this.itemElement.setAttribute('role', 'menuitemcheckbox');
+		this.itemElement.setAttribute('aria-checked', 'true');
 
-		/** find radioGroup assuming this.type === "radio" 
-		 * @returns radioGroup index's starts with (menuContainer[0] || previous separator +1) && ends with (menuContainer[length] || next separator) */
-		function getRadioGroup(): {start: number, end: number} {
-			let startIndex = 0;
-			let found = false;
-			let endIndex: number;
-			for (const index in this.menuContainer) {
-				if (this.menuContainer[index] instanceof CETMenuItem) {
-					if (this.menuContainer[index] === this) {
-						found = true;
-						// @ts-ignore -> menuContainer[index] is CETMenuItem
-					}  else if(this.menuContainer[index].isSeparator()) {
-						if (!found) {
-							startIndex = Number.parseInt(index) + 1;
-						} else {
-							endIndex = Number.parseInt(index);
-							break;
-						}
+	}
+
+	/** find radioGroup assuming this.type === "radio" 
+	* @returns radioGroup index's starts with (menuContainer[0] || previous separator +1) && ends with (menuContainer[length] || next separator) */
+	getRadioGroup(): { start: number, end: number } {
+		let startIndex = 0;
+		let found = false;
+		let endIndex: number;
+		for (const index in this.menuContainer) {
+			const menuItem = this.menuContainer[index];
+			if (menuItem instanceof CETMenuItem) {
+				if (menuItem === this) {
+					found = true;
+				} else if (menuItem.isSeparator()) {
+					if (found) {
+						endIndex = Number.parseInt(index);
+						break;
+					} else {
+						startIndex = Number.parseInt(index) + 1;
 					}
 				}
 			}
-			return {start: startIndex, end: endIndex || this.menuContainer.length}
 		}
-    }
+		return { start: startIndex, end: endIndex || this.menuContainer.length }
+	}
 
 	dispose(): void {
 		if (this.itemElement) {
