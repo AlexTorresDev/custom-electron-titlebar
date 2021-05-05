@@ -18,98 +18,8 @@ function createWindow() {
       nodeIntegration: true,
     }
   })
-  const template = [
-    {
-      label: "Options",
-      submenu: [
-        {
-          label: "Quit",
-          click: ()=>{app.quit()}
-        },
-        {
-          label: "Radio1",
-          type: "radio",
-          checked: true
-        },
-        {
-          label: "Radio2",
-          type: "radio",
-        },
-        {
-          label: "Checkbox1",
-          type: "checkbox",
-          checked: true,
-          click: (item) => {
-            console.log("item is checked? "+item.checked);
-          }
-        },
-        {type: "separator"},
-        {
-          label: "Checkbox2",
-          type: "checkbox",
-          checked: false,
-          click: (item) => {
-            console.log("item is checked? "+item.checked);
-          }
-        },
-        {
-          label: "Radio Test",
-          submenu: [
-            {
-              label: "Sample Checkbox",
-              type: "checkbox",
-              checked: true
-            },
-            {
-              label: "Radio1",
-              checked: true,
-              type: "radio"
-            },
-            {
-              label: "Radio2",
-              type: "radio"
-            },
-            {
-              label: "Radio3",
-              type: "radio"
-            },
-            { type: "separator" },
-                        {
-              label: "Radio1",
-              checked: true,
-              type: "radio"
-            },
-            {
-              label: "Radio2",
-              type: "radio"
-            },
-            {
-              label: "Radio3",
-              type: "radio"
-            }
-          ]
-        },
-        {
-          label: "zoomIn",
-          role: "zoomIn"
-        },
-        {
-          label: "zoomOut",
-          role: "zoomOut"
-        },
-        {
-          label: "Radio1",
-          type: "radio"
-        },
-        {
-          label: "Radio2",
-          checked: true,
-          type: "radio"
-        },
-      ]
-    }
-  ];
-  const menu = Menu.buildFromTemplate(template);
+
+  const menu = Menu.buildFromTemplate(exampleMenuTemplate());
   Menu.setApplicationMenu(menu);
 
   // and load the index.html of the app.
@@ -147,3 +57,95 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+const exampleMenuTemplate = () => [
+  {
+    label: "Options",
+    submenu: [
+      {
+        label: "Quit",
+        click: () => { app.quit() }
+      },
+      {
+        label: "Radio1",
+        type: "radio",
+        checked: true
+      },
+      {
+        label: "Radio2",
+        type: "radio",
+      },
+      {
+        label: "Checkbox1",
+        type: "checkbox",
+        checked: true,
+        click: (item) => {
+          console.log("item is checked? " + item.checked);
+        }
+      },
+      {type: "separator"},
+      {
+        label: "Checkbox2",
+        type: "checkbox",
+        checked: false,
+        click: (item) => {
+          console.log("item is checked? " + item.checked);
+        }
+      },
+      {
+        label: "Radio Test",
+        submenu: [
+          {
+            label: "Sample Checkbox",
+            type: "checkbox",
+            checked: true
+          },
+          {
+            label: "Radio1",
+            checked: true,
+            type: "radio"
+          },
+          {
+            label: "Radio2",
+            type: "radio"
+          },
+          {
+            label: "Radio3",
+            type: "radio"
+          },
+          { type: "separator" },
+                      {
+            label: "Radio1",
+            checked: true,
+            type: "radio"
+          },
+          {
+            label: "Radio2",
+            type: "radio"
+          },
+          {
+            label: "Radio3",
+            type: "radio"
+          }
+        ]
+      },
+      {
+        label: "zoomIn",
+        role: "zoomIn"
+      },
+      {
+        label: "zoomOut",
+        role: "zoomOut"
+      },
+      {
+        label: "Radio1",
+        type: "radio"
+      },
+      {
+        label: "Radio2",
+        checked: true,
+        type: "radio"
+      },
+    ]
+  }
+];
