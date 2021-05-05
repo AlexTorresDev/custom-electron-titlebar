@@ -366,6 +366,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 				removeClass(menuItem.itemElement, 'checked');
 				menuItem.itemElement.setAttribute('role', 'menuitem');
 				menuItem.itemElement.setAttribute('aria-checked', 'false');
+				// set radioGroup of the other radio buttons since it was already calculated
+				menuItem.radioGroup = this.radioGroup;
 			}
 		}
 		// set *this* radio button to checked
