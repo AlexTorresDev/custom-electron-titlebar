@@ -372,28 +372,26 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	/** find radioGroup assuming this.type === "radio" 
-	* @returns radioGroup index's starts with (menuContainer[0] || previous separator +1) && ends with (menuContainer[length] || next separator) */
+	/** radioGroup index's starts with (previous separator +1 OR menuContainer[0]) and ends with (next separator OR menuContainer[length]) */
 	getRadioGroup(): { start: number, end: number } {
 		let startIndex = 0;
+		let endIndex = this.menuContainer.length;
 		let found = false;
-		let endIndex: number;
+
 		for (const index in this.menuContainer) {
 			const menuItem = this.menuContainer[index];
-			if (menuItem instanceof CETMenuItem) {
-				if (menuItem === this) {
-					found = true;
-				} else if (menuItem.isSeparator()) {
-					if (found) {
-						endIndex = Number.parseInt(index);
-						break;
-					} else {
-						startIndex = Number.parseInt(index) + 1;
-					}
+			if (menuItem === this) {
+				found = true;
+			} else if (menuItem instanceof CETMenuItem && menuItem.isSeparator()) {
+				if (found) {
+					endIndex = Number.parseInt(index);
+					break;
+				} else {
+					startIndex = Number.parseInt(index) + 1;
 				}
 			}
 		}
-		return { start: startIndex, end: endIndex || this.menuContainer.length }
+		return { start: startIndex, end: endIndex };
 	}
 
 	dispose(): void {
