@@ -9,7 +9,7 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { BrowserWindow, remote, Accelerator, NativeImage, MenuItem, ipcRenderer } from "electron";
+import { BrowserWindow, remote, Accelerator, NativeImage, MenuItem } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
@@ -32,22 +32,27 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	protected itemElement: HTMLElement;
 
 	private item: MenuItem;
+
+	private radioGroup: { start: number, end: number }; // used only if item.type === "radio"
+	private accelerator: { modifiers: string[], key: string }; // used only if item.role is defined
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
 	private mnemonic: KeyCode;
-	private closeSubMenu: () => void;
+	protected closeSubMenu: () => void;
+	protected menuContainer: IMenuItem[];
 
 	private event: Electron.Event;
 	private currentWindow: BrowserWindow;
 
-	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }) {
+	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
 		super();
 
 		this.item = item;
 		this.options = options;
 		this.currentWindow = remote.getCurrentWindow();
 		this.closeSubMenu = closeSubMenu;
+		this.menuContainer = menuContainer;
 
 		// Set mnemonic
 		if (this.item.label && options.enableMnemonics) {
@@ -130,19 +135,20 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
 
-    if (this.item.role) {
-      ipcRenderer.send('execute-menu-command', {
-        role: this.item.role
-      })
-    } else if (this.item.click) {
-      this.item.click(this.item, this.currentWindow, this.event);
-    }
+		if (this.item.role && this.accelerator) {
+			this.pressKey(this.accelerator.key, this.accelerator.modifiers);
+		} else if (this.item.click) {
+			this.item.click(this.item, this.currentWindow, this.event);
+		}
 
 		if (this.item.type === 'checkbox') {
-			this.item.checked = !this.item.checked;
 			this.updateChecked();
+		} else if (this.item.type === 'radio') {
+			this.updateRadioGroup();
+		} else {
+			this.closeSubMenu();
 		}
-		this.closeSubMenu();
+
 	}
 
 	focus(): void {
@@ -221,8 +227,26 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 
 		if (accelerator !== null) {
+			this.accelerator = this.separateAccelerator(accelerator);
 			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(accelerator);
 		}
+	}
+
+	pressKey(key: string, modifiers: string[] = []): void {
+		this.currentWindow.webContents.sendInputEvent({
+			type: "keyDown",
+			// @ts-ignore -> modifiers should always be of the right type
+			modifiers,
+			keyCode: key,
+		});
+	}
+
+	separateAccelerator(accelerator: string): { modifiers: string[], key: string } {
+		const result = parseAccelerator(accelerator).split("+");
+		return {
+			modifiers: result.slice(0, -1),
+			key: result[result.length - 1]
+		};
 	}
 
 	updateLabel(): void {
@@ -304,7 +328,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	updateEnabled() {
+	updateEnabled(): void {
 		if (this.item.enabled && this.item.type !== 'separator') {
 			removeClass(this.container, 'disabled');
 			this.container.tabIndex = 0;
@@ -313,13 +337,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	updateVisibility() {
+	updateVisibility(): void {
 		if (this.item.visible === false && this.itemElement) {
 			this.itemElement.remove();
 		}
 	}
 
-	updateChecked() {
+	updateChecked(): void {
 		if (this.item.checked) {
 			addClass(this.itemElement, 'checked');
 			this.itemElement.setAttribute('role', 'menuitemcheckbox');
@@ -329,6 +353,45 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.itemElement.setAttribute('role', 'menuitem');
 			this.itemElement.setAttribute('aria-checked', 'false');
 		}
+	}
+
+	updateRadioGroup(): void {
+		if (this.radioGroup === undefined) {
+			this.radioGroup = this.getRadioGroup();
+		}
+		for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
+			const menuItem = this.menuContainer[i];
+			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio') {
+				// updateChecked() *all* radio buttons in group
+				menuItem.updateChecked();
+				// set the radioGroup property of all the other radio buttons since it was already calculated
+				if (menuItem !== this) {
+					menuItem.radioGroup = this.radioGroup;
+				}
+			}
+		}
+	}
+
+	/** radioGroup index's starts with (previous separator +1 OR menuContainer[0]) and ends with (next separator OR menuContainer[length]) */
+	getRadioGroup(): { start: number, end: number } {
+		let startIndex = 0;
+		let endIndex = this.menuContainer.length;
+		let found = false;
+
+		for (const index in this.menuContainer) {
+			const menuItem = this.menuContainer[index];
+			if (menuItem === this) {
+				found = true;
+			} else if (menuItem instanceof CETMenuItem && menuItem.isSeparator()) {
+				if (found) {
+					endIndex = Number.parseInt(index);
+					break;
+				} else {
+					startIndex = Number.parseInt(index) + 1;
+				}
+			}
+		}
+		return { start: startIndex, end: endIndex };
 	}
 
 	dispose(): void {
@@ -344,7 +407,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		return this.mnemonic;
 	}
 
-	protected applyStyle() {
+	protected applyStyle(): void {
 		if (!this.menuStyle) {
 			return;
 		}

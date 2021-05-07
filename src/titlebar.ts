@@ -512,6 +512,9 @@ export class Titlebar extends Themebar {
 		if (!isMacintosh) {
 			if (this.menubar) {
 				this.menubar.dispose();
+				if (!menu) {
+					return;
+				}
 				this._options.menu = menu;
 			}
 
