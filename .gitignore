@@ -187,7 +187,7 @@ typings/
 # Nuxt.js build / generate output
 .nuxt
 dist
-lib/
+build/
 *.map
 package-lock.json
 
