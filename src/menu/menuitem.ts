@@ -34,7 +34,6 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	private item: MenuItem;
 
 	private radioGroup: { start: number, end: number }; // used only if item.type === "radio"
-	private accelerator: { modifiers: string[], key: string }; // used only if item.role is defined
 	private labelElement: HTMLElement;
 	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
@@ -135,11 +134,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
 
-		if (this.item.role && this.accelerator) {
-			this.pressKey(this.accelerator.key, this.accelerator.modifiers);
-		} else if (this.item.click) {
-			this.item.click(this.item, this.currentWindow, this.event);
-		}
+		this.item.click(this.event,this.currentWindow, this.currentWindow.webContents);
 
 		if (this.item.type === 'checkbox') {
 			this.updateChecked();
@@ -227,26 +222,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 
 		if (accelerator !== null) {
-			this.accelerator = this.separateAccelerator(accelerator);
 			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(accelerator);
 		}
-	}
-
-	pressKey(key: string, modifiers: string[] = []): void {
-		this.currentWindow.webContents.sendInputEvent({
-			type: "keyDown",
-			// @ts-ignore -> modifiers should always be of the right type
-			modifiers,
-			keyCode: key,
-		});
-	}
-
-	separateAccelerator(accelerator: string): { modifiers: string[], key: string } {
-		const result = parseAccelerator(accelerator).split("+");
-		return {
-			modifiers: result.slice(0, -1),
-			key: result[result.length - 1]
-		};
 	}
 
 	updateLabel(): void {
