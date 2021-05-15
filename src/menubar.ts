@@ -275,10 +275,8 @@ export class Menubar extends Disposable {
 	private onClick(menuIndex: number) {
 		let electronEvent: Electron.Event;
 		const item = this.menuItems[menuIndex].menuItem;
-
-		if (item.click) {
-			item.click(item as MenuItem, remote.getCurrentWindow(), electronEvent);
-		}
+		const browserWindow = remote.getCurrentWindow();
+		item.click(electronEvent, browserWindow, browserWindow.webContents);
 	}
 
 	public get onVisibilityChange(): Event<boolean> {
