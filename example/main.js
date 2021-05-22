@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu } = require('electron')
+const Remote = require('@electron/remote/main')
 const path = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -18,6 +19,9 @@ function createWindow() {
       nodeIntegration: true,
     }
   })
+
+  // bootstrap remote
+  Remote.initialize()
 
   const menu = Menu.buildFromTemplate(exampleMenuTemplate());
   Menu.setApplicationMenu(menu);

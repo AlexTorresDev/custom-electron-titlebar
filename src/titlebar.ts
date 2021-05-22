@@ -12,7 +12,8 @@ import { isMacintosh, isWindows, isLinux } from './common/platform';
 import { Color, RGBA } from './common/color';
 import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from './common/dom';
 import { Menubar, MenubarOptions } from './menubar';
-import { remote, BrowserWindow } from 'electron';
+import { BrowserWindow } from 'electron';
+import * as remote from '@electron/remote';
 import { Theme, Themebar } from './themebar';
 
 const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');

@@ -34,7 +34,9 @@
   "peerDependencies": {
     "electron": "^10.0.0 || ^11.0.0 || ^12.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@electron/remote": "^1.1.0"
+  },
   "devDependencies": {
     "electron": "^10.4.0",
     "typescript": "^4.2.3"

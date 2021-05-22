@@ -9,7 +9,8 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { Color } from './common/color';
-import { remote, MenuItem, Menu } from 'electron';
+import { MenuItem, Menu } from 'electron';
+import * as remote from '@electron/remote';
 import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode, isAncestor, EventLike, EventHelper } from './common/dom';
 import { CETMenu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu/menu';
 import { StandardKeyboardEvent } from './browser/keyboardEvent';
