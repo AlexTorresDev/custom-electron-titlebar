@@ -5,6 +5,9 @@ This project is a typescript library for electron that allows you to configure a
 ## IMPORTANT
 **This project has been archived and is now read-only. I thank all the people who supported the project with issues, pull request, ideas, etc. <br/>Because I do not have the time to continue with the development of it I have decided to close this project, but, you can always rely on the code to develop something better 😉**
 
+<a href="https://discord.gg/VbryQVzERd" target="_blank"><img height="100" src="https://user-images.githubusercontent.com/45916349/138462986-9071d465-89d2-4a36-8db7-8fc679c9c422.jpg"></a>
+
+
 ### **It is a library for electron, it cannot be used on a basic website.**
 
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
@@ -216,13 +219,6 @@ The following CSS classes exist and can be used to customize the titlebar
 | .action-item                | Description missing                             |
 | .action-menu-item           | Styles action menu elements. (Example: color)   |
 
-## Contributing
-
-Many thanks to all the people who support this project through issues and pull request.
-If you want to contribute with this project, all the issues and pull request are welcome, or we can chat a bit in the [discussions](https://github.com/AlexTorresSk/custom-electron-titlebar/discussions)
-
-You can also:<br>
-<a href="https://www.buymeacoffee.com/bjkGN4g" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 ## License
 
