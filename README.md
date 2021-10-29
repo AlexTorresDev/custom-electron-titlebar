@@ -5,9 +5,6 @@ This project is a typescript library for electron that allows you to configure a
 ## IMPORTANT
 **This project has been archived and is now read-only. I thank all the people who supported the project with issues, pull request, ideas, etc. <br/>Because I do not have the time to continue with the development of it I have decided to close this project, but, you can always rely on the code to develop something better 😉**
 
-<a href="https://discord.gg/VbryQVzERd" target="_blank"><img height="100" src="https://user-images.githubusercontent.com/45916349/138462986-9071d465-89d2-4a36-8db7-8fc679c9c422.jpg"></a>
-
-
 ### **It is a library for electron, it cannot be used on a basic website.**
 
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
