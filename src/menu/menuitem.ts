@@ -9,7 +9,7 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { BrowserWindow, Accelerator, NativeImage, MenuItem } from "electron";
+import { BrowserWindow, NativeImage, MenuItem } from "electron";
 import * as remote from '@electron/remote';
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
@@ -405,7 +405,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 }
 
-function parseAccelerator(a: Accelerator): string {
+function parseAccelerator(a: any): string {
 	var accelerator = a.toString();
 
 	if (!isMacintosh) {

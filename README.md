@@ -2,11 +2,6 @@
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
-## IMPORTANT
-**This project has been archived and is now read-only. I thank all the people who supported the project with issues, pull request, ideas, etc. <br/>Because I do not have the time to continue with the development of it I have decided to close this project, but, you can always rely on the code to develop something better 😉**
-
-### **It is a library for electron, it cannot be used on a basic website.**
-
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
@@ -201,20 +196,20 @@ titlebar.dispose();
 ## CSS Classes
 The following CSS classes exist and can be used to customize the titlebar
 
-| Class name                  | Description                                     |
-| --------------------------- | ----------------------------------------------- |
-| .titlebar                   | Styles the titlebar.                            |
-| .window-appicon             | Styles the app icon on the titlebar.            |
-| .window-title               | Styles the window title. (Example: font-size)   |
-| .window-controls-container  | Styles the window controls section.             |
-| .resizer top                | Description missing                             |
-| .resizer left               | Description missing                             |
-| .menubar                    | Description missing                             |
-| .menubar-menu-button        | Styles the main menu elements. (Example: color) |
-| .menubar-menu-button open   | Description missing                             |
-| .menubar-menu-title         | Description missing                             |
-| .action-item                | Description missing                             |
-| .action-menu-item           | Styles action menu elements. (Example: color)   |
+| Class name                  | Description                                                      |
+| --------------------------- | -----------------------------------------------------------------|
+| .titlebar                   | Styles the titlebar.                                             |
+| .window-appicon             | Styles the app icon on the titlebar.                             |
+| .window-title               | Styles the window title. (Example: font-size)                    |
+| .window-controls-container  | Styles the window controls section.                              |
+| .resizer top                | Styles the resizer invisible top bar                             |
+| .resizer left               | Styles the resizer invisible left bar                            |
+| .menubar                    | Styles the top menus                                             |
+| .menubar-menu-button        | Styles the main menu elements. (Example: color)                  |
+| .menubar-menu-button open   | Styles the main menu elements when open menu. (Example: color)   |
+| .menubar-menu-title         | Description missing                                              |
+| .action-item                | Description missing                                              |
+| .action-menu-item           | Styles action menu elements. (Example: color)                    |
 
 
 ## License
