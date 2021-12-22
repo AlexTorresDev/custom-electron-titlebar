@@ -9,8 +9,7 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { BrowserWindow, NativeImage, MenuItem } from "electron";
-import * as remote from '@electron/remote';
+import { NativeImage, MenuItem } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
@@ -43,14 +42,12 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	protected menuContainer: IMenuItem[];
 
 	private event: Electron.Event;
-	private currentWindow: BrowserWindow;
 
 	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
 		super();
 
 		this.item = item;
 		this.options = options;
-		this.currentWindow = remote.getCurrentWindow();
 		this.closeSubMenu = closeSubMenu;
 		this.menuContainer = menuContainer;
 
@@ -135,7 +132,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
 
-		this.item.click(this.event,this.currentWindow, this.currentWindow.webContents);
+		this.item.click(this.event);
 
 		if (this.item.type === 'checkbox') {
 			this.updateChecked();

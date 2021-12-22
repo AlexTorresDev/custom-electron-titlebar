@@ -13,8 +13,8 @@ typings/
 espowered/
 
 # for https://github.com/Microsoft/TypeScript/issues/4667
-lib/**/*.ts
-!lib/**/*.d.ts
+dist/**/*.ts
+!dist/**/*.d.ts
 
 # codes
 test/

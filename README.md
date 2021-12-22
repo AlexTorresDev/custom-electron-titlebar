@@ -1,4 +1,4 @@
-# Custom Electron Titlebar
+# Custom Electron Titlebar 4
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
@@ -22,17 +22,19 @@ or use example folder to init basic electron project with this titlebar.
 ## Usage
 
 #### Step 1
-In your **renderer** file or in an **HTML script tag** add:
+In your **preload** file add:
+
+For javascript
 
 ```js
 const customTitlebar = require('custom-electron-titlebar');
 
 new customTitlebar.Titlebar({
-	backgroundColor: customTitlebar.Color.fromHex('#444')
+	backgroundColor: customTitlebar.Color.fromHex('#ECECEC')
 });
 ```
 
-> if you are using _typescript_
+For typescript
 ```ts
 import { Titlebar, Color } from 'custom-electron-titlebar'
 
@@ -47,7 +49,7 @@ The parameter `backgroundColor: Color` is required, this should be `Color` type.
 #### Step 2
 Update the code that launches browser window
 ```js
-var mainWindow = new BrowserWindow({
+let mainWindow = new BrowserWindow({
       width: 1000,
       height: 600,
       titleBarStyle: "hidden", // add this line

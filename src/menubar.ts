@@ -8,10 +8,7 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { Color } from './common/color';
-import { MenuItem, Menu } from 'electron';
-import * as remote from '@electron/remote';
-import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode, isAncestor, EventLike, EventHelper } from './common/dom';
+import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode } from './common/dom';
 import { CETMenu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu/menu';
 import { StandardKeyboardEvent } from './browser/keyboardEvent';
 import { KeyCodeUtils, KeyCode } from './common/keyCodes';
@@ -19,43 +16,7 @@ import { Disposable, IDisposable, dispose } from './common/lifecycle';
 import { Event, Emitter } from './common/event';
 import { domEvent } from './browser/event';
 import { isMacintosh } from './common/platform';
-
-export interface MenubarOptions {
-	/**
-	 * The menu to show in the title bar.
-	 * You can use `Menu` or not add this option and the menu created in the main process will be taken.
-	 * The default menu is taken from the [`Menu.getApplicationMenu()`](https://electronjs.org/docs/api/menu#menugetapplicationmenu)
-	 */
-	menu?: Menu | null;
-	/**
-	 * The position of menubar on titlebar.
-	 * *The default is left*
-	 */
-	menuPosition?: "left" | "bottom";
-	/**
-	 * Enable the mnemonics on menubar and menu items
-	 * *The default is true*
-	 */
-	enableMnemonics?: boolean;
-	/**
-	 * The background color when the mouse is over the item.
-	 */
-	itemBackgroundColor?: Color;
-}
-
-interface CustomItem {
-	menuItem: MenuItem;
-	buttonElement: HTMLElement;
-	titleElement: HTMLElement;
-	submenu: Menu;
-}
-
-enum MenubarState {
-	HIDDEN,
-	VISIBLE,
-	FOCUSED,
-	OPEN
-}
+import { CustomItem, MenubarOptions, MenubarState } from './interfaces';
 
 export class Menubar extends Disposable {
 
@@ -276,8 +237,7 @@ export class Menubar extends Disposable {
 	private onClick(menuIndex: number) {
 		let electronEvent: Electron.Event;
 		const item = this.menuItems[menuIndex].menuItem;
-		const browserWindow = remote.getCurrentWindow();
-		item.click(electronEvent, browserWindow, browserWindow.webContents);
+		item.click(electronEvent);
 	}
 
 	public get onVisibilityChange(): Event<boolean> {
