@@ -1,0 +1,164 @@
+.cet-titlebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 13px;
+    padding: 0 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    zoom: 1;
+    line-height: 22px;
+    height: 22px;
+    display: flex;
+    z-index: 99999;
+
+    &.cet-windows,
+    &.cet-linux {
+        padding: 0;
+        height: 30px;
+        line-height: 30px;
+        justify-content: left;
+        overflow: visible;
+
+        .resizer {
+            -webkit-app-region: no-drag;
+            position: absolute;
+
+            &.top {
+                top: 0;
+                width: 100%;
+                height: 6px;
+            }
+
+            &.left {
+                top: 0;
+                left: 0;
+                width: 6px;
+                height: 100%;
+            }
+        }
+    }
+
+    &.cet-inverted {
+        .cet-menubar,
+        .cet-controls-container {
+            flex-direction: row-reverse;
+        }
+
+        .cet-controls-container {
+            margin: 0 5px 0 0;
+        }
+    }
+
+    &.first-buttons .cet-controls-container {
+        order: -1;
+        margin: 0 5px 0 0;
+    }
+
+    .cet-drag-region {
+        top: 0;
+        left: 0;
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        -webkit-app-region: drag;
+    }
+
+    .cet-window-icon {
+        width: 34px;
+        height: 30px;
+        position: relative;
+        z-index: 99;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .cet-window-title {
+        flex: 0 1 auto;
+        font-size: 13px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        zoom: 1;
+    }
+
+    .cet-controls-container {
+        display: flex;
+        flex-grow: 0;
+        flex-shrink: 0;
+        text-align: center;
+        position: relative;
+        z-index: 99;
+        -webkit-app-region: no-drag;
+        height: 30px;
+        margin-left: auto;
+
+        .cet-icon {
+            width: 46px;
+
+            &:not(.inactive) {
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.3);
+                }
+
+                &:active {
+                    background-color: rgba(255, 255, 255, 0.2);
+                }
+            }
+
+            &.inactive svg {
+                opacity: 0.4;
+            }
+
+            &.cet-window-close:hover {
+                background-color: rgba(232, 17, 35, 0.9);
+            }
+
+            &.cet-window-close:active {
+                background-color: rgba(232, 17, 35, 0.5);
+            }
+
+            svg {
+                width: 10px;
+                height: 10px;
+                fill: #eeeeee;
+            }
+        }
+    }
+
+    &.light {
+        .cet-controls-container {
+            .cet-icon {
+                &:not(.inactive) {
+                    &:hover {
+                        background-color: rgba(0, 0, 0, 0.2);
+                    }
+
+                    &:active {
+                        background-color: rgba(0, 0, 0, 0.1);
+                    }
+                }
+
+                svg {
+                    fill: #333333;
+                }
+            }
+        }
+    }
+
+    &.inactive .cet-controls-container .cet-icon svg {
+        opacity: 0.7;
+    }
+}

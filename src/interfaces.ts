@@ -55,13 +55,13 @@ export interface TitlebarOptions extends MenubarOptions {
      */
     overflow?: "auto" | "hidden" | "visible";
 
-    onMinimize: () => void;
+    onMinimize?: () => void;
 
-    onMaximize: () => boolean;
+    onMaximize?: () => boolean;
 
-    onClose: () => void;
+    onClose?: () => void;
 
-    isMaximized: () => boolean;
+    isMaximized?: () => boolean;
 }
 
 export interface MenubarOptions {
@@ -87,7 +87,7 @@ export interface MenubarOptions {
      */
     itemBackgroundColor?: Color;
 
-    onMenuItemClick: () => void;
+    onMenuItemClick?: (commandId: number) => void;
 }
 
 export interface CustomItem {

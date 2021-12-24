@@ -13,7 +13,8 @@ import { Color, RGBA } from './common/color';
 import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from './common/dom';
 import { Menubar } from './menubar';
 import { TitlebarOptions } from './interfaces';
-import styles from './styles/windows.scss';
+import styles from './styles/titlebar.scss';
+import icons from './styles/icons.json';
 
 const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');
 const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
@@ -44,18 +45,23 @@ export default class Titlebar {
 		left: HTMLElement;
 	}
 
-	private defaultOptions = {
+	private defaultOptions: TitlebarOptions = {
 		shadow: false,
 		minimizable: true,
 		maximizable: true,
 		closeable: true,
 		enableMnemonics: true,
 		hideWhenClickingClose: false,
-		unfocusEffect: true
+		unfocusEffect: true,
+		titleHorizontalAlignment: "center",
 	}
+
+	private platformIcons: HTMLElement[];
 
 	constructor(options?: TitlebarOptions) {
 		this._options = { ...this.defaultOptions, ...options };
+
+		this.platformIcons = icons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
 
 		// Inject style
 		(styles as any).use();
@@ -64,9 +70,7 @@ export default class Titlebar {
 	}
 
 	private closeMenu = () => {
-		if (this.menubar) {
-			this.menubar.blur();
-		}
+		if (this.menubar) this.menubar.blur();
 	}
 
 	private createTitlebar() {
@@ -75,11 +79,11 @@ export default class Titlebar {
 
 		if (this._options.menuPosition === 'bottom') {
 			this.container.style.top = BOTTOM_TITLEBAR_HEIGHT;
-			this.container.style.bottom = '0px';
 		} else {
 			this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN;
-			this.container.style.bottom = '0px';
 		}
+
+		this.container.style.bottom = '0px';
 
 		// TODO: This styles will changed to file
 		this.container.style.right = '0';
@@ -141,7 +145,7 @@ export default class Titlebar {
 		}
 
 		this.updateTitle();
-		this.setHorizontalAlignment(this._options.titleHorizontalAlignment);
+		this.updateTitleAlignment(this._options.titleHorizontalAlignment);
 
 		// Maximize/Restore on doubleclick
 		if (isMacintosh) {
@@ -156,24 +160,23 @@ export default class Titlebar {
 			this.windowControls = append(this.titlebar, $('div.cet-controls-container'));
 
 			// Minimize
-			const minimizeIconContainer = append(this.windowControls, $('div.cet-icon-bg'));
-			minimizeIconContainer.title = "Minimize";
-			const minimizeIcon = append(minimizeIconContainer, $('div.cet-icon'));
-			addClass(minimizeIcon, 'cet-minimize');
+			const minimizeIcon = append(this.windowControls, $('div.cet-icon'));
+			minimizeIcon.title = "Minimize";
+			minimizeIcon.innerHTML = this.platformIcons['minimize'];
 
 			if (!this._options.minimizable) {
-				addClass(minimizeIconContainer, 'inactive');
+				addClass(minimizeIcon, 'inactive');
 			} else {
-				addDisposableListener(minimizeIcon, EventType.CLICK, () => this._options.onMinimize);
+				addDisposableListener(minimizeIcon, EventType.CLICK, () => this._options.onMinimize());
 			}
 
 			// Restore
-			const restoreIconContainer = append(this.windowControls, $('div.cet-icon-bg'));
-			this.maxRestoreControl = append(restoreIconContainer, $('div.cet-icon'));
+			this.maxRestoreControl = append(this.windowControls, $('div.cet-icon'));
+			this.maxRestoreControl.innerHTML = this.platformIcons['maximize'];
 			addClass(this.maxRestoreControl, 'cet-max-restore');
 
 			if (!this._options.maximizable) {
-				addClass(restoreIconContainer, 'inactive');
+				addClass(this.maxRestoreControl, 'inactive');
 			} else {
 				addDisposableListener(this.maxRestoreControl, EventType.CLICK, () => {
 					this._options.onMaximize();
@@ -182,16 +185,15 @@ export default class Titlebar {
 			}
 
 			// Close
-			const closeIconContainer = append(this.windowControls, $('div.window-icon-bg'));
-			closeIconContainer.title = "Close";
-			addClass(closeIconContainer, 'window-close-bg');
-			const closeIcon = append(closeIconContainer, $('div.window-icon'));
-			addClass(closeIcon, 'window-close');
+			const closeIcon = append(this.windowControls, $('div.cet-icon'));
+			closeIcon.title = "Close";
+			closeIcon.innerHTML = this.platformIcons['close'];
+			addClass(closeIcon, 'cet-window-close');
 
 			if (!this._options.closeable) {
-				addClass(closeIconContainer, 'inactive');
+				addClass(closeIcon, 'inactive');
 			} else {
-				addDisposableListener(closeIcon, EventType.CLICK, () => this._options.onClose);
+				addDisposableListener(closeIcon, EventType.CLICK, () => this._options.onClose());
 			}
 
 			// Resizer
@@ -252,15 +254,8 @@ export default class Titlebar {
 
 	private onDidChangeMaximized(maximized: boolean) {
 		if (this.maxRestoreControl) {
-			if (maximized) {
-				removeClass(this.maxRestoreControl, 'window-maximize');
-				this.maxRestoreControl.title = "Restore Down"
-				addClass(this.maxRestoreControl, 'window-unmaximize');
-			} else {
-				removeClass(this.maxRestoreControl, 'window-unmaximize');
-				this.maxRestoreControl.title = "Maximize"
-				addClass(this.maxRestoreControl, 'window-maximize');
-			}
+			this.maxRestoreControl.title = maximized ? "Restore Down" : "Maximize";
+			this.maxRestoreControl.innerHTML = maximized ? this.platformIcons['restore'] : this.platformIcons['maximize'];
 		}
 
 		if (this.resizer) {
@@ -272,12 +267,18 @@ export default class Titlebar {
 		}
 	}
 
-	private onDidChangeFullscreen(fullscreen: boolean) {
+	onFullScreen(fullscreen: boolean) {
 		if (!isMacintosh) {
 			if (fullscreen) {
-				hide(this.windowIcon, this.title, this.windowControls);
+				hide(this.titlebar);
+				this.container.style.top = '0px';
 			} else {
-				show(this.windowIcon, this.title, this.windowControls);
+				show(this.titlebar);
+				if (this._options.menuPosition === 'bottom') {
+					this.container.style.top = BOTTOM_TITLEBAR_HEIGHT;
+				} else {
+					this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN;
+				}
 			}
 		}
 	}
@@ -394,13 +395,9 @@ export default class Titlebar {
 	// Menu enhancements, moved menu to bottom of window-titlebar. (by @MairwunNx) https://github.com/AlexTorresSk/custom-electron-titlebar/pull/9
 	updateMenu(menu: Electron.Menu) {
 		if (!isMacintosh) {
-			if (this.menubar) {
-				this.menubar.dispose();
-				if (!menu) {
-					return;
-				}
-				this._options.menu = menu;
-			}
+			if (!menu) return;
+			if (this.menubar) this.menubar.dispose();
+			this._options.menu = menu;
 
 			this.menubar = new Menubar(this.menubarContainer, this._options, this.closeMenu);
 			this.menubar.setupMenubar();
@@ -425,7 +422,7 @@ export default class Titlebar {
 			this.titlebar.style.height = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
 			this.container.style.top = this._options.menuPosition && this._options.menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
 		}
-		this.titlebar.style.webkitFlexWrap = this._options.menuPosition && this._options.menuPosition === 'bottom' ? 'wrap' : null;
+		this.titlebar.style.flexWrap = this._options.menuPosition && this._options.menuPosition === 'bottom' ? 'wrap' : null;
 
 		if (this._options.menuPosition === 'bottom') {
 			addClass(this.menubarContainer, 'bottom');
@@ -438,8 +435,7 @@ export default class Titlebar {
 	 * Horizontal alignment of the title.
 	 * @param side `left`, `center` or `right`.
 	 */
-	// Add ability to customize title-bar title. (by @MairwunNx) https://github.com/AlexTorresSk/custom-electron-titlebar/pull/8
-	setHorizontalAlignment(side: "left" | "center" | "right") {
+	updateTitleAlignment(side: "left" | "center" | "right") {
 		if (this.title) {
 			if (side === 'left' || (side === 'right' && this._options.order === 'inverted')) {
 				this.title.style.marginLeft = '8px';
@@ -452,8 +448,10 @@ export default class Titlebar {
 			}
 
 			if (side === 'center' || side === undefined) {
-				this.title.style.marginRight = 'auto';
-				this.title.style.marginLeft = 'auto';
+				this.title.style.position = 'absolute';
+				this.title.style.left = '50%';
+				this.title.style.transform = 'translate(-50%, 0px)';
+				this.title.style.maxWidth = 'calc(100vw - 296px)';
 			}
 		}
 	}

@@ -18,6 +18,7 @@ import { Disposable, dispose, IDisposable } from "../common/lifecycle";
 import { Event, Emitter } from "../common/event";
 import { RunOnceScheduler } from "../common/async";
 import { MenuItem, Menu } from "electron";
+import { MenubarOptions } from "../interfaces";
 
 export const MENU_MNEMONIC_REGEX = /\(&([^\s&])\)|(^|[^&])&([^\s&])/;
 export const MENU_ESCAPED_MNEMONIC_REGEX = /(&amp;)?(&amp;)([^\s&])/g;
@@ -52,6 +53,7 @@ export class CETMenu extends Disposable {
 	private focusedItem?: number;
 	private menuContainer: HTMLElement;
 	private mnemonics: Map<KeyCode, Array<CETMenuItem>>;
+	private menubarOptions: MenubarOptions;
 	private options: IMenuOptions;
 	private closeSubMenu: () => void;
 
@@ -67,10 +69,11 @@ export class CETMenu extends Disposable {
 	private _onDidCancel = this._register(new Emitter<void>());
 	get onDidCancel(): Event<void> { return this._onDidCancel.event; }
 
-	constructor(container: HTMLElement, options: IMenuOptions = {}, closeSubMenu = () => { }) {
+	constructor(container: HTMLElement, menubarOptions: MenubarOptions, options: IMenuOptions = {}, closeSubMenu = () => { }) {
 		super();
 
 		this.menuContainer = container;
+		this.menubarOptions = menubarOptions;
 		this.options = options;
 		this.closeSubMenu = closeSubMenu;
 		this.items = [];
@@ -257,7 +260,7 @@ export class CETMenu extends Disposable {
 				item = new Separator(menuItem, this.options);
 			} else if (menuItem.type === 'submenu' || menuItem.submenu) {
 				const submenuItems = (menuItem.submenu as Menu).items;
-				item = new Submenu(menuItem, submenuItems, this.parentData, this.options, this.closeSubMenu);
+				item = new Submenu(menuItem, submenuItems, this.parentData, this.menubarOptions, this.options, this.closeSubMenu);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
@@ -274,7 +277,7 @@ export class CETMenu extends Disposable {
 				}
 			} else {
 				const menuItemOptions: IMenuOptions = { enableMnemonics: this.options.enableMnemonics };
-				item = new CETMenuItem(menuItem, menuItemOptions, this.closeSubMenu, this.items);
+				item = new CETMenuItem(menuItem, this.menubarOptions, menuItemOptions, this.closeSubMenu, this.items);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
@@ -463,8 +466,8 @@ class Submenu extends CETMenuItem {
 	private showScheduler: RunOnceScheduler;
 	private hideScheduler: RunOnceScheduler;
 
-	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions, closeSubMenu = () => {}) {
-		super(item, submenuOptions, closeSubMenu);
+	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, menubarOptions: MenubarOptions, private submenuOptions?: IMenuOptions, closeSubMenu = () => { }) {
+		super(item, menubarOptions, submenuOptions, closeSubMenu);
 		this.showScheduler = new RunOnceScheduler(() => {
 			if (this.mouseOver) {
 				this.cleanupExistingSubmenu(false);
@@ -556,7 +559,7 @@ class Submenu extends CETMenuItem {
 			this.submenuContainer = append(this.container, $('ul.submenu'));
 			addClasses(this.submenuContainer, 'menubar-menu-container');
 
-			this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuOptions, this.closeSubMenu);
+			this.parentData.submenu = new CETMenu(this.submenuContainer, this.menubarOptions, this.submenuOptions, this.closeSubMenu);
 			this.parentData.submenu.createMenu(this.submenuItems);
 
 			if (this.menuStyle) {

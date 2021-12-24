@@ -17,6 +17,8 @@ import { Event, Emitter } from './common/event';
 import { domEvent } from './browser/event';
 import { isMacintosh } from './common/platform';
 import { CustomItem, MenubarOptions, MenubarState } from './interfaces';
+import styles from './styles/menubar.scss';
+import icons from './styles/icons.json';
 
 export class Menubar extends Disposable {
 
@@ -47,6 +49,9 @@ export class Menubar extends Disposable {
 
 	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => { }) {
 		super();
+
+		// Inject style
+		(styles as any).use();
 
 		this.menuItems = [];
 		this.mnemonics = new Map<KeyCode, number>();
@@ -140,6 +145,8 @@ export class Menubar extends Disposable {
 	}
 
 	setupMenubar(): void {
+		console.log(this.options.menu);
+
 		const topLevelMenus = this.options.menu.items;
 
 		this._register(this.onFocusStateChange(e => this._onFocusStateChange.fire(e)));
@@ -235,9 +242,8 @@ export class Menubar extends Disposable {
 	}
 
 	private onClick(menuIndex: number) {
-		let electronEvent: Electron.Event;
 		const item = this.menuItems[menuIndex].menuItem;
-		item.click(electronEvent);
+		this.options.onMenuItemClick(item.commandId);
 	}
 
 	public get onVisibilityChange(): Event<boolean> {
@@ -611,7 +617,7 @@ export class Menubar extends Disposable {
 			ariaLabel: btnElement.attributes['aria-label'].value
 		};
 
-		let menuWidget = new CETMenu(menuHolder, menuOptions, this.closeSubMenu);
+		let menuWidget = new CETMenu(menuHolder, this.options, menuOptions, this.closeSubMenu);
 		menuWidget.createMenu(customMenu.submenu.items);
 		menuWidget.style(this.menuStyle);
 

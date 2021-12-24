@@ -1,0 +1,214 @@
+.cet-menubar {
+    display: flex;
+    flex-shrink: 1;
+    box-sizing: border-box;
+    height: 30px;
+    overflow: hidden;
+    flex-wrap: wrap;
+
+    &.bottom {
+        order: 1;
+        width: 100%;
+        padding: 0 5px;
+    }
+
+    .menubar-menu-button {
+        align-items: center;
+        box-sizing: border-box;
+        padding: 0px 8px;
+        cursor: default;
+        -webkit-app-region: no-drag;
+        zoom: 1;
+        white-space: nowrap;
+        outline: 0;
+
+        &.disabled {
+            opacity: 0.4;
+        }
+
+        &:not(.disabled) {
+            &:focus,
+            &.open,
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        &:focus,
+        &.open,
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    .menubar-menu-container {
+        position: absolute;
+        display: block;
+        left: 0px;
+        opacity: 1;
+        outline: 0;
+        border: none;
+        text-align: left;
+        margin: 0 auto;
+        padding: 0.5em 0;
+        margin-left: 0;
+        overflow-x: visible;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-end;
+        white-space: nowrap;
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+            0 3px 14px 2px rgba(0, 0, 0, 0.12);
+        z-index: 99999;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+            height: 4px;
+            cursor: pointer;
+            background-color: rbga(0, 0, 0, 0);
+        }
+
+        &::-webkit-scrollbar-track {
+            border: none;
+            background-color: rbga(0, 0, 0, 0);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background-color: rgba(110, 110, 110, 0.2);
+        }
+
+        &:focus {
+            outline: 0;
+        }
+
+        .action-item {
+            padding: 0;
+            transform: none;
+            display: -ms-flexbox;
+            display: flex;
+            outline: none;
+
+            &.active {
+                transform: none;
+            }
+
+            &.disabled .action-menu-item {
+                opacity: 0.4;
+            }
+
+            .submenu {
+                position: absolute;
+            }
+        }
+
+        .action-menu-item {
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            display: -ms-flexbox;
+            display: flex;
+            height: 2.5em;
+            align-items: center;
+            position: relative;
+        }
+
+        .action-label {
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            text-decoration: none;
+            padding: 0 1em;
+            background: none;
+            font-size: 12px;
+            line-height: 1;
+
+            &:not(.separator) {
+                display: inline-block;
+                -webkit-box-sizing: border-box;
+                -o-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -ms-box-sizing: border-box;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0 2em 0 1em;
+            }
+
+            &.separator {
+                opacity: 0.4;
+                font-size: inherit;
+                padding: 0.2em 0 0;
+                margin-left: 0.8em;
+                margin-right: 0.8em;
+                margin-bottom: 0.2em;
+                width: 100%;
+                border-bottom: 1px solid transparent;
+
+                &.text {
+                    padding: 0.7em 1em 0.1em 1em;
+                    font-weight: bold;
+                    opacity: 1;
+                }
+            }
+
+            &:hover {
+                color: inherit;
+            }
+        }
+
+        .keybinding {
+            padding: 0 2em 0 1em;
+        }
+
+        .keybinding,
+        .submenu-indicator {
+            display: inline-block;
+            -ms-flex: 2 1 auto;
+            flex: 2 1 auto;
+            padding: 0 2em 0 1em;
+            text-align: right;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .submenu-indicator {
+            height: 100%;
+            -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.52 12.364L9.879 7 4.52 1.636l.615-.615L11.122 7l-5.986 5.98-.615-.616z' fill='%23000'/%3E%3C/svg%3E")
+                no-repeat right center/13px 13px;
+            mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.52 12.364L9.879 7 4.52 1.636l.615-.615L11.122 7l-5.986 5.98-.615-.616z' fill='%23000'/%3E%3C/svg%3E")
+                no-repeat right center/13px 13px;
+            font-size: 60%;
+            margin: 0 2em 0 1em;
+        }
+
+        .menu-item-check {
+            position: absolute;
+            visibility: hidden;
+            -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E")
+                no-repeat 50% 56%/15px 15px;
+            mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E")
+                no-repeat 50% 56%/15px 15px;
+            width: 2em;
+            height: 2em;
+            margin: 0 0 0 0.7em;
+
+            &.checked .menu-item-icon {
+                visibility: hidden;
+            }
+
+            &.checked .menu-item-check {
+                visibility: visible;
+            }
+        }
+
+        .menu-item-icon {
+            width: 18px;
+            height: 18px;
+            margin: 0 0 0 1.1em;
+
+            img {
+                display: inherit;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}

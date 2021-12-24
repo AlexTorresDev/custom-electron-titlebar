@@ -14,6 +14,7 @@ import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_R
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
 import { isMacintosh } from "../common/platform";
+import { MenubarOptions } from "../interfaces";
 
 export interface IMenuItem {
 	render(element: HTMLElement): void;
@@ -26,6 +27,7 @@ export interface IMenuItem {
 
 export class CETMenuItem extends Disposable implements IMenuItem {
 
+	protected menubarOptions: MenubarOptions;
 	protected options: IMenuOptions;
 	protected menuStyle: IMenuStyle;
 	protected container: HTMLElement;
@@ -41,12 +43,11 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	protected closeSubMenu: () => void;
 	protected menuContainer: IMenuItem[];
 
-	private event: Electron.Event;
-
-	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
+	constructor(item: MenuItem, menubarOptions: MenubarOptions, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
 		super();
 
 		this.item = item;
+		this.menubarOptions = menubarOptions;
 		this.options = options;
 		this.closeSubMenu = closeSubMenu;
 		this.menuContainer = menuContainer;
@@ -131,8 +132,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
-
-		this.item.click(this.event);
+		this.menubarOptions.onMenuItemClick(this.item.commandId);
 
 		if (this.item.type === 'checkbox') {
 			this.updateChecked();

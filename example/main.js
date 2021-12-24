@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('path')
 
 function createWindow() {
@@ -8,7 +8,7 @@ function createWindow() {
     width: 800,
     height: 600,
     //frame: false,
-    //titleBarStyle: 'hidden',
+    titleBarStyle: 'hidden',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -19,6 +19,14 @@ function createWindow() {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
+
+  mainWindow.on('enter-full-screen', function () {
+    mainWindow.webContents.send('window-fullscreen', true)
+  })
+
+  mainWindow.on('leave-full-screen', function () {
+    mainWindow.webContents.send('window-fullscreen', false)
+  })
 }
 
 // This method will be called when Electron has finished
@@ -43,3 +51,56 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+ipcMain.on('request-application-menu', function (event) {
+  const menu = JSON.parse(JSON.stringify(Menu.getApplicationMenu(), getCircularReplacer()));
+  event.sender.send('titlebar-menu', menu);
+});
+
+ipcMain.on('menu-event', (event, commandId) => {
+  getMenuItemByCommandId(commandId)?.click(undefined, BrowserWindow.fromWebContents(event.sender), event.sender);
+});
+
+ipcMain.on('window-minimize', function (event) {
+  BrowserWindow.fromWebContents(event.sender).minimize();
+})
+
+ipcMain.on('window-maximize', function (event) {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.isMaximized() ? window.unmaximize() : window.maximize();
+})
+
+ipcMain.on('window-close', function (event) {
+  BrowserWindow.fromWebContents(event.sender).close()
+})
+
+ipcMain.on('window-is-maximized', function (event) {
+  event.returnValue = BrowserWindow.fromWebContents(event.sender).isMaximized()
+})
+
+const getCircularReplacer = () => {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (key === 'commandsMap') return;
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+};
+
+const getMenuItemByCommandId = (commandId, menu = Menu.getApplicationMenu()) => {
+  for (let i = 0; i < menu.items.length; i++) {
+    const item = menu.items[i];
+    if (item.commandId === commandId) {
+      return item;
+    } else if (item.submenu) {
+      const result = getMenuItemByCommandId(commandId, item.submenu);
+      if (result) {
+        return result;
+      }
+    }
+  }
+};
