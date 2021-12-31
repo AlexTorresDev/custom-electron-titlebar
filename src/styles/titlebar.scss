@@ -123,11 +123,11 @@
             }
 
             &.cet-window-close:hover {
-                background-color: rgba(232, 17, 35, 0.9);
+                background-color: rgba(232, 17, 35, 0.9) !important;
             }
 
             &.cet-window-close:active {
-                background-color: rgba(232, 17, 35, 0.5);
+                background-color: rgba(232, 17, 35, 0.5) !important;
             }
 
             svg {

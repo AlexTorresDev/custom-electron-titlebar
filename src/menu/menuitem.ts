@@ -15,6 +15,7 @@ import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
 import { isMacintosh } from "../common/platform";
 import { MenubarOptions } from "../interfaces";
+import defaultIcons from '../styles/icons.json';
 
 export interface IMenuItem {
 	render(element: HTMLElement): void;
@@ -37,7 +38,6 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	private radioGroup: { start: number, end: number }; // used only if item.type === "radio"
 	private labelElement: HTMLElement;
-	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
 	private mnemonic: KeyCode;
 	protected closeSubMenu: () => void;
@@ -112,9 +112,6 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`);
 		}
-
-		this.checkElement = append(this.itemElement, $('span.menu-item-check'));
-		this.checkElement.setAttribute('role', 'none');
 
 		this.iconElement = append(this.itemElement, $('span.menu-item-icon'));
 		this.iconElement.setAttribute('role', 'none');
@@ -273,15 +270,16 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 
 	updateIcon(): void {
-		let icon: string | NativeImage | null = null;
-
 		if (this.item.icon) {
-			icon = this.item.icon;
-		}
+			const icon = this.item.icon;
 
-		if (icon) {
-			const iconE = append(this.iconElement, $('img'));
-			iconE.setAttribute('src', icon.toString());
+			if (icon) {
+				const iconE = append(this.iconElement, $('img'));
+				iconE.setAttribute('src', icon.toString());
+			}
+		} else if (this.item.type === 'checkbox') {
+			addClass(this.iconElement, 'checkbox');
+			this.iconElement.innerHTML = defaultIcons.check;
 		}
 	}
 
@@ -387,13 +385,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			return;
 		}
 
-		const isSelected = this.container && hasClass(this.container, 'focused');
+		/*const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
 		const bgColor = isSelected && this.menuStyle.selectionBackgroundColor ? this.menuStyle.selectionBackgroundColor : this.menuStyle.backgroundColor;
 
 		this.checkElement.style.backgroundColor = fgColor ? fgColor.toString() : null;
 		this.itemElement.style.color = fgColor ? fgColor.toString() : null;
-		this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : null;
+		this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : null;*/
 	}
 
 	style(style: IMenuStyle): void {

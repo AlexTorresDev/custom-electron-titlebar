@@ -50,13 +50,15 @@
         border: none;
         text-align: left;
         margin: 0 auto;
-        padding: 0.5em 0;
+        padding: 4px 0;
         margin-left: 0;
         overflow-x: visible;
         overflow-y: visible;
         -webkit-overflow-scrolling: touch;
         justify-content: flex-end;
         white-space: nowrap;
+        border-radius: 6px;
+        backdrop-filter: blur(5px);
         box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14),
             0 3px 14px 2px rgba(0, 0, 0, 0.12);
         z-index: 99999;
@@ -108,8 +110,14 @@
             display: -ms-flexbox;
             display: flex;
             height: 2.5em;
+            margin: 2px 5px;
             align-items: center;
             position: relative;
+            border-radius: 6px;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.12);
+            }
         }
 
         .action-label {
@@ -133,12 +141,9 @@
             }
 
             &.separator {
-                opacity: 0.4;
+                opacity: 0.1;
                 font-size: inherit;
-                padding: 0.2em 0 0;
-                margin-left: 0.8em;
-                margin-right: 0.8em;
-                margin-bottom: 0.2em;
+                margin: 1px 0;
                 width: 100%;
                 border-bottom: 1px solid transparent;
 
@@ -163,51 +168,41 @@
             display: inline-block;
             -ms-flex: 2 1 auto;
             flex: 2 1 auto;
-            padding: 0 2em 0 1em;
+            padding: 0 3.1em 0 1em;
             text-align: right;
             font-size: 12px;
             line-height: 1;
         }
 
         .submenu-indicator {
-            height: 100%;
-            -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.52 12.364L9.879 7 4.52 1.636l.615-.615L11.122 7l-5.986 5.98-.615-.616z' fill='%23000'/%3E%3C/svg%3E")
-                no-repeat right center/13px 13px;
-            mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.52 12.364L9.879 7 4.52 1.636l.615-.615L11.122 7l-5.986 5.98-.615-.616z' fill='%23000'/%3E%3C/svg%3E")
-                no-repeat right center/13px 13px;
-            font-size: 60%;
-            margin: 0 2em 0 1em;
+            position: absolute;
+            right: 8px;
+            height: 14px;
+            width: 14px;
+            padding: 0;
         }
 
-        .menu-item-check {
-            position: absolute;
-            visibility: hidden;
-            -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E")
-                no-repeat 50% 56%/15px 15px;
-            mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23424242' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E")
-                no-repeat 50% 56%/15px 15px;
-            width: 2em;
-            height: 2em;
-            margin: 0 0 0 0.7em;
-
-            &.checked .menu-item-icon {
-                visibility: hidden;
-            }
-
-            &.checked .menu-item-check {
-                visibility: visible;
+        .submenu-indicator,
+        .menu-item-icon {
+            img,
+            svg {
+                display: inherit;
+                width: 100%;
+                height: 100%;
             }
         }
 
         .menu-item-icon {
             width: 18px;
             height: 18px;
-            margin: 0 0 0 1.1em;
+            margin: 0 0 0 0.8em;
 
-            img {
-                display: inherit;
-                width: 100%;
-                height: 100%;
+            &.checkbox {
+                visibility: hidden;
+
+                &.checked {
+                    visibility: visible;
+                }
             }
         }
     }

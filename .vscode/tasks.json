@@ -6,12 +6,16 @@
     {
       "label": "electron-debug",
       "type": "process",
-      "command": "./node_modules/.bin/tsc",
+      "command": "./node_modules/.bin/webpack",
       "windows": {
-        "command": "./node_modules/.bin/tsc.cmd"
+        "command": "./node_modules/.bin/webpack.cmd"
       },
-      "isBackground": true,
-      // "args": [],
+      "args": [
+        "--config",
+        "./webpack.config.js",
+        "--mode",
+        "development"
+      ],
       "problemMatcher": {
         "owner": "custom",
         "pattern": {

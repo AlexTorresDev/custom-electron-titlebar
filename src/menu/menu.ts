@@ -8,7 +8,7 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { Color } from "../common/color";
+import { Color, RGBA } from "../common/color";
 import { addClass, addDisposableListener, EventType, isAncestor, hasClass, append, addClasses, $, removeNode, EventHelper, EventLike } from "../common/dom";
 import { KeyCode, KeyCodeUtils, KeyMod } from "../common/keyCodes";
 import { isLinux } from "../common/platform";
@@ -19,6 +19,7 @@ import { Event, Emitter } from "../common/event";
 import { RunOnceScheduler } from "../common/async";
 import { MenuItem, Menu } from "electron";
 import { MenubarOptions } from "../interfaces";
+import icons from "../styles/icons.json";
 
 export const MENU_MNEMONIC_REGEX = /\(&([^\s&])\)|(^|[^&])&([^\s&])/;
 export const MENU_ESCAPED_MNEMONIC_REGEX = /(&amp;)?(&amp;)([^\s&])/g;
@@ -243,6 +244,8 @@ export class CETMenu extends Disposable {
 	}
 
 	createMenu(items: MenuItem[]) {
+		console.log('createMenu', items);
+
 		items.forEach((menuItem: MenuItem) => {
 			const itemElement = document.createElement('li');
 			itemElement.className = 'action-item';
@@ -424,7 +427,10 @@ export class CETMenu extends Disposable {
 	style(style: IMenuStyle) {
 		const container = this.getContainer();
 
-		container.style.backgroundColor = style.backgroundColor ? style.backgroundColor.toString() : null;
+		const rgba = style.backgroundColor.rgba;
+		const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, 0.8));
+
+		container.style.backgroundColor = style.backgroundColor ? color.toString() : null;
 
 		if (this.items) {
 			this.items.forEach(item => {
@@ -494,6 +500,7 @@ class Submenu extends CETMenuItem {
 		this.itemElement.setAttribute('aria-haspopup', 'true');
 
 		this.submenuIndicator = append(this.itemElement, $('span.submenu-indicator'));
+		this.submenuIndicator.innerHTML = icons.arrow;
 		this.submenuIndicator.setAttribute('aria-hidden', 'true');
 
 		this._register(addDisposableListener(this.container, EventType.KEY_UP, e => {
@@ -633,7 +640,7 @@ class Submenu extends CETMenuItem {
 		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
 
-		this.submenuIndicator.style.backgroundColor = fgColor ? `${fgColor}` : null;
+		//this.submenuIndicator.style.backgroundColor = fgColor ? `${fgColor}` : null;
 
 		if (this.parentData.submenu) {
 			this.parentData.submenu.style(this.menuStyle);

@@ -16,8 +16,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   titlebar = new customTitlebar.Titlebar({
-    backgroundColor: customTitlebar.Color.fromHex('#2f3241'),
-    icon: './images/icon.png',
+    backgroundColor: customTitlebar.Color.fromHex('#2F3241'),
+    icon: './assets/images/icon.svg',
     shadow: true,
     onMinimize: () => ipcRenderer.send('window-minimize'),
     onMaximize: () => ipcRenderer.send('window-maximize'),

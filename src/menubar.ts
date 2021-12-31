@@ -145,8 +145,6 @@ export class Menubar extends Disposable {
 	}
 
 	setupMenubar(): void {
-		console.log(this.options.menu);
-
 		const topLevelMenus = this.options.menu.items;
 
 		this._register(this.onFocusStateChange(e => this._onFocusStateChange.fire(e)));
@@ -604,7 +602,7 @@ export class Menubar extends Disposable {
 		addClass(btnElement, 'open');
 		menuHolder.setAttribute('role', 'menu');
 		menuHolder.tabIndex = 0;
-		menuHolder.style.top = `${btnRect.bottom}px`;
+		menuHolder.style.top = `${btnRect.bottom - 5}px`;
 		menuHolder.style.left = `${btnRect.left}px`;
 
 		btnElement.appendChild(menuHolder);

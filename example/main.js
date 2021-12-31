@@ -52,12 +52,14 @@ app.on('window-all-closed', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on('request-application-menu', function (event) {
-  const menu = JSON.parse(JSON.stringify(Menu.getApplicationMenu(), getCircularReplacer()));
+  const m = Menu.buildFromTemplate(exampleMenuTemplate());
+  const menu = JSON.parse(JSON.stringify(m, parseMenu()));
   event.sender.send('titlebar-menu', menu);
 });
 
 ipcMain.on('menu-event', (event, commandId) => {
-  getMenuItemByCommandId(commandId)?.click(undefined, BrowserWindow.fromWebContents(event.sender), event.sender);
+  const item = getMenuItemByCommandId(commandId);
+  item?.click(undefined, BrowserWindow.fromWebContents(event.sender), event.sender);
 });
 
 ipcMain.on('window-minimize', function (event) {
@@ -77,30 +79,79 @@ ipcMain.on('window-is-maximized', function (event) {
   event.returnValue = BrowserWindow.fromWebContents(event.sender).isMaximized()
 })
 
-const getCircularReplacer = () => {
-  const seen = new WeakSet();
+const parseMenu = () => {
+  const menu = new WeakSet();
   return (key, value) => {
     if (key === 'commandsMap') return;
     if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) {
-        return;
-      }
-      seen.add(value);
+      if (menu.has(value)) return;
+      menu.add(value);
     }
     return value;
   };
+}
+
+const getMenuItemByCommandId = (commandId, menu = Menu.buildFromTemplate(exampleMenuTemplate())) => {
+  let menuItem;
+  menu.items.forEach(item => {
+    if (item.submenu) {
+      const submenuItem = getMenuItemByCommandId(commandId, item.submenu);
+      if (submenuItem) menuItem = submenuItem;
+    }
+    if (item.commandId === commandId) menuItem = item;
+  });
+
+  return menuItem;
 };
 
-const getMenuItemByCommandId = (commandId, menu = Menu.getApplicationMenu()) => {
-  for (let i = 0; i < menu.items.length; i++) {
-    const item = menu.items[i];
-    if (item.commandId === commandId) {
-      return item;
-    } else if (item.submenu) {
-      const result = getMenuItemByCommandId(commandId, item.submenu);
-      if (result) {
-        return result;
+const exampleMenuTemplate = () => [
+  {
+    label: "Options",
+    submenu: [
+      {
+        label: "Quit",
+        click: () => app.quit()
+      },
+      {
+        label: "Checkbox1",
+        type: "checkbox",
+        checked: true,
+        click: (item) => {
+          console.log("item is checked? " + item.checked);
+        }
+      },
+      { type: "separator" },
+      {
+        label: "Checkbox2",
+        type: "checkbox",
+        checked: false,
+        click: (item) => {
+          console.log("item is checked? " + item.checked);
+        }
+      },
+      {
+        label: "Esto es un submenu",
+        submenu: [
+          {
+            label: "Sample Checkbox",
+            type: "checkbox",
+            checked: true
+          },
+          { type: "separator" },
+          {
+            label: "Checkbox",
+            type: "checkbox",
+          }
+        ]
+      },
+      {
+        label: "zoomIn",
+        role: "zoomIn"
+      },
+      {
+        label: "zoomOut",
+        role: "zoomOut"
       }
-    }
+    ]
   }
-};
+];
