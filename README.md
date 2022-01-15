@@ -9,8 +9,6 @@ This project is a typescript library for electron that allows you to configure a
 
 ![Preview 2](screenshots/window_2.png)
 
-![Preview 3](screenshots/window_3.png)
-
 ## Install
 
 ```
@@ -50,9 +48,12 @@ The parameter `backgroundColor: Color` is required, this should be `Color` type.
 Update the code that launches browser window
 ```js
 let mainWindow = new BrowserWindow({
-      width: 1000,
-      height: 600,
-      titleBarStyle: "hidden", // add this line
+    width: 1000,
+    height: 600,
+    titleBarStyle: "hidden", // add this line
+	webPreferences: {
+      	preload: path.join(__dirname, 'preload.js')
+    }
 });
 ```
 
@@ -60,25 +61,24 @@ let mainWindow = new BrowserWindow({
 
 The interface [`TitleBarOptions`] is managed, which has the following configurable options for the title bar. Some parameters are optional.
 
-| Parameter                      | Type             | Description                                                                                                                     | Default                   |
-| ------------------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| backgroundColor **(required)** | Color            | The background color of the titlebar.                                                                                           | #444444                   |
-| icon                           | string           | The icon shown on the left side of the title bar.                                                                               | null                      |
-| iconsTheme                     | Theme            | Style of the icons.                                                                                                             | Themebar.win              |
-| shadow                         | boolean          | The shadow of the titlebar.                                                                                                     | false                     |
-| drag                           | boolean          | Define whether or not you can drag the window by holding the click on the title bar.                                            | true                      |
-| minimizable                    | boolean          | Enables or disables the option to minimize the window by clicking on the corresponding button in the title bar.                 | true                      |
-| maximizable                    | boolean          | Enables or disables the option to maximize and un-maximize the window by clicking on the corresponding button in the title bar. | true                      |
-| closeable                      | boolean          | Enables or disables the option of the close window by clicking on the corresponding button in the title bar.                    | true                      |
-| order                          | string           | Set the order of the elements on the title bar. (`inverted`, `first-buttons`)                                                   | null                      |
-| titleHorizontalAlignment       | string           | Set horizontal alignment of the window title. (`left`, `center`, `right`)                                                       | center                    |
-| menu                           | Electron.Menu    | The menu to show in the title bar.                                                                                              | Menu.getApplicationMenu() |
-| menuPosition                   | string           | The position of menubar on titlebar.                                                                                            | left 					  |
-| enableMnemonics                | boolean 		    | Enable the mnemonics on menubar and menu items.																		          | true                      |
-| itemBackgroundColor            | Color            | The background color when the mouse is over the item.                                                                           | rgba(0, 0, 0, .14)        |
-| hideWhenClickingClose          | boolean          | When the close button is clicked, the window is hidden instead of closed.                                                       | false                     |
-| overflow                       | string           | The overflow of the container (`auto`, `visible`, `hidden`)                                                                     | auto                      |
-| unfocusEffect                  | boolean          | Enables or disables the blur option in the title bar.                                                                           | false                     |
+| Parameter                      | Type                      | Description                                                                                                                     | Default                   |
+| ------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| backgroundColor **(required)** | Color                     | The background color of the titlebar.                                                                                           | #444444                   |
+| icon                           | string                    | The icon shown on the left side of the title bar.                                                                               | null                      |
+| shadow                         | boolean                   | The shadow of the titlebar.                                                                                                     | false                     |
+| drag                           | boolean                   | Define whether or not you can drag the window by holding the click on the title bar.                                            | true                      |
+| onMinimize                     | Funtion                   | Enables or disables the option to minimize the window by clicking on the corresponding button in the title bar.                 | undefined                 |
+| onMaximize                     | Funtion                   | Enables or disables the option to maximize and un-maximize the window by clicking on the corresponding button in the title bar. | undefined                 |
+| onClose                        | Funtion                   | Enables or disables the option of the close window by clicking on the corresponding button in the title bar.                    | undefined                 |
+| isMaximized                    | Funtion                   | Check if window is maximized.                                                                                                   | undefined                 |
+| onMenuItemClick                | Funtion(commandId: number)| Fires when any menu option is pressed.                                                                                          | undefined                 |
+| order                          | string                    | Set the order of the elements on the title bar. (`inverted`, `first-buttons`)                                                   | null                      |
+| titleHorizontalAlignment       | string                    | Set horizontal alignment of the window title. (`left`, `center`, `right`)                                                       | center                    |
+| menuPosition                   | string                    | The position of menubar on titlebar.                                                                                            | left 	  				   |
+| enableMnemonics                | boolean 		             | Enable the mnemonics on menubar and menu items.																		           | true                      |
+| hideWhenClickingClose          | boolean                   | When the close button is clicked, the window is hidden instead of closed.                                                       | false                     |
+| overflow                       | string                    | The overflow of the container (`auto`, `visible`, `hidden`)                                                                     | auto                      |
+| unfocusEffect                  | boolean                   | Enables or disables the blur option in the title bar.                                                                           | false                     |
 
 ## Methods
 
@@ -124,51 +124,6 @@ With this method you can update the icon. This method receives the url of the im
 titlebar.updateIcon('./images/my-icon.svg');
 ```
 
-### Update Menu
-
-This method updates or creates the menu, to create the menu use remote.Menu and remote.MenuItem.
-
-```js
-const menu = new Menu();
-menu.append(new MenuItem({
-	label: 'Item 1',
-	submenu: [
-		{
-			label: 'Subitem 1',
-			click: () => console.log('Click on subitem 1')
-		},
-		{
-			type: 'separator'
-		}
-	]
-}));
-
-menu.append(new MenuItem({
-	label: 'Item 2',
-	submenu: [
-		{
-			label: 'Subitem checkbox',
-			type: 'checkbox',
-			checked: true
-		},
-		{
-			type: 'separator'
-		},
-		{
-			label: 'Subitem with submenu',
-			submenu: [
-				{
-					label: 'Submenu &item 1',
-					accelerator: 'Ctrl+T'
-				}
-			]
-		}
-	]
-}));
-
-titlebar.updateMenu(menu);
-```
-
 ### Update Menu Position
 
 You can change the position of the menu bar. `left` and `bottom` are allowed.
@@ -179,9 +134,7 @@ titlebar.updateMenuPosition('bottom');
 
 ### Set Horizontal Alignment
 
-> setHorizontalAlignment method was contributed by [@MairwunNx](https://github.com/MairwunNx) :punch:
-
-`left`, `center` and `right` are allowed
+You can change the position of the title of title bar. `left`, `center` and `right` are allowed
 
 ```js
 titlebar.setHorizontalAlignment('right');
@@ -194,25 +147,6 @@ This method removes the title bar completely and all recorded events.
 ```js
 titlebar.dispose();
 ```
-
-## CSS Classes
-The following CSS classes exist and can be used to customize the titlebar
-
-| Class name                  | Description                                                      |
-| --------------------------- | -----------------------------------------------------------------|
-| .titlebar                   | Styles the titlebar.                                             |
-| .window-appicon             | Styles the app icon on the titlebar.                             |
-| .window-title               | Styles the window title. (Example: font-size)                    |
-| .window-controls-container  | Styles the window controls section.                              |
-| .resizer top                | Styles the resizer invisible top bar                             |
-| .resizer left               | Styles the resizer invisible left bar                            |
-| .menubar                    | Styles the top menus                                             |
-| .menubar-menu-button        | Styles the main menu elements. (Example: color)                  |
-| .menubar-menu-button open   | Styles the main menu elements when open menu. (Example: color)   |
-| .menubar-menu-title         | Description missing                                              |
-| .action-item                | Description missing                                              |
-| .action-menu-item           | Styles action menu elements. (Example: color)                    |
-
 
 ## License
 

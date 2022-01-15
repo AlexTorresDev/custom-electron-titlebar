@@ -4,6 +4,8 @@
 .idea/
 
 # for npm
+.vscode/
+.github/
 node_modules/
 npm-shrinkwrap.json
 
