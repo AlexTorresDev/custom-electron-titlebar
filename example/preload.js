@@ -1,7 +1,7 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 const { ipcRenderer } = require('electron');
-const customTitlebar = require('..'); // Delete this line and uncomment top line
+const customTitlebar = require('..');
 
 let titlebar;
 
