@@ -5,9 +5,8 @@ This project is a typescript library for electron that allows you to configure a
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 
-![Preview 1](screenshots/window_1.png)
-
-![Preview 2](screenshots/window_2.png)
+<img width="100%" src="screenshots/cet-001.png">
+<img width="100%" src="screenshots/cet-002.png">
 
 ## Install
 
