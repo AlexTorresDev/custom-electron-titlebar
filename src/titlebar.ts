@@ -141,6 +141,7 @@ export default class Titlebar {
 		if (IS_MAC_BIGSUR_OR_LATER) {
 			this.title.style.fontWeight = "600";
 			this.title.style.fontSize = "13px";
+			this.titlebar.style.height = TOP_TITLEBAR_HEIGHT_MAC;
 		}
 
 		this.updateTitle();
