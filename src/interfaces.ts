@@ -11,21 +11,26 @@ export interface TitlebarOptions extends MenubarOptions {
      */
     icon?: string;
     /**
+     * The icon size of titlebar. Value between 16 and 24.
+     * **The default is 17**
+     */
+    iconSize?: number;
+    /**
      * The shadow color of titlebar.
      */
     shadow?: boolean;
     /**
-     * Define if the minimize window button is displayed.
+     * Define if the minimize button is enabled.
      * **The default is true**
      */
     minimizable?: boolean;
     /**
-     * Define if the maximize and restore window buttons are displayed.
+     * Define if the maximize and restore buttons are enabled.
      * **The default is true**
      */
     maximizable?: boolean;
     /**
-     * Define if the close window button is displayed.
+     * Define if the close button is enabled.
      * **The default is true**
      */
     closeable?: boolean;
@@ -33,12 +38,7 @@ export interface TitlebarOptions extends MenubarOptions {
      * When the close button is clicked, the window is hidden instead of closed.
      * **The default is false**
      */
-    hideWhenClickingClose?: boolean;
-    /**
-     * Enables or disables the blur option in titlebar.
-     * **The default is true**
-     */
-    unfocusEffect?: boolean;
+    //hideWhenClickingClose?: boolean;
     /**
      * Set the order of the elements on the title bar. You can use `inverted`, `first-buttons` or don't add for.
      * **The default is undefined**
@@ -50,14 +50,14 @@ export interface TitlebarOptions extends MenubarOptions {
      */
     titleHorizontalAlignment?: "left" | "center" | "right";
     /**
-     * Sets the value for the overflow of the window.
+     * Sets the value for the overflow of the container after title bar.
      * **The default value is auto**
      */
-    overflow?: "auto" | "hidden" | "visible";
+    containerOverflow?: "auto" | "hidden" | "visible";
 
     onMinimize?: () => void;
 
-    onMaximize?: () => boolean;
+    onMaximize?: () => void;
 
     onClose?: () => void;
 

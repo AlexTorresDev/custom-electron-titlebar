@@ -9,7 +9,7 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { NativeImage, MenuItem } from "electron";
+import { MenuItem } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
@@ -106,17 +106,17 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			}));
 		});
 
-		this.itemElement = append(this.container, $('a.action-menu-item'));
+		this.itemElement = append(this.container, $('a.cet-action-menu-item'));
 		this.itemElement.setAttribute('role', 'menuitem');
 
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`);
 		}
 
-		this.iconElement = append(this.itemElement, $('span.menu-item-icon'));
+		this.iconElement = append(this.itemElement, $('span.cet-menu-item-icon'));
 		this.iconElement.setAttribute('role', 'none');
 
-		this.labelElement = append(this.itemElement, $('span.action-label'));
+		this.labelElement = append(this.itemElement, $('span.cet-action-label'));
 
 		this.setAccelerator();
 		this.updateLabel();
@@ -385,13 +385,12 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			return;
 		}
 
-		/*const isSelected = this.container && hasClass(this.container, 'focused');
+		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
-		const bgColor = isSelected && this.menuStyle.selectionBackgroundColor ? this.menuStyle.selectionBackgroundColor : this.menuStyle.backgroundColor;
+		const bgColor = isSelected && this.menuStyle.selectionBackgroundColor ? this.menuStyle.selectionBackgroundColor : null;
 
-		this.checkElement.style.backgroundColor = fgColor ? fgColor.toString() : null;
 		this.itemElement.style.color = fgColor ? fgColor.toString() : null;
-		this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : null;*/
+		this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : null;
 	}
 
 	style(style: IMenuStyle): void {

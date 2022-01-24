@@ -18,7 +18,6 @@ import { domEvent } from './browser/event';
 import { isMacintosh } from './common/platform';
 import { CustomItem, MenubarOptions, MenubarState } from './interfaces';
 import styles from './styles/menubar.scss';
-import icons from './styles/icons.json';
 
 export class Menubar extends Disposable {
 
@@ -154,11 +153,11 @@ export class Menubar extends Disposable {
 			const menuIndex = this.menuItems.length;
 			const cleanMenuLabel = cleanMnemonic(menubarMenu.label);
 
-			const buttonElement = $('div.menubar-menu-button', { 'role': 'menuitem', 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
+			const buttonElement = $('div.cet-menubar-menu-button', { 'role': 'menuitem', 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
 			if (!menubarMenu.enabled) {
 				addClass(buttonElement, 'disabled');
 			}
-			const titleElement = $('div.menubar-menu-title', { 'role': 'none', 'aria-hidden': true });
+			const titleElement = $('div.cet-menubar-menu-title', { 'role': 'none', 'aria-hidden': true });
 
 			buttonElement.appendChild(titleElement);
 			append(this.container, buttonElement);
@@ -597,7 +596,7 @@ export class Menubar extends Disposable {
 		const customMenu = this.menuItems[menuIndex];
 		const btnElement = customMenu.buttonElement;
 		const btnRect = btnElement.getBoundingClientRect();
-		const menuHolder = $('ul.menubar-menu-container');
+		const menuHolder = $('ul.cet-menubar-menu-container');
 
 		addClass(btnElement, 'open');
 		menuHolder.setAttribute('role', 'menu');

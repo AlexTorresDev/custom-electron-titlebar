@@ -12,7 +12,7 @@
         padding: 0 5px;
     }
 
-    .menubar-menu-button {
+    .cet-menubar-menu-button {
         align-items: center;
         box-sizing: border-box;
         padding: 0px 8px;
@@ -41,7 +41,7 @@
         }
     }
 
-    .menubar-menu-container {
+    .cet-menubar-menu-container {
         position: absolute;
         display: block;
         left: 0px;
@@ -84,7 +84,7 @@
             outline: 0;
         }
 
-        .action-item {
+        .cet-action-item {
             padding: 0;
             transform: none;
             display: -ms-flexbox;
@@ -95,16 +95,16 @@
                 transform: none;
             }
 
-            &.disabled .action-menu-item {
+            &.disabled .cet-action-menu-item {
                 opacity: 0.4;
             }
 
-            .submenu {
+            .cet-submenu {
                 position: absolute;
             }
         }
 
-        .action-menu-item {
+        .cet-action-menu-item {
             -ms-flex: 1 1 auto;
             flex: 1 1 auto;
             display: -ms-flexbox;
@@ -120,7 +120,7 @@
             }
         }
 
-        .action-label {
+        .cet-action-label {
             -ms-flex: 1 1 auto;
             flex: 1 1 auto;
             text-decoration: none;
@@ -164,7 +164,7 @@
         }
 
         .keybinding,
-        .submenu-indicator {
+        .cet-submenu-indicator {
             display: inline-block;
             -ms-flex: 2 1 auto;
             flex: 2 1 auto;
@@ -174,7 +174,7 @@
             line-height: 1;
         }
 
-        .submenu-indicator {
+        .cet-submenu-indicator {
             position: absolute;
             right: 8px;
             height: 14px;
@@ -182,8 +182,8 @@
             padding: 0;
         }
 
-        .submenu-indicator,
-        .menu-item-icon {
+        .cet-submenu-indicator,
+        .cet-menu-item-icon {
             img,
             svg {
                 display: inherit;
@@ -192,7 +192,7 @@
             }
         }
 
-        .menu-item-icon {
+        .cet-menu-item-icon {
             width: 18px;
             height: 18px;
             margin: 0 0 0 0.8em;

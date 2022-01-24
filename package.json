@@ -1,6 +1,6 @@
 {
   "name": "custom-electron-titlebar",
-  "version": "4.0.0-beta.1",
+  "version": "4.0.0",
   "description": "Custom Electron Titlebar is a library for electron that allows you to configure a fully customizable title bar.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
     "example": "electron example/main.js",
     "start": "npm run build && npm run example"
   },
-  "author": "Alex Torres <alextorressk@gmail.com>",
+  "author": "AlexTorresSk <alextorressk@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
   "keywords": [
     "typescript",
     "electron",
-    "titlebar",
+    "title bar",
     "menubar",
     "windows",
     "linux"
@@ -32,22 +32,21 @@
     "dist": "dist"
   },
   "peerDependencies": {
-    "electron": "^16.0.5",
-    "@types/node": "^17.0.2"
+    "electron": "^16.0.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.5",
-    "@babel/preset-env": "^7.16.5",
-    "@types/node": "^17.0.2",
+    "@babel/core": "^7.16.12",
+    "@babel/preset-env": "^7.16.11",
+    "@types/node": "^17.0.10",
     "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
-    "electron": "^16.0.5",
-    "sass": "^1.45.1",
+    "electron": "^16.0.7",
+    "sass": "^1.49.0",
     "sass-loader": "^12.4.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
-    "typescript": "^4.5.4",
-    "webpack": "^5.65.0",
+    "typescript": "^4.5.5",
+    "webpack": "^5.67.0",
     "webpack-cli": "^4.9.1"
   }
 }

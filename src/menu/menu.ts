@@ -193,7 +193,7 @@ export class CETMenu extends Disposable {
 				target = target.parentElement;
 			}
 
-			if (hasClass(target, 'action-item')) {
+			if (hasClass(target, 'cet-action-item')) {
 				const lastFocusedItem = this.focusedItem;
 				this.setFocusedItem(target);
 
@@ -244,11 +244,9 @@ export class CETMenu extends Disposable {
 	}
 
 	createMenu(items: MenuItem[]) {
-		console.log('createMenu', items);
-
 		items.forEach((menuItem: MenuItem) => {
 			const itemElement = document.createElement('li');
-			itemElement.className = 'action-item';
+			itemElement.className = 'cet-action-item';
 			itemElement.setAttribute('role', 'presentation');
 
 			// Prevent native context menu on actions
@@ -496,10 +494,10 @@ class Submenu extends CETMenuItem {
 			return;
 		}
 
-		addClass(this.itemElement, 'submenu-item');
+		addClass(this.itemElement, 'cet-submenu-item');
 		this.itemElement.setAttribute('aria-haspopup', 'true');
 
-		this.submenuIndicator = append(this.itemElement, $('span.submenu-indicator'));
+		this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'));
 		this.submenuIndicator.innerHTML = icons.arrow;
 		this.submenuIndicator.setAttribute('aria-hidden', 'true');
 
@@ -563,8 +561,8 @@ class Submenu extends CETMenuItem {
 		}
 
 		if (!this.parentData.submenu) {
-			this.submenuContainer = append(this.container, $('ul.submenu'));
-			addClasses(this.submenuContainer, 'menubar-menu-container');
+			this.submenuContainer = append(this.container, $('ul.cet-submenu'));
+			addClasses(this.submenuContainer, 'cet-menubar-menu-container');
 
 			this.parentData.submenu = new CETMenu(this.submenuContainer, this.menubarOptions, this.submenuOptions, this.closeSubMenu);
 			this.parentData.submenu.createMenu(this.submenuItems);
@@ -640,7 +638,7 @@ class Submenu extends CETMenuItem {
 		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
 
-		//this.submenuIndicator.style.backgroundColor = fgColor ? `${fgColor}` : null;
+		this.submenuIndicator.style.backgroundColor = fgColor ? fgColor.toString() : null;
 
 		if (this.parentData.submenu) {
 			this.parentData.submenu.style(this.menuStyle);
@@ -674,7 +672,7 @@ class Separator extends CETMenuItem {
 
 	render(container: HTMLElement) {
 		if (container) {
-			this.separatorElement = append(container, $('a.action-label'));
+			this.separatorElement = append(container, $('a.cet-action-label'));
 			this.separatorElement.setAttribute('role', 'presentation');
 			addClass(this.separatorElement, 'separator');
 		}
