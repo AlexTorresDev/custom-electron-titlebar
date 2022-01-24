@@ -22,7 +22,7 @@ window.addEventListener('DOMContentLoaded', () => {
 ipcRenderer.on('renderer-titlebar', (event, menu) => {
   titlebar = new cet.Titlebar({
     backgroundColor: cet.Color.fromHex("#388e3c"),
-    icon: new URL(path.join(__dirname, '/assets/images', '/icon.svg')),
+    icon: path.join(__dirname, '/assets/images', '/icon.svg'),
     menu: menu,
     onMinimize: () => ipcRenderer.send('window-event', 'window-minimize'),
     onMaximize: () => ipcRenderer.send('window-event', 'window-maximize'),
