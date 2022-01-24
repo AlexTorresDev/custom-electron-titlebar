@@ -1,10 +1,5 @@
 # Custom Electron Titlebar
 
-**🔴IMPORTANT🔴**
-The new version (4.0.0) of this project will be released on January 23, 2022, before this a beta version will be released on January 15, 2022. Anyone who wants to can review it.
-
----
-
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
