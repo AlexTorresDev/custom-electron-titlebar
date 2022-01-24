@@ -11,6 +11,7 @@
 import { isMacintosh, isWindows, isLinux } from './common/platform';
 import { Color, RGBA } from './common/color';
 import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from './common/dom';
+import { Menu } from 'electron';
 import { Menubar } from './menubar';
 import { TitlebarOptions } from './interfaces';
 import styles from './styles/titlebar.scss';
@@ -410,7 +411,7 @@ export default class Titlebar {
 	 * Update the default menu or set a new menu.
 	 * @param menu The menu.
 	 */
-	public updateMenu(menu: Electron.Menu): void {
+	public updateMenu(menu: Menu): void {
 		if (!isMacintosh) {
 			if (!menu) return;
 			if (this.menubar) this.menubar.dispose();
@@ -470,7 +471,7 @@ export default class Titlebar {
 					addClass(this.title, 'cet-center');
 				}
 
-				if (this.options.order !== 'first-buttons') {
+				if (!isMacintosh && this.options.order !== 'first-buttons') {
 					this.windowControls.style.marginLeft = 'auto';
 				}
 
