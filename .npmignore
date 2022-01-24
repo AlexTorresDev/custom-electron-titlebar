@@ -34,3 +34,5 @@ tslint.json
 tsconfig.json
 
 npm-debug.log
+webpack.config.js
+._config.yml

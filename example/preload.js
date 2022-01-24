@@ -1,8 +1,8 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 const { ipcRenderer } = require('electron');
+const { Titlebar, Color } = require('..');
 const path = require('path');
-const cet = require('..');
 
 let titlebar;
 
@@ -20,8 +20,8 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 ipcRenderer.on('renderer-titlebar', (event, menu) => {
-  titlebar = new cet.Titlebar({
-    backgroundColor: cet.Color.fromHex("#388e3c"),
+  titlebar = new Titlebar({
+    backgroundColor: Color.fromHex("#45322E"),
     icon: new URL(path.join(__dirname, '/assets/images', '/icon.svg')),
     menu: menu,
     onMinimize: () => ipcRenderer.send('window-event', 'window-minimize'),

@@ -9,7 +9,7 @@ ipcMain.on('request-application-menu', (event) => {
     const menu = Menu.getApplicationMenu();
     const jsonMenu = JSON.parse(JSON.stringify(menu, parseMenu()));
     event.sender.send('renderer-titlebar', jsonMenu);
-});
+})
 
 ipcMain.on('window-event', (event, eventName) => {
     const window = BrowserWindow.fromWebContents(event.sender);

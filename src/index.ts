@@ -6,4 +6,4 @@
 import Titlebar from './titlebar';
 import { Color } from './common/color';
 
-export default { Titlebar, Color };
+export = { Titlebar, Color };
