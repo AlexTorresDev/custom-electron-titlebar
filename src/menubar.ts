@@ -8,10 +8,7 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { Color } from './common/color';
-import { MenuItem, Menu } from 'electron';
-import * as remote from '@electron/remote';
-import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode, isAncestor, EventLike, EventHelper } from './common/dom';
+import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode } from './common/dom';
 import { CETMenu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu/menu';
 import { StandardKeyboardEvent } from './browser/keyboardEvent';
 import { KeyCodeUtils, KeyCode } from './common/keyCodes';
@@ -19,43 +16,8 @@ import { Disposable, IDisposable, dispose } from './common/lifecycle';
 import { Event, Emitter } from './common/event';
 import { domEvent } from './browser/event';
 import { isMacintosh } from './common/platform';
-
-export interface MenubarOptions {
-	/**
-	 * The menu to show in the title bar.
-	 * You can use `Menu` or not add this option and the menu created in the main process will be taken.
-	 * The default menu is taken from the [`Menu.getApplicationMenu()`](https://electronjs.org/docs/api/menu#menugetapplicationmenu)
-	 */
-	menu?: Menu | null;
-	/**
-	 * The position of menubar on titlebar.
-	 * *The default is left*
-	 */
-	menuPosition?: "left" | "bottom";
-	/**
-	 * Enable the mnemonics on menubar and menu items
-	 * *The default is true*
-	 */
-	enableMnemonics?: boolean;
-	/**
-	 * The background color when the mouse is over the item.
-	 */
-	itemBackgroundColor?: Color;
-}
-
-interface CustomItem {
-	menuItem: MenuItem;
-	buttonElement: HTMLElement;
-	titleElement: HTMLElement;
-	submenu: Menu;
-}
-
-enum MenubarState {
-	HIDDEN,
-	VISIBLE,
-	FOCUSED,
-	OPEN
-}
+import { CustomItem, MenubarOptions, MenubarState } from './interfaces';
+import styles from './styles/menubar.scss';
 
 export class Menubar extends Disposable {
 
@@ -86,6 +48,9 @@ export class Menubar extends Disposable {
 
 	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => { }) {
 		super();
+
+		// Inject style
+		(styles as any).use();
 
 		this.menuItems = [];
 		this.mnemonics = new Map<KeyCode, number>();
@@ -188,11 +153,11 @@ export class Menubar extends Disposable {
 			const menuIndex = this.menuItems.length;
 			const cleanMenuLabel = cleanMnemonic(menubarMenu.label);
 
-			const buttonElement = $('div.menubar-menu-button', { 'role': 'menuitem', 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
+			const buttonElement = $('div.cet-menubar-menu-button', { 'role': 'menuitem', 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
 			if (!menubarMenu.enabled) {
 				addClass(buttonElement, 'disabled');
 			}
-			const titleElement = $('div.menubar-menu-title', { 'role': 'none', 'aria-hidden': true });
+			const titleElement = $('div.cet-menubar-menu-title', { 'role': 'none', 'aria-hidden': true });
 
 			buttonElement.appendChild(titleElement);
 			append(this.container, buttonElement);
@@ -274,10 +239,8 @@ export class Menubar extends Disposable {
 	}
 
 	private onClick(menuIndex: number) {
-		let electronEvent: Electron.Event;
 		const item = this.menuItems[menuIndex].menuItem;
-		const browserWindow = remote.getCurrentWindow();
-		item.click(electronEvent, browserWindow, browserWindow.webContents);
+		this.options.onMenuItemClick(item.commandId);
 	}
 
 	public get onVisibilityChange(): Event<boolean> {
@@ -633,12 +596,12 @@ export class Menubar extends Disposable {
 		const customMenu = this.menuItems[menuIndex];
 		const btnElement = customMenu.buttonElement;
 		const btnRect = btnElement.getBoundingClientRect();
-		const menuHolder = $('ul.menubar-menu-container');
+		const menuHolder = $('ul.cet-menubar-menu-container');
 
 		addClass(btnElement, 'open');
 		menuHolder.setAttribute('role', 'menu');
 		menuHolder.tabIndex = 0;
-		menuHolder.style.top = `${btnRect.bottom}px`;
+		menuHolder.style.top = `${btnRect.bottom - 5}px`;
 		menuHolder.style.left = `${btnRect.left}px`;
 
 		btnElement.appendChild(menuHolder);
@@ -651,7 +614,7 @@ export class Menubar extends Disposable {
 			ariaLabel: btnElement.attributes['aria-label'].value
 		};
 
-		let menuWidget = new CETMenu(menuHolder, menuOptions, this.closeSubMenu);
+		let menuWidget = new CETMenu(menuHolder, this.options, menuOptions, this.closeSubMenu);
 		menuWidget.createMenu(customMenu.submenu.items);
 		menuWidget.style(this.menuStyle);
 

@@ -8,7 +8,7 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { Color } from "../common/color";
+import { Color, RGBA } from "../common/color";
 import { addClass, addDisposableListener, EventType, isAncestor, hasClass, append, addClasses, $, removeNode, EventHelper, EventLike } from "../common/dom";
 import { KeyCode, KeyCodeUtils, KeyMod } from "../common/keyCodes";
 import { isLinux } from "../common/platform";
@@ -18,6 +18,8 @@ import { Disposable, dispose, IDisposable } from "../common/lifecycle";
 import { Event, Emitter } from "../common/event";
 import { RunOnceScheduler } from "../common/async";
 import { MenuItem, Menu } from "electron";
+import { MenubarOptions } from "../interfaces";
+import icons from "../styles/icons.json";
 
 export const MENU_MNEMONIC_REGEX = /\(&([^\s&])\)|(^|[^&])&([^\s&])/;
 export const MENU_ESCAPED_MNEMONIC_REGEX = /(&amp;)?(&amp;)([^\s&])/g;
@@ -52,6 +54,7 @@ export class CETMenu extends Disposable {
 	private focusedItem?: number;
 	private menuContainer: HTMLElement;
 	private mnemonics: Map<KeyCode, Array<CETMenuItem>>;
+	private menubarOptions: MenubarOptions;
 	private options: IMenuOptions;
 	private closeSubMenu: () => void;
 
@@ -67,10 +70,11 @@ export class CETMenu extends Disposable {
 	private _onDidCancel = this._register(new Emitter<void>());
 	get onDidCancel(): Event<void> { return this._onDidCancel.event; }
 
-	constructor(container: HTMLElement, options: IMenuOptions = {}, closeSubMenu = () => { }) {
+	constructor(container: HTMLElement, menubarOptions: MenubarOptions, options: IMenuOptions = {}, closeSubMenu = () => { }) {
 		super();
 
 		this.menuContainer = container;
+		this.menubarOptions = menubarOptions;
 		this.options = options;
 		this.closeSubMenu = closeSubMenu;
 		this.items = [];
@@ -189,7 +193,7 @@ export class CETMenu extends Disposable {
 				target = target.parentElement;
 			}
 
-			if (hasClass(target, 'action-item')) {
+			if (hasClass(target, 'cet-action-item')) {
 				const lastFocusedItem = this.focusedItem;
 				this.setFocusedItem(target);
 
@@ -242,7 +246,7 @@ export class CETMenu extends Disposable {
 	createMenu(items: MenuItem[]) {
 		items.forEach((menuItem: MenuItem) => {
 			const itemElement = document.createElement('li');
-			itemElement.className = 'action-item';
+			itemElement.className = 'cet-action-item';
 			itemElement.setAttribute('role', 'presentation');
 
 			// Prevent native context menu on actions
@@ -257,7 +261,7 @@ export class CETMenu extends Disposable {
 				item = new Separator(menuItem, this.options);
 			} else if (menuItem.type === 'submenu' || menuItem.submenu) {
 				const submenuItems = (menuItem.submenu as Menu).items;
-				item = new Submenu(menuItem, submenuItems, this.parentData, this.options, this.closeSubMenu);
+				item = new Submenu(menuItem, submenuItems, this.parentData, this.menubarOptions, this.options, this.closeSubMenu);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
@@ -274,7 +278,7 @@ export class CETMenu extends Disposable {
 				}
 			} else {
 				const menuItemOptions: IMenuOptions = { enableMnemonics: this.options.enableMnemonics };
-				item = new CETMenuItem(menuItem, menuItemOptions, this.closeSubMenu, this.items);
+				item = new CETMenuItem(menuItem, this.menubarOptions, menuItemOptions, this.closeSubMenu, this.items);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
@@ -421,7 +425,10 @@ export class CETMenu extends Disposable {
 	style(style: IMenuStyle) {
 		const container = this.getContainer();
 
-		container.style.backgroundColor = style.backgroundColor ? style.backgroundColor.toString() : null;
+		const rgba = style.backgroundColor.rgba;
+		const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, 0.8));
+
+		container.style.backgroundColor = style.backgroundColor ? color.toString() : null;
 
 		if (this.items) {
 			this.items.forEach(item => {
@@ -463,8 +470,8 @@ class Submenu extends CETMenuItem {
 	private showScheduler: RunOnceScheduler;
 	private hideScheduler: RunOnceScheduler;
 
-	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuOptions?: IMenuOptions, closeSubMenu = () => {}) {
-		super(item, submenuOptions, closeSubMenu);
+	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, menubarOptions: MenubarOptions, private submenuOptions?: IMenuOptions, closeSubMenu = () => { }) {
+		super(item, menubarOptions, submenuOptions, closeSubMenu);
 		this.showScheduler = new RunOnceScheduler(() => {
 			if (this.mouseOver) {
 				this.cleanupExistingSubmenu(false);
@@ -487,10 +494,11 @@ class Submenu extends CETMenuItem {
 			return;
 		}
 
-		addClass(this.itemElement, 'submenu-item');
+		addClass(this.itemElement, 'cet-submenu-item');
 		this.itemElement.setAttribute('aria-haspopup', 'true');
 
-		this.submenuIndicator = append(this.itemElement, $('span.submenu-indicator'));
+		this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'));
+		this.submenuIndicator.innerHTML = icons.arrow;
 		this.submenuIndicator.setAttribute('aria-hidden', 'true');
 
 		this._register(addDisposableListener(this.container, EventType.KEY_UP, e => {
@@ -553,10 +561,10 @@ class Submenu extends CETMenuItem {
 		}
 
 		if (!this.parentData.submenu) {
-			this.submenuContainer = append(this.container, $('ul.submenu'));
-			addClasses(this.submenuContainer, 'menubar-menu-container');
+			this.submenuContainer = append(this.container, $('ul.cet-submenu'));
+			addClasses(this.submenuContainer, 'cet-menubar-menu-container');
 
-			this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuOptions, this.closeSubMenu);
+			this.parentData.submenu = new CETMenu(this.submenuContainer, this.menubarOptions, this.submenuOptions, this.closeSubMenu);
 			this.parentData.submenu.createMenu(this.submenuItems);
 
 			if (this.menuStyle) {
@@ -630,7 +638,7 @@ class Submenu extends CETMenuItem {
 		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
 
-		this.submenuIndicator.style.backgroundColor = fgColor ? `${fgColor}` : null;
+		this.submenuIndicator.style.backgroundColor = fgColor ? fgColor.toString() : null;
 
 		if (this.parentData.submenu) {
 			this.parentData.submenu.style(this.menuStyle);
@@ -664,7 +672,7 @@ class Separator extends CETMenuItem {
 
 	render(container: HTMLElement) {
 		if (container) {
-			this.separatorElement = append(container, $('a.action-label'));
+			this.separatorElement = append(container, $('a.cet-action-label'));
 			this.separatorElement.setAttribute('role', 'presentation');
 			addClass(this.separatorElement, 'separator');
 		}

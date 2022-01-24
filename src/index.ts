@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *------------------------------------------------------------------------------------------*/
 
-export * from './titlebar';
-export * from './themebar';
-export * from './common/color';
+import Titlebar from './titlebar';
+import { Color } from './common/color';
+
+export default { Titlebar, Color };

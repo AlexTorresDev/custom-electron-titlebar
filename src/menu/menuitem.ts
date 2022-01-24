@@ -9,12 +9,13 @@
  *-------------------------------------------------------------------------------------------------------*/
 
 import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { BrowserWindow, NativeImage, MenuItem } from "electron";
-import * as remote from '@electron/remote';
+import { MenuItem } from "electron";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
 import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
 import { Disposable } from "../common/lifecycle";
 import { isMacintosh } from "../common/platform";
+import { MenubarOptions } from "../interfaces";
+import defaultIcons from '../styles/icons.json';
 
 export interface IMenuItem {
 	render(element: HTMLElement): void;
@@ -27,6 +28,7 @@ export interface IMenuItem {
 
 export class CETMenuItem extends Disposable implements IMenuItem {
 
+	protected menubarOptions: MenubarOptions;
 	protected options: IMenuOptions;
 	protected menuStyle: IMenuStyle;
 	protected container: HTMLElement;
@@ -36,21 +38,17 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	private radioGroup: { start: number, end: number }; // used only if item.type === "radio"
 	private labelElement: HTMLElement;
-	private checkElement: HTMLElement;
 	private iconElement: HTMLElement;
 	private mnemonic: KeyCode;
 	protected closeSubMenu: () => void;
 	protected menuContainer: IMenuItem[];
 
-	private event: Electron.Event;
-	private currentWindow: BrowserWindow;
-
-	constructor(item: MenuItem, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
+	constructor(item: MenuItem, menubarOptions: MenubarOptions, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
 		super();
 
 		this.item = item;
+		this.menubarOptions = menubarOptions;
 		this.options = options;
-		this.currentWindow = remote.getCurrentWindow();
 		this.closeSubMenu = closeSubMenu;
 		this.menuContainer = menuContainer;
 
@@ -108,20 +106,17 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			}));
 		});
 
-		this.itemElement = append(this.container, $('a.action-menu-item'));
+		this.itemElement = append(this.container, $('a.cet-action-menu-item'));
 		this.itemElement.setAttribute('role', 'menuitem');
 
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`);
 		}
 
-		this.checkElement = append(this.itemElement, $('span.menu-item-check'));
-		this.checkElement.setAttribute('role', 'none');
-
-		this.iconElement = append(this.itemElement, $('span.menu-item-icon'));
+		this.iconElement = append(this.itemElement, $('span.cet-menu-item-icon'));
 		this.iconElement.setAttribute('role', 'none');
 
-		this.labelElement = append(this.itemElement, $('span.action-label'));
+		this.labelElement = append(this.itemElement, $('span.cet-action-label'));
 
 		this.setAccelerator();
 		this.updateLabel();
@@ -134,8 +129,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
-
-		this.item.click(this.event,this.currentWindow, this.currentWindow.webContents);
+		this.menubarOptions.onMenuItemClick(this.item.commandId);
 
 		if (this.item.type === 'checkbox') {
 			this.updateChecked();
@@ -276,15 +270,16 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 
 	updateIcon(): void {
-		let icon: string | NativeImage | null = null;
-
 		if (this.item.icon) {
-			icon = this.item.icon;
-		}
+			const icon = this.item.icon;
 
-		if (icon) {
-			const iconE = append(this.iconElement, $('img'));
-			iconE.setAttribute('src', icon.toString());
+			if (icon) {
+				const iconE = append(this.iconElement, $('img'));
+				iconE.setAttribute('src', icon.toString());
+			}
+		} else if (this.item.type === 'checkbox') {
+			addClass(this.iconElement, 'checkbox');
+			this.iconElement.innerHTML = defaultIcons.check;
 		}
 	}
 
@@ -392,9 +387,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
-		const bgColor = isSelected && this.menuStyle.selectionBackgroundColor ? this.menuStyle.selectionBackgroundColor : this.menuStyle.backgroundColor;
+		const bgColor = isSelected && this.menuStyle.selectionBackgroundColor ? this.menuStyle.selectionBackgroundColor : null;
 
-		this.checkElement.style.backgroundColor = fgColor ? fgColor.toString() : null;
 		this.itemElement.style.color = fgColor ? fgColor.toString() : null;
 		this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : null;
 	}
