@@ -471,7 +471,7 @@ export default class Titlebar {
 					addClass(this.title, 'cet-center');
 				}
 
-				if (this.options.order !== 'first-buttons') {
+				if (!isMacintosh && this.options.order !== 'first-buttons') {
 					this.windowControls.style.marginLeft = 'auto';
 				}
 

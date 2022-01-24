@@ -21,8 +21,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 ipcRenderer.on('renderer-titlebar', (event, menu) => {
   titlebar = new Titlebar({
-    backgroundColor: Color.fromHex("#45322E"),
-    icon: new URL(path.join(__dirname, '/assets/images', '/icon.svg')),
+    backgroundColor: Color.fromHex("#388e3c"),
+    icon: path.join(__dirname, '/assets/images', '/icon.svg'),
     menu: menu,
     onMinimize: () => ipcRenderer.send('window-event', 'window-minimize'),
     onMaximize: () => ipcRenderer.send('window-event', 'window-maximize'),
