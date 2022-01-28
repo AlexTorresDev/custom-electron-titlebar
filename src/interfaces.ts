@@ -4,17 +4,23 @@ import { Color } from "./common/color";
 export interface TitlebarOptions extends MenubarOptions {
     /**
      * The background color of titlebar.
+     * **The default is `#ffffff`**
      */
     backgroundColor?: Color;
     /**
      * The icon shown on the left side of titlebar.
+     * **The default is the favicon of the index.html**
      */
     icon?: string;
     /**
      * The icon size of titlebar. Value between 16 and 24.
-     * **The default is 17**
+     * **The default is 16**
      */
     iconSize?: number;
+    /**
+     * The path of the icons of titlebar.
+     */
+    icons?: string;
     /**
      * The shadow color of titlebar.
      */
@@ -54,13 +60,21 @@ export interface TitlebarOptions extends MenubarOptions {
      * **The default value is auto**
      */
     containerOverflow?: "auto" | "hidden" | "visible";
-
+    /**
+     * Method to call when the window is minimized.
+     */
     onMinimize?: () => void;
-
+    /**
+     * Method to call when the window is maximized and restored.
+     */
     onMaximize?: () => void;
-
+    /**
+     * Method to call when the window is closed.
+     */
     onClose?: () => void;
-
+    /**
+     * Method to verify if the window is maximized.
+     */
     isMaximized?: () => boolean;
 }
 

@@ -16,6 +16,7 @@ import { Menubar } from './menubar';
 import { TitlebarOptions } from './interfaces';
 import styles from './styles/titlebar.scss';
 import defaultIcons from './styles/icons.json';
+import fs from 'fs';
 
 const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');
 const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
@@ -61,7 +62,13 @@ export default class Titlebar {
 
 	constructor(titlebarOptions?: TitlebarOptions) {
 		this.options = { ...this.defaultOptions, ...titlebarOptions };
-		this.platformIcons = defaultIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
+		if (this.options.icons) {
+			const icons = fs.readFileSync(this.options.icons, 'utf8');
+			const jsonIcons = JSON.parse(icons);
+			this.platformIcons = jsonIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
+		} else {
+			this.platformIcons = defaultIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
+		}
 
 		if (!this.options.isMaximized) {
 			throw new Error("isMaximized has not been added. Check: https://github.com/AlexTorresSk/custom-electron-titlebar/wiki/How-to-use for more information.");
@@ -69,6 +76,20 @@ export default class Titlebar {
 
 		if (!this.options.onMenuItemClick) {
 			throw new Error("onMenuItemClick has not been added. Check: https://github.com/AlexTorresSk/custom-electron-titlebar/wiki/Menu for more information.");
+		}
+
+		let color = Color.fromHex('#ffffff');
+
+		if (!this.options.backgroundColor) {
+			const nodeList = document.getElementsByTagName("meta");
+
+			for (let i = 0; i < nodeList.length; i++) {
+				if ((nodeList[i].getAttribute("name") == "theme-color") || (nodeList[i].getAttribute("name") == "msapplication-TileColor")) {
+					color = Color.fromHex(nodeList[i].getAttribute("content"));
+				}
+			}
+
+			this.options.backgroundColor = color;
 		}
 
 		// Inject style
@@ -112,9 +133,22 @@ export default class Titlebar {
 		this.dragRegion = append(this.titlebar, $('div.cet-drag-region'));
 
 		// Create window icon (Windows/Linux)
-		if (!isMacintosh && this.options.icon) {
+		if (!isMacintosh) {
 			const icon = append(this.titlebar, $('div.cet-window-icon'));
 			this.windowIcon = append(icon, $('img'));
+			if (!this.options.icon) {
+				let favicon: string;
+				const nodeList = document.getElementsByTagName("link");
+
+				for (let i = 0; i < nodeList.length; i++) {
+					if ((nodeList[i].getAttribute("rel") == "icon") || (nodeList[i].getAttribute("rel") == "shortcut icon")) {
+						favicon = nodeList[i].getAttribute("href");
+					}
+				}
+
+				this.options.icon = favicon;
+			}
+
 			this.updateIcon(this.options.icon);
 		}
 
@@ -208,7 +242,7 @@ export default class Titlebar {
 			this.updateMenuPosition(this.options.menuPosition);
 		}
 
-		this.updateTitle();
+		this.updateTitle(document.title);
 		this.updateTitleAlignment(this.options.titleHorizontalAlignment);
 	}
 
@@ -374,14 +408,9 @@ export default class Titlebar {
 	 * You can use this method if change the content of `<title>` tag on your html.
 	 * @param title The title of the title bar and document.
 	 */
-	public updateTitle(title?: string): void {
+	public updateTitle(title: string): void {
 		if (this.title) {
-			if (title) {
-				document.title = title;
-			} else {
-				title = document.title;
-			}
-
+			document.title = title;
 			this.title.innerText = title;
 		}
 	}
