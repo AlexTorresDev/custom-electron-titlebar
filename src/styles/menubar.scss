@@ -192,6 +192,10 @@
             }
         }
 
+        .cet-action-menu-item.checked  > .cet-menu-item-icon.checkbox {
+            visibility: visible;
+        }
+
         .cet-menu-item-icon {
             width: 18px;
             height: 18px;
@@ -199,10 +203,6 @@
 
             &.checkbox {
                 visibility: hidden;
-
-                &.checked {
-                    visibility: visible;
-                }
             }
         }
     }
