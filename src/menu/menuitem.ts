@@ -132,6 +132,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		this.menubarOptions.onMenuItemClick(this.item.commandId);
 
 		if (this.item.type === 'checkbox') {
+			this.item.checked = !this.item.checked;
 			this.updateChecked();
 		} else if (this.item.type === 'radio') {
 			this.updateRadioGroup();
@@ -280,6 +281,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		} else if (this.item.type === 'checkbox') {
 			addClass(this.iconElement, 'checkbox');
 			this.iconElement.innerHTML = defaultIcons.check;
+		} else if (this.item.type === 'radio') {
+			addClass(this.iconElement, 'radio');
+			this.iconElement.innerHTML = this.item.checked ? defaultIcons.radio.checked : defaultIcons.radio.unchecked ;
+		}
+
+		if (this.iconElement.firstElementChild) {
+			this.iconElement.firstElementChild.setAttribute('fill', this.menubarOptions.svgColor?.toString() || this.menuStyle?.foregroundColor?.toString() || undefined)
 		}
 	}
 
@@ -319,7 +327,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	updateChecked(): void {
 		if (this.item.checked) {
 			addClass(this.itemElement, 'checked');
-			this.itemElement.setAttribute('role', 'menuitemcheckbox');
+			this.itemElement.setAttribute('role', 'menuitemcheckbox'+this.item.type);
 			this.itemElement.setAttribute('aria-checked', 'true');
 		} else {
 			removeClass(this.itemElement, 'checked');
@@ -335,8 +343,12 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
 			const menuItem = this.menuContainer[i];
 			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio') {
+				// update item.checked for each radio button in group
+				menuItem.item.checked = menuItem === this; 
+				menuItem.updateIcon();
 				// updateChecked() *all* radio buttons in group
 				menuItem.updateChecked();
+				menuItem
 				// set the radioGroup property of all the other radio buttons since it was already calculated
 				if (menuItem !== this) {
 					menuItem.radioGroup = this.radioGroup;

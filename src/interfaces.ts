@@ -61,19 +61,24 @@ export interface TitlebarOptions extends MenubarOptions {
      */
     containerOverflow?: "auto" | "hidden" | "visible";
     /**
-     * Method to call when the window is minimized.
+     * Callback that is called on window minimize button clicked
+     * **Optional (included in setupTitlebar())**
      */
     onMinimize?: () => void;
     /**
-     * Method to call when the window is maximized and restored.
+     * Callback that is called on window maximize button clicked
+     * **Optional (included in setupTitlebar())**
      */
     onMaximize?: () => void;
     /**
-     * Method to call when the window is closed.
+     * Callback that is called on window minimize button clicked
+     * **Optional (included in setupTitlebar())**
      */
     onClose?: () => void;
     /**
-     * Method to verify if the window is maximized.
+     * Function that should return a value indicating if window is maximized
+     * **Optional (included in setupTitlebar())**
+     * @returns is window maximized boolean
      */
     isMaximized?: () => boolean;
 }
@@ -100,7 +105,16 @@ export interface MenubarOptions {
      * **The default is undefined**
      */
     itemBackgroundColor?: Color;
-
+    /**
+     * The color of the svg icons in the menu
+     * **The default is black**
+     */
+    svgColor?: Color;
+	/**
+	 * Callback on menu item click
+	 * @param commandId commandId of the clicked item.
+     * **Optional (included in setupTitlebar() - execute callback of item with same id in Menu.getApplicationMenu())**
+	 */
     onMenuItemClick?: (commandId: number) => void;
 }
 

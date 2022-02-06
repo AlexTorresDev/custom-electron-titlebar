@@ -11,7 +11,7 @@
 import { isMacintosh, isWindows, isLinux } from './common/platform';
 import { Color, RGBA } from './common/color';
 import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from './common/dom';
-import { Menu } from 'electron';
+import { Menu, ipcRenderer } from 'electron';
 import { Menubar } from './menubar';
 import { TitlebarOptions } from './interfaces';
 import styles from './styles/titlebar.scss';
@@ -50,9 +50,14 @@ export default class Titlebar {
 	private defaultOptions: TitlebarOptions = {
 		shadow: false,
 		minimizable: true,
+		onMinimize: () => ipcRenderer.send('window-event', 'window-minimize'),
 		maximizable: true,
+		onMaximize: () => ipcRenderer.send('window-event', 'window-maximize'),
+		isMaximized: () => ipcRenderer.sendSync('window-event', 'window-is-maximized'),
 		closeable: true,
+		onClose: () => ipcRenderer.send('window-event', 'window-close'),
 		enableMnemonics: true,
+		onMenuItemClick: (commandId) => ipcRenderer.send('menu-event', commandId),
 		//hideWhenClickingClose: false,
 		titleHorizontalAlignment: 'center',
 		menuPosition: 'left',
@@ -70,13 +75,9 @@ export default class Titlebar {
 			this.platformIcons = defaultIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
 		}
 
-		if (!this.options.isMaximized) {
-			throw new Error("isMaximized has not been added. Check: https://github.com/AlexTorresSk/custom-electron-titlebar/wiki/How-to-use for more information.");
-		}
+		ipcRenderer.on('window-fullscreen', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen));
 
-		if (!this.options.onMenuItemClick) {
-			throw new Error("onMenuItemClick has not been added. Check: https://github.com/AlexTorresSk/custom-electron-titlebar/wiki/Menu for more information.");
-		}
+		ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused));
 
 		let color = Color.fromHex('#ffffff');
 
@@ -236,6 +237,8 @@ export default class Titlebar {
 
 		if (this.options.menu) {
 			this.updateMenu(this.options.menu);
+		} else if (this.options.menu !== null) {
+			ipcRenderer.invoke('request-application-menu').then(menu => this.updateMenu(menu));
 		}
 
 		if (this.options.menuPosition) {
@@ -441,18 +444,26 @@ export default class Titlebar {
 	 * @param menu The menu.
 	 */
 	public updateMenu(menu: Menu): void {
+		if (isMacintosh) return;
+		if (this.menubar) this.menubar.dispose();
+		if (!menu) return;
+		this.options.menu = menu;
+
+		this.menubar = new Menubar(this.menubarContainer, this.options, this.closeMenu);
+		this.menubar.setupMenubar();
+
+		this.menubar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e));
+		this.menubar.onFocusStateChange(e => this.onMenubarFocusChanged(e));
+
+		this.updateStyles();
+	}
+
+	/**
+	 * Update the menu from Menu.getApplicationMenu()
+	 */
+	public async refreshMenu(): Promise<void> {
 		if (!isMacintosh) {
-			if (!menu) return;
-			if (this.menubar) this.menubar.dispose();
-			this.options.menu = menu;
-
-			this.menubar = new Menubar(this.menubarContainer, this.options, this.closeMenu);
-			this.menubar.setupMenubar();
-
-			this.menubar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e));
-			this.menubar.onFocusStateChange(e => this.onMenubarFocusChanged(e));
-
-			this.updateStyles();
+			ipcRenderer.invoke('request-application-menu').then(menu => this.updateMenu(menu));
 		}
 	}
 
