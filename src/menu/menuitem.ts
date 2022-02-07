@@ -107,7 +107,19 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		});
 
 		this.itemElement = append(this.container, $('a.cet-action-menu-item'));
-		this.itemElement.setAttribute('role', 'menuitem');
+		let role = 'menuitem';
+		switch (this.item.type) {
+			case 'checkbox':
+			case 'radio':
+				role += this.item.type;
+				break;
+			case 'separator':
+				role = this.item.type;
+				break;
+			case 'submenu':
+				this.itemElement.setAttribute('aria-haspopup', 'true');
+		}
+		this.itemElement.setAttribute('role', role);
 
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`);
@@ -327,11 +339,9 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	updateChecked(): void {
 		if (this.item.checked) {
 			addClass(this.itemElement, 'checked');
-			this.itemElement.setAttribute('role', 'menuitemcheckbox'+this.item.type);
 			this.itemElement.setAttribute('aria-checked', 'true');
 		} else {
 			removeClass(this.itemElement, 'checked');
-			this.itemElement.setAttribute('role', 'menuitem');
 			this.itemElement.setAttribute('aria-checked', 'false');
 		}
 	}
@@ -348,7 +358,6 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 				menuItem.updateIcon();
 				// updateChecked() *all* radio buttons in group
 				menuItem.updateChecked();
-				menuItem
 				// set the radioGroup property of all the other radio buttons since it was already calculated
 				if (menuItem !== this) {
 					menuItem.radioGroup = this.radioGroup;
