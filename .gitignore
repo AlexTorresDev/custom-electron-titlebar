@@ -189,7 +189,6 @@ typings/
 dist
 build/
 *.map
-package-lock.json
 
 # Gatsby files
 .cache/
