@@ -150,6 +150,7 @@ export class Menubar extends Disposable {
 		this._register(this.onVisibilityChange(e => this._onVisibilityChange.fire(e)));
 
 		topLevelMenus.forEach((menubarMenu) => {
+			if (!menubarMenu) return;
 			const menuIndex = this.menuItems.length;
 			const cleanMenuLabel = cleanMnemonic(menubarMenu.label);
 

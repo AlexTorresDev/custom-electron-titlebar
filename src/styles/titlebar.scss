@@ -88,7 +88,7 @@
         overflow: hidden;
 
         img {
-            height: 17px;
+            height: 16px;
         }
     }
 
@@ -150,7 +150,7 @@
 
             svg {
                 width: 10px;
-                height: 10px;
+                height: -webkit-fill-available;
                 fill: #eeeeee;
             }
         }

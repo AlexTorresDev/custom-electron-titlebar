@@ -245,6 +245,7 @@ export class CETMenu extends Disposable {
 
 	createMenu(items: MenuItem[]) {
 		items.forEach((menuItem: MenuItem) => {
+			if (!menuItem) return;
 			const itemElement = document.createElement('li');
 			itemElement.className = 'cet-action-item';
 			itemElement.setAttribute('role', 'presentation');
@@ -499,6 +500,8 @@ class Submenu extends CETMenuItem {
 
 		this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'));
 		this.submenuIndicator.innerHTML = icons.arrow;
+		this.submenuIndicator.firstElementChild.setAttribute('fill', this.menubarOptions.svgColor?.toString() || this.menuStyle?.foregroundColor?.toString() || undefined)
+
 		this.submenuIndicator.setAttribute('aria-hidden', 'true');
 
 		this._register(addDisposableListener(this.container, EventType.KEY_UP, e => {
@@ -638,7 +641,7 @@ class Submenu extends CETMenuItem {
 		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
 
-		this.submenuIndicator.style.backgroundColor = fgColor ? fgColor.toString() : null;
+		this.submenuIndicator.firstElementChild.setAttribute('fill', this.menubarOptions.svgColor?.toString() || fgColor?.toString() || undefined);
 
 		if (this.parentData.submenu) {
 			this.parentData.submenu.style(this.menuStyle);

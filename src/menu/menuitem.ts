@@ -107,7 +107,19 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		});
 
 		this.itemElement = append(this.container, $('a.cet-action-menu-item'));
-		this.itemElement.setAttribute('role', 'menuitem');
+		let role = 'menuitem';
+		switch (this.item.type) {
+			case 'checkbox':
+			case 'radio':
+				role += this.item.type;
+				break;
+			case 'separator':
+				role = this.item.type;
+				break;
+			case 'submenu':
+				this.itemElement.setAttribute('aria-haspopup', 'true');
+		}
+		this.itemElement.setAttribute('role', role);
 
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`);
@@ -132,6 +144,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		this.menubarOptions.onMenuItemClick(this.item.commandId);
 
 		if (this.item.type === 'checkbox') {
+			this.item.checked = !this.item.checked;
 			this.updateChecked();
 		} else if (this.item.type === 'radio') {
 			this.updateRadioGroup();
@@ -280,6 +293,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		} else if (this.item.type === 'checkbox') {
 			addClass(this.iconElement, 'checkbox');
 			this.iconElement.innerHTML = defaultIcons.check;
+		} else if (this.item.type === 'radio') {
+			addClass(this.iconElement, 'radio');
+			this.iconElement.innerHTML = this.item.checked ? defaultIcons.radio.checked : defaultIcons.radio.unchecked ;
+		}
+
+		if (this.iconElement.firstElementChild) {
+			this.iconElement.firstElementChild.setAttribute('fill', this.menubarOptions.svgColor?.toString() || this.menuStyle?.foregroundColor?.toString() || undefined)
 		}
 	}
 
@@ -319,11 +339,9 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	updateChecked(): void {
 		if (this.item.checked) {
 			addClass(this.itemElement, 'checked');
-			this.itemElement.setAttribute('role', 'menuitemcheckbox');
 			this.itemElement.setAttribute('aria-checked', 'true');
 		} else {
 			removeClass(this.itemElement, 'checked');
-			this.itemElement.setAttribute('role', 'menuitem');
 			this.itemElement.setAttribute('aria-checked', 'false');
 		}
 	}
@@ -335,6 +353,9 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
 			const menuItem = this.menuContainer[i];
 			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio') {
+				// update item.checked for each radio button in group
+				menuItem.item.checked = menuItem === this; 
+				menuItem.updateIcon();
 				// updateChecked() *all* radio buttons in group
 				menuItem.updateChecked();
 				// set the radioGroup property of all the other radio buttons since it was already calculated
