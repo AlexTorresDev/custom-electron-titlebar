@@ -189,6 +189,8 @@ typings/
 dist
 build/
 *.map
+index.js
+main.js
 
 # Gatsby files
 .cache/

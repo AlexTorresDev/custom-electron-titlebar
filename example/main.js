@@ -2,6 +2,7 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main');
+
 // setup the titlebar main process
 setupTitlebar();
 
@@ -19,8 +20,6 @@ createWindow = () => {
 
   const menu = Menu.buildFromTemplate(exampleMenuTemplate());
   Menu.setApplicationMenu(menu);
-
-
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html');

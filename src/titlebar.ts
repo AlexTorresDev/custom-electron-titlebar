@@ -8,15 +8,15 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { isMacintosh, isWindows, isLinux } from './common/platform';
-import { Color, RGBA } from './common/color';
-import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from './common/dom';
-import { Menu, ipcRenderer } from 'electron';
-import { Menubar } from './menubar';
-import { TitlebarOptions } from './interfaces';
-import styles from './styles/titlebar.scss';
-import defaultIcons from './styles/icons.json';
 import fs from 'fs';
+import { Menu, ipcRenderer } from 'electron';
+import { isMacintosh, isWindows, isLinux } from 'vs/base/common/platform';
+import { Color, RGBA } from 'vs/base/common/color';
+import { EventType, hide, show, removeClass, addClass, append, $, addDisposableListener, prepend, removeNode } from 'vs/base/common/dom';
+import { Menubar } from './menubar';
+import { TitlebarOptions } from './types/titlebar-options';
+import defaultIcons from 'static/icons.json';
+import titlebarTheme from 'static/titlebar.scss';
 
 const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');
 const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
@@ -29,54 +29,50 @@ const TOP_TITLEBAR_HEIGHT_MAC = IS_MAC_BIGSUR_OR_LATER ? '28px' : '22px';
 const TOP_TITLEBAR_HEIGHT_WIN = '30px';
 
 export default class Titlebar {
-	private titlebar: HTMLElement;
-	private dragRegion: HTMLElement;
-	private windowIcon: HTMLImageElement;
-	private title: HTMLElement;
-	private menubarContainer: HTMLElement;
-	private windowControls: HTMLElement;
-	private maxRestoreControl: HTMLElement;
-	private container: HTMLElement;
+	private titlebar?: HTMLElement;
+	private dragRegion?: HTMLElement;
+	private windowIcon?: HTMLImageElement;
+	private title?: HTMLElement;
+	private menubarContainer?: HTMLElement;
+	private windowControls?: HTMLElement;
+	private maxRestoreControl?: HTMLElement;
+	private container?: HTMLElement;
 
-	private isInactive: boolean;
-	private menubar: Menubar;
+	private isInactive?: boolean;
+	private menubar?: Menubar;
 	private options: TitlebarOptions;
 
-	private resizer: {
+	private resizer?: {
 		top: HTMLElement;
 		left: HTMLElement;
 	};
 
 	private defaultOptions: TitlebarOptions = {
-		shadow: false,
-		minimizable: true,
-		onMinimize: () => ipcRenderer.send('window-event', 'window-minimize'),
-		maximizable: true,
-		onMaximize: () => ipcRenderer.send('window-event', 'window-maximize'),
-		isMaximized: () => ipcRenderer.sendSync('window-event', 'window-is-maximized'),
-		closeable: true,
-		onClose: () => ipcRenderer.send('window-event', 'window-close'),
-		enableMnemonics: true,
-		onMenuItemClick: (commandId) => ipcRenderer.send('menu-event', commandId),
-		//hideWhenClickingClose: false,
 		titleHorizontalAlignment: 'center',
 		menuPosition: 'left',
+		enableMnemonics: true,
+		shadow: false,
+		//hideWhenClickingClose: false,
+		minimizable: true,
+		maximizable: true,
+		closeable: true,
 	}
 
-	private platformIcons: HTMLElement[];
+	private platformIcons: { [key: string]: string };
 
 	constructor(titlebarOptions?: TitlebarOptions) {
+		(titlebarTheme as any).use();
+
 		this.options = { ...this.defaultOptions, ...titlebarOptions };
 		if (this.options.icons) {
 			const icons = fs.readFileSync(this.options.icons, 'utf8');
 			const jsonIcons = JSON.parse(icons);
 			this.platformIcons = jsonIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
 		} else {
-			this.platformIcons = defaultIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
+			this.platformIcons = (defaultIcons as any)[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
 		}
 
 		ipcRenderer.on('window-fullscreen', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen));
-
 		ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused));
 
 		let color = Color.fromHex('#ffffff');
@@ -86,15 +82,13 @@ export default class Titlebar {
 
 			for (let i = 0; i < nodeList.length; i++) {
 				if ((nodeList[i].getAttribute("name") == "theme-color") || (nodeList[i].getAttribute("name") == "msapplication-TileColor")) {
-					color = Color.fromHex(nodeList[i].getAttribute("content"));
+					color = Color.fromHex(nodeList[i].getAttribute("content") || '#ffffff');
 				}
 			}
 
 			this.options.backgroundColor = color;
 		}
 
-		// Inject style
-		(styles as any).use();
 		this.createTitlebar();
 		this.updateStyles();
 	}
@@ -138,12 +132,12 @@ export default class Titlebar {
 			const icon = append(this.titlebar, $('div.cet-window-icon'));
 			this.windowIcon = append(icon, $('img'));
 			if (!this.options.icon) {
-				let favicon: string;
+				let favicon: string | undefined;
 				const nodeList = document.getElementsByTagName("link");
 
 				for (let i = 0; i < nodeList.length; i++) {
 					if ((nodeList[i].getAttribute("rel") == "icon") || (nodeList[i].getAttribute("rel") == "shortcut icon")) {
-						favicon = nodeList[i].getAttribute("href");
+						favicon = nodeList[i].getAttribute("href") || undefined;
 					}
 				}
 
@@ -172,8 +166,8 @@ export default class Titlebar {
 		// Maximize/Restore on doubleclick
 		if (isMacintosh) {
 			addDisposableListener(this.titlebar, EventType.DBLCLICK, () => {
-				let isMaximized = this.options.isMaximized();
-				this.onDidChangeMaximized(isMaximized);
+				let isMaximized = ipcRenderer.sendSync('window-event', 'window-is-maximized');
+				if (isMaximized !== undefined) this.onDidChangeMaximized(isMaximized);
 			});
 		}
 
@@ -182,7 +176,7 @@ export default class Titlebar {
 			this.windowControls = append(this.titlebar, $('div.cet-controls-container'));
 
 			// Minimize
-			if (this.options.onMinimize) {
+			if (this.options.minimizable) {
 				const minimizeIcon = append(this.windowControls, $('div.cet-icon'));
 				minimizeIcon.title = "Minimize";
 				minimizeIcon.innerHTML = this.platformIcons['minimize'];
@@ -190,12 +184,12 @@ export default class Titlebar {
 				if (!this.options.minimizable) {
 					addClass(minimizeIcon, 'inactive');
 				} else {
-					addDisposableListener(minimizeIcon, EventType.CLICK, () => this.options.onMinimize());
+					addDisposableListener(minimizeIcon, EventType.CLICK, () => ipcRenderer.send('window-event', 'window-minimize'));
 				}
 			}
 
 			// Restore
-			if (this.options.onMaximize) {
+			if (this.options.maximizable) {
 				this.maxRestoreControl = append(this.windowControls, $('div.cet-icon'));
 				this.maxRestoreControl.innerHTML = this.platformIcons['maximize'];
 				addClass(this.maxRestoreControl, 'cet-max-restore');
@@ -204,14 +198,14 @@ export default class Titlebar {
 					addClass(this.maxRestoreControl, 'inactive');
 				} else {
 					addDisposableListener(this.maxRestoreControl, EventType.CLICK, () => {
-						this.options.onMaximize();
-						this.onDidChangeMaximized(this.options.isMaximized());
+						ipcRenderer.send('window-event', 'window-maximize');
+						this.onDidChangeMaximized(ipcRenderer.sendSync('window-event', 'window-is-maximized'));
 					});
 				}
 			}
 
 			// Close
-			if (this.options.onClose) {
+			if (this.options.closeable) {
 				const closeIcon = append(this.windowControls, $('div.cet-icon'));
 				closeIcon.title = "Close";
 				closeIcon.innerHTML = this.platformIcons['close'];
@@ -220,7 +214,7 @@ export default class Titlebar {
 				if (!this.options.closeable) {
 					addClass(closeIcon, 'inactive');
 				} else {
-					addDisposableListener(closeIcon, EventType.CLICK, () => this.options.onClose());
+					addDisposableListener(closeIcon, EventType.CLICK, () => ipcRenderer.send('window-event', 'window-close'));
 				}
 			}
 
@@ -230,7 +224,7 @@ export default class Titlebar {
 				left: append(this.titlebar, $('div.resizer.left'))
 			}
 
-			this.onDidChangeMaximized(this.options.isMaximized());
+			this.onDidChangeMaximized(ipcRenderer.sendSync('window-event', 'window-is-maximized'));
 		}
 
 		prepend(document.body, this.titlebar);
@@ -246,7 +240,7 @@ export default class Titlebar {
 		}
 
 		this.updateTitle(document.title);
-		this.updateTitleAlignment(this.options.titleHorizontalAlignment);
+		this.updateTitleAlignment(this.options.titleHorizontalAlignment!);
 	}
 
 	private onBlur(): void {
@@ -264,8 +258,8 @@ export default class Titlebar {
 			// Hide title when toggling menu bar
 			if (visible) {
 				// Hack to fix issue #52522 with layered webkit-app-region elements appearing under cursor
-				hide(this.dragRegion);
-				setTimeout(() => show(this.dragRegion), 50);
+				hide(this.dragRegion!);
+				setTimeout(() => show(this.dragRegion!), 50);
 			}
 		}
 	}
@@ -273,9 +267,9 @@ export default class Titlebar {
 	private onMenubarFocusChanged(focused: boolean) {
 		if (isWindows || isLinux) {
 			if (focused) {
-				hide(this.dragRegion);
+				hide(this.dragRegion!);
 			} else {
-				show(this.dragRegion);
+				show(this.dragRegion!);
 			}
 		}
 	}
@@ -304,14 +298,14 @@ export default class Titlebar {
 			}
 
 			const titleBackground = this.isInactive
-				? this.options.backgroundColor.lighten(.15)
+				? this.options.backgroundColor?.lighten(.15)
 				: this.options.backgroundColor;
 
-			this.titlebar.style.backgroundColor = titleBackground.toString();
+			if (titleBackground) this.titlebar.style.backgroundColor = titleBackground.toString();
 
 			let titleForeground: Color;
 
-			if (titleBackground.isLighter()) {
+			if (titleBackground?.isLighter()) {
 				addClass(this.titlebar, 'light');
 
 				titleForeground = this.isInactive
@@ -327,13 +321,13 @@ export default class Titlebar {
 
 			this.titlebar.style.color = titleForeground.toString();
 
-			const backgroundColor = this.options.backgroundColor.darken(.16);
+			const backgroundColor = this.options.backgroundColor?.darken(.16);
 
-			const foregroundColor = backgroundColor.isLighter()
+			const foregroundColor = backgroundColor?.isLighter()
 				? INACTIVE_FOREGROUND_DARK
 				: INACTIVE_FOREGROUND;
 
-			const bgColor = !this.options.itemBackgroundColor || this.options.itemBackgroundColor.equals(backgroundColor)
+			const bgColor = !this.options.itemBackgroundColor || this.options.itemBackgroundColor.equals(backgroundColor!)
 				? new Color(new RGBA(0, 0, 0, .14))
 				: this.options.itemBackgroundColor;
 
@@ -375,14 +369,14 @@ export default class Titlebar {
 	public onWindowFullScreen(fullscreen: boolean): void {
 		if (!isMacintosh) {
 			if (fullscreen) {
-				hide(this.titlebar);
-				this.container.style.top = '0px';
+				hide(this.titlebar!);
+				this.container!.style.top = '0px';
 			} else {
-				show(this.titlebar);
+				show(this.titlebar!);
 				if (this.options.menuPosition === 'bottom') {
-					this.container.style.top = BOTTOM_TITLEBAR_HEIGHT;
+					this.container!.style.top = BOTTOM_TITLEBAR_HEIGHT;
 				} else {
-					this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN;
+					this.container!.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN;
 				}
 			}
 		}
@@ -422,8 +416,8 @@ export default class Titlebar {
 	 * It method set new icon to title-bar-icon of title-bar.
 	 * @param path path to icon
 	 */
-	public updateIcon(path: string): void {
-		if (path === null || path === '') {
+	public updateIcon(path?: string): void {
+		if (!path) {
 			return;
 		}
 
@@ -432,10 +426,11 @@ export default class Titlebar {
 
 			let iconSize = this.options.iconSize;
 
-			if (iconSize <= 16) iconSize = 16;
-			if (iconSize >= 24) iconSize = 24;
-
-			this.windowIcon.style.height = `${iconSize}px`;
+			if (iconSize) {
+				if (iconSize <= 16) iconSize = 16;
+				if (iconSize >= 24) iconSize = 24;
+				this.windowIcon.style.height = `${iconSize}px`;
+			}
 		}
 	}
 
@@ -449,7 +444,7 @@ export default class Titlebar {
 		if (!menu) return;
 		this.options.menu = menu;
 
-		this.menubar = new Menubar(this.menubarContainer, this.options, this.closeMenu);
+		this.menubar = new Menubar(this.menubarContainer!, this.options, this.closeMenu);
 		this.menubar.setupMenubar();
 
 		this.menubar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e));
@@ -473,18 +468,18 @@ export default class Titlebar {
 	 */
 	public updateMenuPosition(menuPosition: "left" | "bottom"): void {
 		if (isMacintosh) {
-			this.titlebar.style.height = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
-			this.container.style.top = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
+			this.titlebar!.style.height = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
+			this.container!.style.top = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_MAC;
 		} else {
-			this.titlebar.style.height = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
-			this.container.style.top = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
+			this.titlebar!.style.height = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
+			this.container!.style.top = menuPosition && menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : TOP_TITLEBAR_HEIGHT_WIN;
 		}
-		this.titlebar.style.flexWrap = menuPosition && menuPosition === 'bottom' ? 'wrap' : null;
+		if (menuPosition && menuPosition === 'bottom') this.titlebar!.style.flexWrap = 'wrap';
 
 		if (menuPosition === 'bottom') {
-			addClass(this.menubarContainer, 'bottom');
+			addClass(this.menubarContainer!, 'bottom');
 		} else {
-			removeClass(this.menubarContainer, 'bottom');
+			removeClass(this.menubarContainer!, 'bottom');
 		}
 
 		this.options.menuPosition = menuPosition;
@@ -512,7 +507,7 @@ export default class Titlebar {
 				}
 
 				if (!isMacintosh && this.options.order !== 'first-buttons') {
-					this.windowControls.style.marginLeft = 'auto';
+					this.windowControls!.style.marginLeft = 'auto';
 				}
 
 				this.title.style.maxWidth = 'calc(100vw - 296px)';
@@ -526,12 +521,12 @@ export default class Titlebar {
 	public dispose(): void {
 		if (this.menubar) this.menubar.dispose();
 
-		removeNode(this.titlebar);
+		this.titlebar!.remove();
 
-		while (this.container.firstChild) {
-			append(document.body, this.container.firstChild);
+		while (this.container!.firstChild) {
+			append(document.body, this.container!.firstChild);
 		}
 
-		removeNode(this.container);
+		this.container!.remove();
 	}
 }

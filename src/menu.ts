@@ -8,18 +8,18 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { Color, RGBA } from "../common/color";
-import { addClass, addDisposableListener, EventType, isAncestor, hasClass, append, addClasses, $, removeNode, EventHelper, EventLike } from "../common/dom";
-import { KeyCode, KeyCodeUtils, KeyMod } from "../common/keyCodes";
-import { isLinux } from "../common/platform";
-import { StandardKeyboardEvent } from "../browser/keyboardEvent";
-import { IMenuItem, CETMenuItem } from "./menuitem";
-import { Disposable, dispose, IDisposable } from "../common/lifecycle";
-import { Event, Emitter } from "../common/event";
-import { RunOnceScheduler } from "../common/async";
 import { MenuItem, Menu } from "electron";
-import { MenubarOptions } from "../interfaces";
-import icons from "../styles/icons.json";
+import { Color, RGBA } from "vs/base/common/color";
+import { addClass, addDisposableListener, EventType, isAncestor, hasClass, append, addClasses, $, removeNode, EventHelper, EventLike } from "vs/base/common/dom";
+import { KeyCode, KeyCodeUtils, KeyMod } from "vs/base/common/keyCodes";
+import { isLinux } from "vs/base/common/platform";
+import { StandardKeyboardEvent } from "vs/base/browser/keyboardEvent";
+import { IMenuItem, CETMenuItem } from "./menuitem";
+import { Disposable, dispose, IDisposable } from "vs/base/common/lifecycle";
+import { Event, Emitter } from "vs/base/common/event";
+import { RunOnceScheduler } from "vs/base/common/async";
+import { MenubarOptions } from "./types/menubar-options";
+import icons from "static/icons.json";
 
 export const MENU_MNEMONIC_REGEX = /\(&([^\s&])\)|(^|[^&])&([^\s&])/;
 export const MENU_ESCAPED_MNEMONIC_REGEX = /(&amp;)?(&amp;)([^\s&])/g;
@@ -54,7 +54,7 @@ export class CETMenu extends Disposable {
 	private focusedItem?: number;
 	private menuContainer: HTMLElement;
 	private mnemonics: Map<KeyCode, Array<CETMenuItem>>;
-	private menubarOptions: MenubarOptions;
+	private menubarOptions?: MenubarOptions;
 	private options: IMenuOptions;
 	private closeSubMenu: () => void;
 
@@ -70,7 +70,7 @@ export class CETMenu extends Disposable {
 	private _onDidCancel = this._register(new Emitter<void>());
 	get onDidCancel(): Event<void> { return this._onDidCancel.event; }
 
-	constructor(container: HTMLElement, menubarOptions: MenubarOptions, options: IMenuOptions = {}, closeSubMenu = () => { }) {
+	constructor(container: HTMLElement, menubarOptions?: MenubarOptions, options: IMenuOptions = {}, closeSubMenu = () => { }) {
 		super();
 
 		this.menuContainer = container;
@@ -243,9 +243,10 @@ export class CETMenu extends Disposable {
 		return this.menuContainer;
 	}
 
-	createMenu(items: MenuItem[]) {
-		items.forEach((menuItem: MenuItem) => {
+	createMenu(items: MenuItem[] | undefined) {
+		items?.forEach((menuItem: MenuItem) => {
 			if (!menuItem) return;
+
 			const itemElement = document.createElement('li');
 			itemElement.className = 'cet-action-item';
 			itemElement.setAttribute('role', 'presentation');
@@ -279,7 +280,7 @@ export class CETMenu extends Disposable {
 				}
 			} else {
 				const menuItemOptions: IMenuOptions = { enableMnemonics: this.options.enableMnemonics };
-				item = new CETMenuItem(menuItem, this.menubarOptions, menuItemOptions, this.closeSubMenu, this.items);
+				item = new CETMenuItem(menuItem, menuItemOptions, this.menubarOptions, this.closeSubMenu, this.items);
 
 				if (this.options.enableMnemonics) {
 					const mnemonic = item.getMnemonic();
@@ -423,13 +424,14 @@ export class CETMenu extends Disposable {
 		super.dispose();
 	}
 
-	style(style: IMenuStyle) {
+	style(style: IMenuStyle | undefined) {
 		const container = this.getContainer();
 
-		const rgba = style.backgroundColor.rgba;
-		const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, 0.8));
-
-		container.style.backgroundColor = style.backgroundColor ? color.toString() : null;
+		if (style?.backgroundColor) {
+			const rgba = style.backgroundColor?.rgba;
+			const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, 0.8));
+			container.style.backgroundColor = color.toString();
+		}
 
 		if (this.items) {
 			this.items.forEach(item => {
@@ -440,9 +442,9 @@ export class CETMenu extends Disposable {
 		}
 	}
 
-	private focusItemByElement(element: HTMLElement) {
+	private focusItemByElement(element: HTMLElement | undefined) {
 		const lastFocusedItem = this.focusedItem;
-		this.setFocusedItem(element);
+		if (element) this.setFocusedItem(element);
 
 		if (lastFocusedItem !== this.focusedItem) {
 			this.updateFocus();
@@ -463,16 +465,16 @@ export class CETMenu extends Disposable {
 
 class Submenu extends CETMenuItem {
 
-	private mysubmenu: CETMenu | null;
-	private submenuContainer: HTMLElement | undefined;
-	private submenuIndicator: HTMLElement;
+	private mysubmenu?: CETMenu | null;
+	private submenuContainer?: HTMLElement;
+	private submenuIndicator?: HTMLElement;
 	private submenuDisposables: IDisposable[] = [];
-	private mouseOver: boolean;
+	private mouseOver = false;
 	private showScheduler: RunOnceScheduler;
 	private hideScheduler: RunOnceScheduler;
 
-	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, menubarOptions: MenubarOptions, private submenuOptions?: IMenuOptions, closeSubMenu = () => { }) {
-		super(item, menubarOptions, submenuOptions, closeSubMenu);
+	constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, menubarOptions?: MenubarOptions, private submenuOptions?: IMenuOptions, closeSubMenu = () => { }) {
+		super(item, submenuOptions, menubarOptions, closeSubMenu);
 		this.showScheduler = new RunOnceScheduler(() => {
 			if (this.mouseOver) {
 				this.cleanupExistingSubmenu(false);
@@ -500,43 +502,49 @@ class Submenu extends CETMenuItem {
 
 		this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'));
 		this.submenuIndicator.innerHTML = icons.arrow;
-		this.submenuIndicator.firstElementChild.setAttribute('fill', this.menubarOptions.svgColor?.toString() || this.menuStyle?.foregroundColor?.toString() || undefined)
 
+		let fillColor;
+
+		if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
+		else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
+		this.submenuIndicator.firstElementChild?.setAttribute('fill', fillColor as string);
 		this.submenuIndicator.setAttribute('aria-hidden', 'true');
 
-		this._register(addDisposableListener(this.container, EventType.KEY_UP, e => {
-			let event = new StandardKeyboardEvent(e);
-			if (event.equals(KeyCode.RightArrow) || event.equals(KeyCode.Enter)) {
-				EventHelper.stop(e, true);
+		if (this.container) {
+			addDisposableListener(this.container, EventType.KEY_UP, e => {
+				let event = new StandardKeyboardEvent(e);
+				if (event.equals(KeyCode.RightArrow) || event.equals(KeyCode.Enter)) {
+					EventHelper.stop(e, true);
 
-				this.createSubmenu(true);
-			}
-		}));
+					this.createSubmenu(true);
+				}
+			});
 
-		this._register(addDisposableListener(this.container, EventType.KEY_DOWN, e => {
-			let event = new StandardKeyboardEvent(e);
-			if (event.equals(KeyCode.RightArrow) || event.equals(KeyCode.Enter)) {
-				EventHelper.stop(e, true);
-			}
-		}));
+			addDisposableListener(this.container, EventType.KEY_DOWN, e => {
+				let event = new StandardKeyboardEvent(e);
+				if (event.equals(KeyCode.RightArrow) || event.equals(KeyCode.Enter)) {
+					EventHelper.stop(e, true);
+				}
+			});
 
-		this._register(addDisposableListener(this.container, EventType.MOUSE_OVER, e => {
-			if (!this.mouseOver) {
-				this.mouseOver = true;
+			addDisposableListener(this.container, EventType.MOUSE_OVER, e => {
+				if (!this.mouseOver) {
+					this.mouseOver = true;
 
-				this.showScheduler.schedule();
-			}
-		}));
+					this.showScheduler.schedule();
+				}
+			});
 
-		this._register(addDisposableListener(this.container, EventType.MOUSE_LEAVE, e => {
-			this.mouseOver = false;
-		}));
+			addDisposableListener(this.container, EventType.MOUSE_LEAVE, e => {
+				this.mouseOver = false;
+			});
 
-		this._register(addDisposableListener(this.container, EventType.FOCUS_OUT, e => {
-			if (this.container && !isAncestor(document.activeElement, this.container)) {
-				this.hideScheduler.schedule();
-			}
-		}));
+			addDisposableListener(this.container, EventType.FOCUS_OUT, e => {
+				if (this.container && !isAncestor(document.activeElement, this.container)) {
+					this.hideScheduler.schedule();
+				}
+			});
+		}
 	}
 
 	onClick(e: EventLike): void {
@@ -563,35 +571,56 @@ class Submenu extends CETMenuItem {
 			return;
 		}
 
-		if (!this.parentData.submenu) {
-			this.submenuContainer = append(this.container, $('ul.cet-submenu'));
-			addClasses(this.submenuContainer, 'cet-menubar-menu-container');
+		if (this.container) {
+			if (!this.parentData.submenu) {
+				this.submenuContainer = append(this.container, $('ul.cet-submenu'));
+				addClasses(this.submenuContainer, 'cet-menubar-menu-container');
 
-			this.parentData.submenu = new CETMenu(this.submenuContainer, this.menubarOptions, this.submenuOptions, this.closeSubMenu);
-			this.parentData.submenu.createMenu(this.submenuItems);
+				this.parentData.submenu = new CETMenu(this.submenuContainer, this.menubarOptions, this.submenuOptions, this.closeSubMenu);
+				this.parentData.submenu.createMenu(this.submenuItems);
 
-			if (this.menuStyle) {
-				this.parentData.submenu.style(this.menuStyle);
-			}
+				if (this.menuStyle) {
+					this.parentData.submenu.style(this.menuStyle);
+				}
 
-			const boundingRect = this.container.getBoundingClientRect();
-			const childBoundingRect = this.submenuContainer.getBoundingClientRect();
-			const computedStyles = getComputedStyle(this.parentData.parent.getContainer());
-			const paddingTop = parseFloat(computedStyles.paddingTop || '0') || 0;
+				const boundingRect = this.container.getBoundingClientRect();
+				const childBoundingRect = this.submenuContainer.getBoundingClientRect();
+				const computedStyles = getComputedStyle(this.parentData.parent.getContainer());
+				const paddingTop = parseFloat(computedStyles.paddingTop || '0') || 0;
 
-			if (window.innerWidth <= boundingRect.right + childBoundingRect.width) {
-				this.submenuContainer.style.left = '10px';
-				this.submenuContainer.style.top = `${this.container.offsetTop + boundingRect.height}px`;
-			} else {
-				this.submenuContainer.style.left = `${this.container.offsetWidth}px`;
-				this.submenuContainer.style.top = `${this.container.offsetTop - paddingTop}px`;
-			}
+				if (window.innerWidth <= boundingRect.right + childBoundingRect.width) {
+					this.submenuContainer.style.left = '10px';
+					this.submenuContainer.style.top = `${this.container.offsetTop + boundingRect.height}px`;
+				} else {
+					this.submenuContainer.style.left = `${this.container.offsetWidth}px`;
+					this.submenuContainer.style.top = `${this.container.offsetTop - paddingTop}px`;
+				}
 
-			this.submenuDisposables.push(addDisposableListener(this.submenuContainer, EventType.KEY_UP, e => {
-				let event = new StandardKeyboardEvent(e);
-				if (event.equals(KeyCode.LeftArrow)) {
-					EventHelper.stop(e, true);
+				this.submenuDisposables.push(addDisposableListener(this.submenuContainer, EventType.KEY_UP, e => {
+					let event = new StandardKeyboardEvent(e);
+					if (event.equals(KeyCode.LeftArrow)) {
+						EventHelper.stop(e, true);
 
+						this.parentData.parent.focus();
+
+						if (this.parentData.submenu) {
+							this.parentData.submenu.dispose();
+							this.parentData.submenu = undefined;
+						}
+
+						this.submenuDisposables = dispose(this.submenuDisposables);
+						this.submenuContainer = undefined;
+					}
+				}));
+
+				this.submenuDisposables.push(addDisposableListener(this.submenuContainer, EventType.KEY_DOWN, e => {
+					let event = new StandardKeyboardEvent(e);
+					if (event.equals(KeyCode.LeftArrow)) {
+						EventHelper.stop(e, true);
+					}
+				}));
+
+				this.submenuDisposables.push(this.parentData.submenu.onDidCancel(() => {
 					this.parentData.parent.focus();
 
 					if (this.parentData.submenu) {
@@ -601,33 +630,14 @@ class Submenu extends CETMenuItem {
 
 					this.submenuDisposables = dispose(this.submenuDisposables);
 					this.submenuContainer = undefined;
-				}
-			}));
+				}));
 
-			this.submenuDisposables.push(addDisposableListener(this.submenuContainer, EventType.KEY_DOWN, e => {
-				let event = new StandardKeyboardEvent(e);
-				if (event.equals(KeyCode.LeftArrow)) {
-					EventHelper.stop(e, true);
-				}
-			}));
+				this.parentData.submenu.focus(selectFirstItem);
 
-			this.submenuDisposables.push(this.parentData.submenu.onDidCancel(() => {
-				this.parentData.parent.focus();
-
-				if (this.parentData.submenu) {
-					this.parentData.submenu.dispose();
-					this.parentData.submenu = undefined;
-				}
-
-				this.submenuDisposables = dispose(this.submenuDisposables);
-				this.submenuContainer = undefined;
-			}));
-
-			this.parentData.submenu.focus(selectFirstItem);
-
-			this.mysubmenu = this.parentData.submenu;
-		} else {
-			this.parentData.submenu.focus(false);
+				this.mysubmenu = this.parentData.submenu;
+			} else {
+				this.parentData.submenu.focus(false);
+			}
 		}
 	}
 
@@ -641,7 +651,11 @@ class Submenu extends CETMenuItem {
 		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
 
-		this.submenuIndicator.firstElementChild.setAttribute('fill', this.menubarOptions.svgColor?.toString() || fgColor?.toString() || undefined);
+		let fillColor = '';
+
+		if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
+		else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
+		if (this.submenuIndicator) this.submenuIndicator.firstElementChild?.setAttribute('fill', fgColor ? fgColor.toString() : fillColor);
 
 		if (this.parentData.submenu) {
 			this.parentData.submenu.style(this.menuStyle);
@@ -667,9 +681,9 @@ class Submenu extends CETMenuItem {
 
 class Separator extends CETMenuItem {
 
-	private separatorElement: HTMLElement;
+	private separatorElement?: HTMLElement;
 
-	constructor(item: MenuItem, options: IMenuOptions) {
+	constructor(item: MenuItem, options?: IMenuOptions) {
 		super(item, options);
 	}
 
@@ -682,7 +696,8 @@ class Separator extends CETMenuItem {
 	}
 
 	style(style: IMenuStyle) {
-		this.separatorElement.style.borderBottomColor = style.separatorColor ? `${style.separatorColor}` : null;
+		if (this.separatorElement && style.separatorColor)
+			this.separatorElement.style.borderBottomColor = style.separatorColor.toString();
 	}
 }
 

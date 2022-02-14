@@ -30,6 +30,17 @@ import { setupTitlebar, attachTitlebarToWindow } from "custom-electron-titlebar/
 setupTitlebar();
 
 function createWindow() {
+  // Create the browser window.
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    titleBarStyle: 'hidden',
+    //frame: false, // needed if process.versions.electron < 14
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  });
+  
   ...
 
   // attach fullscreen(f11 and not 'maximized') && focus listeners

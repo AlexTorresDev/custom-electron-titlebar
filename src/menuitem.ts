@@ -8,14 +8,15 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "../common/dom";
-import { MenuItem } from "electron";
+import fs from 'fs';
+import { ipcRenderer, MenuItem } from "electron";
+import { EventType, addDisposableListener, addClass, removeClass, removeNode, append, $, hasClass, EventHelper, EventLike } from "vs/base/common/dom";
 import { IMenuStyle, MENU_MNEMONIC_REGEX, cleanMnemonic, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions } from "./menu";
-import { KeyCode, KeyCodeUtils } from "../common/keyCodes";
-import { Disposable } from "../common/lifecycle";
-import { isMacintosh } from "../common/platform";
-import { MenubarOptions } from "../interfaces";
-import defaultIcons from '../styles/icons.json';
+import { KeyCode, KeyCodeUtils } from "vs/base/common/keyCodes";
+import { Disposable } from "vs/base/common/lifecycle";
+import { isMacintosh } from "vs/base/common/platform";
+import { MenubarOptions } from "./types/menubar-options";
+import defaultIcons from 'static/icons.json';
 
 export interface IMenuItem {
 	render(element: HTMLElement): void;
@@ -28,29 +29,41 @@ export interface IMenuItem {
 
 export class CETMenuItem extends Disposable implements IMenuItem {
 
-	protected menubarOptions: MenubarOptions;
+	protected menubarOptions?: MenubarOptions;
 	protected options: IMenuOptions;
-	protected menuStyle: IMenuStyle;
-	protected container: HTMLElement;
-	protected itemElement: HTMLElement;
+	protected menuStyle?: IMenuStyle;
+	protected container?: HTMLElement;
+	protected itemElement?: HTMLElement;
 
 	private item: MenuItem;
 
-	private radioGroup: { start: number, end: number }; // used only if item.type === "radio"
-	private labelElement: HTMLElement;
-	private iconElement: HTMLElement;
-	private mnemonic: KeyCode;
+	private radioGroup?: { start: number, end: number }; // used only if item.type === "radio"
+	private labelElement?: HTMLElement;
+	private iconElement?: HTMLElement;
+	private mnemonic?: KeyCode;
 	protected closeSubMenu: () => void;
-	protected menuContainer: IMenuItem[];
+	protected menuContainer?: IMenuItem[];
 
-	constructor(item: MenuItem, menubarOptions: MenubarOptions, options: IMenuOptions = {}, closeSubMenu = () => { }, menuContainer: IMenuItem[] = undefined) {
+	private menuIcons: any;
+
+	constructor(item: MenuItem, options: IMenuOptions = {}, menubarOptions?: MenubarOptions, closeSubMenu = () => { }, menuContainer?: IMenuItem[]) {
 		super();
+
+		/*const _options = { menubarOptions } as TitlebarOptions;
+
+		if (_options && _options.icons) {
+			const icons = fs.readFileSync(_options.icons, 'utf8');
+			const jsonIcons = JSON.parse(icons);
+			this.menuIcons = jsonIcons;
+		} else {
+			this.menuIcons = defaultIcons as any;
+		}*/
 
 		this.item = item;
 		this.menubarOptions = menubarOptions;
 		this.options = options;
 		this.closeSubMenu = closeSubMenu;
-		this.menuContainer = menuContainer;
+		if (menuContainer) this.menuContainer = menuContainer;
 
 		// Set mnemonic
 		if (this.item.label && options.enableMnemonics) {
@@ -107,19 +120,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		});
 
 		this.itemElement = append(this.container, $('a.cet-action-menu-item'));
-		let role = 'menuitem';
-		switch (this.item.type) {
-			case 'checkbox':
-			case 'radio':
-				role += this.item.type;
-				break;
-			case 'separator':
-				role = this.item.type;
-				break;
-			case 'submenu':
-				this.itemElement.setAttribute('aria-haspopup', 'true');
-		}
-		this.itemElement.setAttribute('role', role);
+		this.itemElement.setAttribute('role', 'menuitem');
 
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`);
@@ -141,7 +142,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true);
-		this.menubarOptions.onMenuItemClick(this.item.commandId);
+		ipcRenderer.send('menu-event', this.item.commandId);
 
 		if (this.item.type === 'checkbox') {
 			this.item.checked = !this.item.checked;
@@ -229,7 +230,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			accelerator = this.item.accelerator;
 		}
 
-		if (accelerator !== null) {
+		if (this.itemElement && accelerator !== null) {
 			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(accelerator);
 		}
 	}
@@ -286,20 +287,23 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		if (this.item.icon) {
 			const icon = this.item.icon;
 
-			if (icon) {
+			if (this.iconElement && icon) {
 				const iconE = append(this.iconElement, $('img'));
 				iconE.setAttribute('src', icon.toString());
 			}
-		} else if (this.item.type === 'checkbox') {
+		} else if (this.iconElement && this.item.type === 'checkbox') {
 			addClass(this.iconElement, 'checkbox');
 			this.iconElement.innerHTML = defaultIcons.check;
 		} else if (this.item.type === 'radio') {
-			addClass(this.iconElement, 'radio');
-			this.iconElement.innerHTML = this.item.checked ? defaultIcons.radio.checked : defaultIcons.radio.unchecked ;
+			addClass(this.iconElement!, 'radio');
+			this.iconElement!.innerHTML = this.item.checked ? defaultIcons.radio.checked : defaultIcons.radio.unchecked;
 		}
 
-		if (this.iconElement.firstElementChild) {
-			this.iconElement.firstElementChild.setAttribute('fill', this.menubarOptions.svgColor?.toString() || this.menuStyle?.foregroundColor?.toString() || undefined)
+		if (this.iconElement!.firstElementChild) {
+			let fillColor;
+			if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
+			else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
+			this.iconElement?.firstElementChild.setAttribute('fill', fillColor as string);
 		}
 	}
 
@@ -316,17 +320,19 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			}
 		}
 
-		if (title) {
+		if (this.itemElement && title) {
 			this.itemElement.title = title;
 		}
 	}
 
 	updateEnabled(): void {
-		if (this.item.enabled && this.item.type !== 'separator') {
-			removeClass(this.container, 'disabled');
-			this.container.tabIndex = 0;
-		} else {
-			addClass(this.container, 'disabled');
+		if (this.container) {
+			if (this.item.enabled && this.item.type !== 'separator') {
+				removeClass(this.container, 'disabled');
+				this.container.tabIndex = 0;
+			} else {
+				addClass(this.container, 'disabled');
+			}
 		}
 	}
 
@@ -337,12 +343,16 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 
 	updateChecked(): void {
-		if (this.item.checked) {
-			addClass(this.itemElement, 'checked');
-			this.itemElement.setAttribute('aria-checked', 'true');
-		} else {
-			removeClass(this.itemElement, 'checked');
-			this.itemElement.setAttribute('aria-checked', 'false');
+		if (this.itemElement) {
+			if (this.item.checked) {
+				addClass(this.itemElement, 'checked');
+				this.itemElement.setAttribute('role', `menuitemcheckbox${this.item.type}`);
+				this.itemElement.setAttribute('aria-checked', 'true');
+			} else {
+				removeClass(this.itemElement, 'checked');
+				this.itemElement.setAttribute('role', 'menuitem');
+				this.itemElement.setAttribute('aria-checked', 'false');
+			}
 		}
 	}
 
@@ -350,17 +360,20 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		if (this.radioGroup === undefined) {
 			this.radioGroup = this.getRadioGroup();
 		}
-		for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
-			const menuItem = this.menuContainer[i];
-			if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio') {
-				// update item.checked for each radio button in group
-				menuItem.item.checked = menuItem === this; 
-				menuItem.updateIcon();
-				// updateChecked() *all* radio buttons in group
-				menuItem.updateChecked();
-				// set the radioGroup property of all the other radio buttons since it was already calculated
-				if (menuItem !== this) {
-					menuItem.radioGroup = this.radioGroup;
+
+		if (this.menuContainer) {
+			for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
+				const menuItem = this.menuContainer[i];
+				if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio') {
+					// update item.checked for each radio button in group
+					menuItem.item.checked = menuItem === this;
+					menuItem.updateIcon();
+					// updateChecked() *all* radio buttons in group
+					menuItem.updateChecked();
+					// set the radioGroup property of all the other radio buttons since it was already calculated
+					if (menuItem !== this) {
+						menuItem.radioGroup = this.radioGroup;
+					}
 				}
 			}
 		}
@@ -369,22 +382,25 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	/** radioGroup index's starts with (previous separator +1 OR menuContainer[0]) and ends with (next separator OR menuContainer[length]) */
 	getRadioGroup(): { start: number, end: number } {
 		let startIndex = 0;
-		let endIndex = this.menuContainer.length;
+		let endIndex = this.menuContainer ? this.menuContainer.length : 0;
 		let found = false;
 
-		for (const index in this.menuContainer) {
-			const menuItem = this.menuContainer[index];
-			if (menuItem === this) {
-				found = true;
-			} else if (menuItem instanceof CETMenuItem && menuItem.isSeparator()) {
-				if (found) {
-					endIndex = Number.parseInt(index);
-					break;
-				} else {
-					startIndex = Number.parseInt(index) + 1;
+		if (this.menuContainer) {
+			for (const index in this.menuContainer) {
+				const menuItem = this.menuContainer[index];
+				if (menuItem === this) {
+					found = true;
+				} else if (menuItem instanceof CETMenuItem && menuItem.isSeparator()) {
+					if (found) {
+						endIndex = Number.parseInt(index);
+						break;
+					} else {
+						startIndex = Number.parseInt(index) + 1;
+					}
 				}
 			}
 		}
+
 		return { start: startIndex, end: endIndex };
 	}
 
@@ -397,7 +413,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		super.dispose();
 	}
 
-	getMnemonic(): KeyCode {
+	getMnemonic(): KeyCode | undefined {
 		return this.mnemonic;
 	}
 
@@ -410,11 +426,21 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
 		const bgColor = isSelected && this.menuStyle.selectionBackgroundColor ? this.menuStyle.selectionBackgroundColor : null;
 
-		this.itemElement.style.color = fgColor ? fgColor.toString() : null;
-		this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : null;
+		if (this.itemElement) {
+			this.itemElement.style.color = fgColor ? fgColor.toString() : '';
+			this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : '';
+
+			if (this.iconElement) {
+				let fillColor = '';
+
+				if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
+				else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
+				this.iconElement.firstElementChild?.setAttribute('fill', fgColor ? fgColor.toString() : fillColor);
+			}
+		}
 	}
 
-	style(style: IMenuStyle): void {
+	style(style: IMenuStyle | undefined): void {
 		this.menuStyle = style;
 		this.applyStyle();
 	}

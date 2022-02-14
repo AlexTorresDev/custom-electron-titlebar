@@ -1,11 +1,33 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "lib": [
+      "ES2021",
+      "DOM"
+    ],
+    "target": "ES2021",
+    "baseUrl": "./src",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "esModuleInterop": true,
-    "resolveJsonModule": true
-  }
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "paths": {
+      "vs": [
+        "vs/*"
+      ],
+      "static": [
+        "static/*"
+      ],
+    },
+    "skipLibCheck": true,
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "./node_modules",
+    "**/node_modules/*"
+  ]
 }

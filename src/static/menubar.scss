@@ -192,7 +192,7 @@
             }
         }
 
-        .cet-action-menu-item.checked  > .cet-menu-item-icon.checkbox {
+        .cet-action-menu-item.checked > .cet-menu-item-icon.checkbox {
             visibility: visible;
         }
 
@@ -203,6 +203,10 @@
 
             &.checkbox {
                 visibility: hidden;
+
+                &.checked {
+                    visibility: visible;
+                }
             }
         }
     }

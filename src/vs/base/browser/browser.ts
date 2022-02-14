@@ -3,9 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Emitter, Event } from '../common/event';
-import { IDisposable } from '../common/lifecycle';
-import * as platform from '../common/platform';
+import { Emitter, Event } from 'vs/base/common/event';
+import { IDisposable } from 'vs/base/common/lifecycle';
+import * as platform from 'vs/base/common/platform';
 
 class WindowManager {
 
@@ -57,7 +57,7 @@ class WindowManager {
     }
 
     // --- Fullscreen
-    private _fullscreen: boolean;
+    private _fullscreen = false;
     private readonly _onDidChangeFullscreen = new Emitter<void>();
 
     public readonly onDidChangeFullscreen: Event<void> = this._onDidChangeFullscreen.event;

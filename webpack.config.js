@@ -1,7 +1,12 @@
 const path = require("path");
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+
+const srcPath = path.join(__dirname, "src");
 
 const commonConfig = {
+    context: srcPath,
     resolve: {
+        plugins: [new TsconfigPathsPlugin()],
         extensions: [".js", ".ts", ".tsx"],
     },
     module: {
@@ -9,7 +14,7 @@ const commonConfig = {
             {
                 test: /\.tsx?$/,
                 use: "ts-loader",
-                exclude: /node_modules/,
+                exclude: /node_modules|\.d\.ts$/
             },
             {
                 test: /\.scss$/,
@@ -32,9 +37,9 @@ module.exports = [
     Object.assign(
         {
             target: "electron-renderer",
-            entry: { index: "./src/index.ts" },
+            entry: { index: path.join(srcPath, 'index.ts') },
             output: {
-                path: path.resolve(__dirname, "./dist"),
+                path: __dirname,
                 filename: "index.js",
                 libraryTarget: "umd",
                 globalObject: "this",
@@ -45,9 +50,9 @@ module.exports = [
     Object.assign(
         {
             target: "electron-main",
-            entry: { main: "./src/main/main.ts" },
+            entry: { main: path.join(srcPath, 'main', 'main.ts') },
             output: {
-                path: path.resolve(__dirname, "./dist"),
+                path: __dirname,
                 filename: "main.js",
                 libraryTarget: "umd",
                 globalObject: "this",

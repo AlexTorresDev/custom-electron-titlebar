@@ -4,6 +4,6 @@
  *------------------------------------------------------------------------------------------*/
 
 import Titlebar from './titlebar';
-import { Color } from './common/color';
+import { Color } from 'vs/base/common/color';
 
 export = { Titlebar, Color };
