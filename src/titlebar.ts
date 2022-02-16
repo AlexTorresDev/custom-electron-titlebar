@@ -149,7 +149,6 @@ export default class Titlebar {
 
 		// Create menubar
 		this.menubarContainer = append(this.titlebar, $('div.cet-menubar'));
-		this.menubarContainer.setAttribute('role', 'menubar');
 
 		// Create title
 		this.title = append(this.titlebar, $('div.cet-window-title'));

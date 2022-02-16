@@ -17,6 +17,7 @@ import { Disposable } from "vs/base/common/lifecycle";
 import { isMacintosh } from "vs/base/common/platform";
 import { MenubarOptions } from "./types/menubar-options";
 import defaultIcons from 'static/icons.json';
+import { applyFill } from 'utils/color';
 
 export interface IMenuItem {
 	render(element: HTMLElement): void;
@@ -120,7 +121,6 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		});
 
 		this.itemElement = append(this.container, $('a.cet-action-menu-item'));
-		this.itemElement.setAttribute('role', 'menuitem');
 
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`);
@@ -299,12 +299,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.iconElement!.innerHTML = this.item.checked ? defaultIcons.radio.checked : defaultIcons.radio.unchecked;
 		}
 
-		if (this.iconElement!.firstElementChild) {
-			let fillColor;
-			if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
-			else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
-			this.iconElement?.firstElementChild.setAttribute('fill', fillColor as string);
-		}
+		applyFill(this.iconElement?.firstElementChild, this.menubarOptions?.svgColor, this.menuStyle?.foregroundColor);
 	}
 
 	updateTooltip(): void {
@@ -346,11 +341,9 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		if (this.itemElement) {
 			if (this.item.checked) {
 				addClass(this.itemElement, 'checked');
-				this.itemElement.setAttribute('role', `menuitemcheckbox${this.item.type}`);
 				this.itemElement.setAttribute('aria-checked', 'true');
 			} else {
 				removeClass(this.itemElement, 'checked');
-				this.itemElement.setAttribute('role', 'menuitem');
 				this.itemElement.setAttribute('aria-checked', 'false');
 			}
 		}
@@ -430,13 +423,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.itemElement.style.color = fgColor ? fgColor.toString() : '';
 			this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : '';
 
-			if (this.iconElement) {
-				let fillColor = '';
-
-				if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
-				else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
-				this.iconElement.firstElementChild?.setAttribute('fill', fgColor ? fgColor.toString() : fillColor);
-			}
+			if (this.iconElement) applyFill(this.iconElement.firstElementChild, this.menubarOptions?.svgColor, fgColor);
 		}
 	}
 

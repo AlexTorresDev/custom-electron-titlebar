@@ -153,11 +153,11 @@ export class Menubar {
 			const menuIndex = this.menuItems.length;
 			const cleanMenuLabel = cleanMnemonic(menubarMenu.label);
 
-			const buttonElement = $('div.cet-menubar-menu-button', { 'role': 'menuitem', 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
+			const buttonElement = $('div.cet-menubar-menu-button', { 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
 			if (!menubarMenu.enabled) {
 				addClass(buttonElement, 'disabled');
 			}
-			const titleElement = $('div.cet-menubar-menu-title', { 'role': 'none', 'aria-hidden': true });
+			const titleElement = $('div.cet-menubar-menu-title', { 'aria-hidden': true });
 
 			buttonElement.appendChild(titleElement);
 			append(this.container, buttonElement);
@@ -597,7 +597,6 @@ export class Menubar {
 		const menuHolder = $('ul.cet-menubar-menu-container');
 
 		addClass(btnElement, 'open');
-		menuHolder.setAttribute('role', 'menu');
 		menuHolder.tabIndex = 0;
 		menuHolder.style.top = `${btnRect.bottom - 5}px`;
 		menuHolder.style.left = `${btnRect.left}px`;

@@ -20,6 +20,7 @@ import { Event, Emitter } from "vs/base/common/event";
 import { RunOnceScheduler } from "vs/base/common/async";
 import { MenubarOptions } from "./types/menubar-options";
 import icons from "static/icons.json";
+import { applyFill } from "utils/color";
 
 export const MENU_MNEMONIC_REGEX = /\(&([^\s&])\)|(^|[^&])&([^\s&])/;
 export const MENU_ESCAPED_MNEMONIC_REGEX = /(&amp;)?(&amp;)([^\s&])/g;
@@ -503,11 +504,7 @@ class Submenu extends CETMenuItem {
 		this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'));
 		this.submenuIndicator.innerHTML = icons.arrow;
 
-		let fillColor;
-
-		if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
-		else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
-		this.submenuIndicator.firstElementChild?.setAttribute('fill', fillColor as string);
+		applyFill(this.submenuIndicator.firstElementChild, this.menubarOptions?.svgColor, this.menuStyle?.foregroundColor);
 		this.submenuIndicator.setAttribute('aria-hidden', 'true');
 
 		if (this.container) {
@@ -644,22 +641,13 @@ class Submenu extends CETMenuItem {
 	applyStyle(): void {
 		super.applyStyle();
 
-		if (!this.menuStyle) {
-			return;
-		}
+		if (!this.menuStyle) return;
 
 		const isSelected = this.container && hasClass(this.container, 'focused');
 		const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
+		applyFill(this.submenuIndicator?.firstElementChild, this.menubarOptions?.svgColor, fgColor);
 
-		let fillColor = '';
-
-		if (this.menubarOptions?.svgColor) fillColor = this.menubarOptions.svgColor?.toString();
-		else if (this.menuStyle?.foregroundColor) fillColor = this.menuStyle?.foregroundColor?.toString();
-		if (this.submenuIndicator) this.submenuIndicator.firstElementChild?.setAttribute('fill', fgColor ? fgColor.toString() : fillColor);
-
-		if (this.parentData.submenu) {
-			this.parentData.submenu.style(this.menuStyle);
-		}
+		if (this.parentData.submenu) this.parentData.submenu.style(this.menuStyle);
 	}
 
 	dispose(): void {

@@ -2,6 +2,7 @@ const path = require("path");
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const srcPath = path.join(__dirname, "src");
+const distPath = path.join(__dirname, "dist");
 
 const commonConfig = {
     context: srcPath,
@@ -39,7 +40,7 @@ module.exports = [
             target: "electron-renderer",
             entry: { index: path.join(srcPath, 'index.ts') },
             output: {
-                path: __dirname,
+                path: distPath,
                 filename: "index.js",
                 libraryTarget: "umd",
                 globalObject: "this",
@@ -52,7 +53,7 @@ module.exports = [
             target: "electron-main",
             entry: { main: path.join(srcPath, 'main', 'main.ts') },
             output: {
-                path: __dirname,
+                path: distPath,
                 filename: "main.js",
                 libraryTarget: "umd",
                 globalObject: "this",
