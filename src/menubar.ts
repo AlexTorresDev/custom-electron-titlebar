@@ -48,7 +48,7 @@ export class Menubar {
 	private menuStyle?: IMenuStyle;
 	private closeSubMenu: () => void;
 
-	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => { }) {
+	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => {}) {
 		(menubarTheme as any).use();
 
 		this.menuItems = [];
@@ -62,7 +62,7 @@ export class Menubar {
 		ModifierKeyEmitter.getInstance().event(this.onModifierKeyToggled, this);
 
 		addDisposableListener(this.container, EventType.KEY_DOWN, (e) => {
-			let event = new StandardKeyboardEvent(e as KeyboardEvent);
+			let event = new StandardKeyboardEvent(e);
 			let eventHandled = true;
 			const key = !!e.key ? KeyCodeUtils.fromString(e.key) : KeyCode.Unknown;
 
@@ -92,9 +92,7 @@ export class Menubar {
 			}
 		});
 
-		addDisposableListener(this.container, EventType.FOCUS_IN, (e) => {
-			let event = e as FocusEvent;
-
+		addDisposableListener(this.container, EventType.FOCUS_IN, (event) => {
 			if (event.relatedTarget) {
 				if (!this.container.contains(event.relatedTarget as HTMLElement)) {
 					this.focusToReturn = event.relatedTarget as HTMLElement;
@@ -102,9 +100,7 @@ export class Menubar {
 			}
 		});
 
-		addDisposableListener(this.container, EventType.FOCUS_OUT, (e) => {
-			let event = e as FocusEvent;
-
+		addDisposableListener(this.container, EventType.FOCUS_OUT, (event) => {
 			if (event.relatedTarget) {
 				if (!this.container.contains(event.relatedTarget as HTMLElement)) {
 					this.focusToReturn = undefined;
@@ -175,7 +171,7 @@ export class Menubar {
 
 			if (menubarMenu.enabled) {
 				addDisposableListener(buttonElement, EventType.KEY_UP, (e) => {
-					let event = new StandardKeyboardEvent(e as KeyboardEvent);
+					let event = new StandardKeyboardEvent(e);
 					let eventHandled = true;
 
 					if ((event.equals(KeyCode.DownArrow) || event.equals(KeyCode.Enter)) && !this.isOpen) {

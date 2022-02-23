@@ -7,11 +7,13 @@ let titlebar;
 
 window.addEventListener('DOMContentLoaded', () => {
   titlebar = new Titlebar({
-    backgroundColor: Color.fromHex("#388e3c"),
-    itemBackgroundColor: Color.fromHex("#ffffff"),
+    backgroundColor: Color.fromHex("#262626"),
+    //itemBackgroundColor: Color.fromHex("#ffffff"),
     svgColor: Color.WHITE,
     icon: path.join(__dirname, '/assets/images', '/icon.svg'),
+    //menuPosition: 'bottom',
     //menu: null // = do not automatically use Menu.applicationMenu
+    menuTransparent: 80,
   })
 
   const replaceText = (selector, text) => {

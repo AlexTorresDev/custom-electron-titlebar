@@ -1,3 +1,9 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresSk. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+import { NativeImage } from "electron";
 import { Color } from "../vs/base/common/color";
 import { MenubarOptions } from "./menubar-options";
 
@@ -11,7 +17,7 @@ export interface TitlebarOptions extends MenubarOptions {
      * The icon shown on the left side of titlebar.
      * **The default is the favicon of the index.html**
      */
-    icon?: string;
+    icon?: NativeImage | string;
     /**
      * The icon size of titlebar. Value between 16 and 24.
      * **The default is 16**

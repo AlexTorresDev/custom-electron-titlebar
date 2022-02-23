@@ -25,5 +25,5 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows]
- - Electron version [e.g. 4.0.0]
- - Node Version [e.g. 2.2]
+ - Electron version [e.g. 16.0.0]
+ - Node Version [e.g. 14.0]

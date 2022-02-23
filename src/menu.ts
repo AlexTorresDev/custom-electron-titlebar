@@ -429,8 +429,12 @@ export class CETMenu extends Disposable {
 		const container = this.getContainer();
 
 		if (style?.backgroundColor) {
+			let transparency = this.menubarOptions?.menuTransparency ?? 100;
+
+			if (transparency < 0 || transparency >= 100) transparency = 100;
+			const transparencyPercent = transparency / 100;
 			const rgba = style.backgroundColor?.rgba;
-			const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, 0.8));
+			const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, transparencyPercent));
 			container.style.backgroundColor = color.toString();
 		}
 

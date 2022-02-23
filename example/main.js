@@ -6,7 +6,7 @@ const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-title
 // setup the titlebar main process
 setupTitlebar();
 
-createWindow = () => {
+const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -53,7 +53,7 @@ app.on('window-all-closed', function () {
 
 const exampleMenuTemplate = () => [
   {
-    label: "Simple Options",
+    label: "Simple O&ptions",
     submenu: [
       {
         label: "Quit",
@@ -69,7 +69,7 @@ const exampleMenuTemplate = () => [
         type: "radio",
       },
       {
-        label: "Checkbox1",
+        label: "Check&box1",
         type: "checkbox",
         checked: true,
         click: (item) => {
@@ -78,7 +78,7 @@ const exampleMenuTemplate = () => [
       },
       { type: "separator" },
       {
-        label: "Checkbox2",
+        label: "Che&ckbox2",
         type: "checkbox",
         checked: false,
         click: (item) => {
@@ -88,7 +88,7 @@ const exampleMenuTemplate = () => [
     ]
   },
   {
-    label: "Advanced Options",
+    label: "A&dvanced Options",
     submenu: [
       {
         label: "Quit",
@@ -124,7 +124,7 @@ const exampleMenuTemplate = () => [
         label: "Radio Test",
         submenu: [
           {
-            label: "Sample Checkbox",
+            label: "S&ample Checkbox",
             type: "checkbox",
             checked: true
           },
@@ -177,7 +177,7 @@ const exampleMenuTemplate = () => [
     ]
   },
   {
-    label: "View",
+    label: "&View",
     submenu: [
       { role: "reload" },
       { role: "forceReload" },

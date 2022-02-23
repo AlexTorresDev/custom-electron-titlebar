@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresSk. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 import { Menu } from "electron";
 import { Color } from "../vs/base/common/color";
 
@@ -23,6 +28,11 @@ export interface MenubarOptions {
      * **The default is undefined**
      */
     itemBackgroundColor?: Color;
+    /**
+     * The menu conatiner transparency
+     * **The default is 100**
+     */
+     menuTransparency?: number;
     /**
      * The color of the svg icons in the menu
      * **The default is black**
