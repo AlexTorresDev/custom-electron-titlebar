@@ -89,7 +89,7 @@ export interface MenubarOptions {
      * You can use `Menu` or not add this option and the menu created in the main process will be taken.
      * **The default menu is undefined**
      */
-    menu?: Menu;
+    menu?: Menu | null;
     /**
      * The position of menubar on titlebar.
      * **The default is left**
