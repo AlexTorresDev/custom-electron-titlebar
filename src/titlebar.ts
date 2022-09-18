@@ -16,7 +16,6 @@ import { Menubar } from './menubar';
 import { TitlebarOptions } from './interfaces';
 import styles from './styles/titlebar.scss';
 import defaultIcons from './styles/icons.json';
-import fs from 'fs';
 
 const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');
 const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
@@ -68,8 +67,7 @@ export default class Titlebar {
 	constructor(titlebarOptions?: TitlebarOptions) {
 		this.options = { ...this.defaultOptions, ...titlebarOptions };
 		if (this.options.icons) {
-			const icons = fs.readFileSync(this.options.icons, 'utf8');
-			const jsonIcons = JSON.parse(icons);
+			const jsonIcons = this.options.icons;
 			this.platformIcons = jsonIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
 		} else {
 			this.platformIcons = defaultIcons[isWindows ? 'win' : isLinux ? 'linux' : 'mac'];
