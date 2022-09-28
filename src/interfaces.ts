@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from "electron";
-import { Color } from "./common/color";
+import { Color } from "vs/base/common/color";
 
 export interface TitlebarOptions extends MenubarOptions {
     /**

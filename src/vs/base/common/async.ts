@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Disposable } from './lifecycle';
+import { Disposable } from 'vs/base/common/lifecycle';
 
 export class TimeoutTimer extends Disposable {
 	private _token: any;

@@ -8,18 +8,20 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode } from './common/dom';
-import { CETMenu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu/menu';
-import { StandardKeyboardEvent } from './browser/keyboardEvent';
-import { KeyCodeUtils, KeyCode } from './common/keyCodes';
-import { Disposable, IDisposable, dispose } from './common/lifecycle';
-import { Event, Emitter } from './common/event';
-import { domEvent } from './browser/event';
-import { isMacintosh } from './common/platform';
-import { CustomItem, MenubarOptions, MenubarState } from './interfaces';
-import styles from './styles/menubar.scss';
-
-export class Menubar extends Disposable {
+import { ipcRenderer } from 'electron';
+import { $, addDisposableListener, EventType, removeClass, addClass, append, removeNode } from 'vs/base/common/dom';
+import { CETMenu, cleanMnemonic, MENU_MNEMONIC_REGEX, MENU_ESCAPED_MNEMONIC_REGEX, IMenuOptions, IMenuStyle } from './menu';
+import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+import { KeyCodeUtils, KeyCode } from 'vs/base/common/keyCodes';
+import { IDisposable, dispose } from 'vs/base/common/lifecycle';
+import { Event, Emitter } from 'vs/base/common/event';
+import { domEvent } from 'vs/base/browser/event';
+import { isMacintosh } from 'vs/base/common/platform';
+import { MenubarOptions } from './types/menubar-options';
+import { CustomItem } from './types/custom-item';
+import { MenubarState } from './enums/menu-state';
+import menubarTheme from 'static/menubar.scss';
+export class Menubar {
 
 	private menuItems: CustomItem[];
 
@@ -32,10 +34,10 @@ export class Menubar extends Disposable {
 	private focusToReturn: HTMLElement | undefined;
 
 	// Input-related
-	private _mnemonicsInUse: boolean;
-	private openedViaKeyboard: boolean;
-	private awaitingAltRelease: boolean;
-	private ignoreNextMouseUp: boolean;
+	private _mnemonicsInUse?: boolean;
+	private openedViaKeyboard?: boolean;
+	private awaitingAltRelease?: boolean;
+	private ignoreNextMouseUp?: boolean;
 	private mnemonics: Map<KeyCode, number>;
 
 	private _focusState: MenubarState;
@@ -43,27 +45,24 @@ export class Menubar extends Disposable {
 	private _onVisibilityChange: Emitter<boolean>;
 	private _onFocusStateChange: Emitter<boolean>;
 
-	private menuStyle: IMenuStyle;
+	private menuStyle?: IMenuStyle;
 	private closeSubMenu: () => void;
 
-	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => { }) {
-		super();
-
-		// Inject style
-		(styles as any).use();
+	constructor(private container: HTMLElement, private options?: MenubarOptions, closeSubMenu = () => {}) {
+		(menubarTheme as any).use();
 
 		this.menuItems = [];
 		this.mnemonics = new Map<KeyCode, number>();
 		this.closeSubMenu = closeSubMenu;
 		this._focusState = MenubarState.VISIBLE;
 
-		this._onVisibilityChange = this._register(new Emitter<boolean>());
-		this._onFocusStateChange = this._register(new Emitter<boolean>());
+		this._onVisibilityChange = new Emitter<boolean>();
+		this._onFocusStateChange = new Emitter<boolean>();
 
-		this._register(ModifierKeyEmitter.getInstance().event(this.onModifierKeyToggled, this));
+		ModifierKeyEmitter.getInstance().event(this.onModifierKeyToggled, this);
 
-		this._register(addDisposableListener(this.container, EventType.KEY_DOWN, (e) => {
-			let event = new StandardKeyboardEvent(e as KeyboardEvent);
+		addDisposableListener(this.container, EventType.KEY_DOWN, (e) => {
+			let event = new StandardKeyboardEvent(e);
 			let eventHandled = true;
 			const key = !!e.key ? KeyCodeUtils.fromString(e.key) : KeyCode.Unknown;
 
@@ -73,7 +72,7 @@ export class Menubar extends Disposable {
 				this.focusNext();
 			} else if (event.equals(KeyCode.Escape) && this.isFocused && !this.isOpen) {
 				this.setUnfocusedState();
-			} else if (!this.isOpen && !event.ctrlKey && this.options.enableMnemonics && this.mnemonicsInUse && this.mnemonics.has(key)) {
+			} else if (!this.isOpen && !event.ctrlKey && this.options?.enableMnemonics && this.mnemonicsInUse && this.mnemonics.has(key)) {
 				const menuIndex = this.mnemonics.get(key)!;
 				this.onMenuTriggered(menuIndex, false);
 			} else {
@@ -84,38 +83,34 @@ export class Menubar extends Disposable {
 				event.preventDefault();
 				event.stopPropagation();
 			}
-		}));
+		});
 
-		this._register(addDisposableListener(window, EventType.MOUSE_DOWN, () => {
+		addDisposableListener(window, EventType.MOUSE_DOWN, () => {
 			// This mouse event is outside the menubar so it counts as a focus out
 			if (this.isFocused) {
 				this.setUnfocusedState();
 			}
-		}));
+		});
 
-		this._register(addDisposableListener(this.container, EventType.FOCUS_IN, (e) => {
-			let event = e as FocusEvent;
-
+		addDisposableListener(this.container, EventType.FOCUS_IN, (event) => {
 			if (event.relatedTarget) {
 				if (!this.container.contains(event.relatedTarget as HTMLElement)) {
 					this.focusToReturn = event.relatedTarget as HTMLElement;
 				}
 			}
-		}));
+		});
 
-		this._register(addDisposableListener(this.container, EventType.FOCUS_OUT, (e) => {
-			let event = e as FocusEvent;
-
+		addDisposableListener(this.container, EventType.FOCUS_OUT, (event) => {
 			if (event.relatedTarget) {
 				if (!this.container.contains(event.relatedTarget as HTMLElement)) {
 					this.focusToReturn = undefined;
 					this.setUnfocusedState();
 				}
 			}
-		}));
+		});
 
-		this._register(addDisposableListener(window, EventType.KEY_DOWN, (e: KeyboardEvent) => {
-			if (!this.options.enableMnemonics || !e.altKey || e.ctrlKey || e.defaultPrevented) {
+		addDisposableListener(window, EventType.KEY_DOWN, (e: KeyboardEvent) => {
+			if (!this.options?.enableMnemonics || !e.altKey || e.ctrlKey || e.defaultPrevented) {
 				return;
 			}
 
@@ -129,7 +124,7 @@ export class Menubar extends Disposable {
 
 			const menuIndex = this.mnemonics.get(key)!;
 			this.onMenuTriggered(menuIndex, false);
-		}));
+		});
 
 		this.setUnfocusedState();
 		this.registerListeners();
@@ -137,28 +132,28 @@ export class Menubar extends Disposable {
 
 	private registerListeners(): void {
 		if (!isMacintosh) {
-			this._register(addDisposableListener(window, EventType.RESIZE, () => {
+			addDisposableListener(window, EventType.RESIZE, () => {
 				this.blur();
-			}));
+			});
 		}
 	}
 
 	setupMenubar(): void {
-		const topLevelMenus = this.options.menu.items;
+		const topLevelMenus = this.options?.menu?.items;
 
-		this._register(this.onFocusStateChange(e => this._onFocusStateChange.fire(e)));
-		this._register(this.onVisibilityChange(e => this._onVisibilityChange.fire(e)));
+		this.onFocusStateChange(e => this._onFocusStateChange.fire(e));
+		this.onVisibilityChange(e => this._onVisibilityChange.fire(e));
 
-		topLevelMenus.forEach((menubarMenu) => {
+		topLevelMenus?.forEach((menubarMenu) => {
 			if (!menubarMenu) return;
 			const menuIndex = this.menuItems.length;
 			const cleanMenuLabel = cleanMnemonic(menubarMenu.label);
 
-			const buttonElement = $('div.cet-menubar-menu-button', { 'role': 'menuitem', 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
+			const buttonElement = $('div.cet-menubar-menu-button', { 'tabindex': -1, 'aria-label': cleanMenuLabel, 'aria-haspopup': true });
 			if (!menubarMenu.enabled) {
 				addClass(buttonElement, 'disabled');
 			}
-			const titleElement = $('div.cet-menubar-menu-title', { 'role': 'none', 'aria-hidden': true });
+			const titleElement = $('div.cet-menubar-menu-title', { 'aria-hidden': true });
 
 			buttonElement.appendChild(titleElement);
 			append(this.container, buttonElement);
@@ -175,8 +170,8 @@ export class Menubar extends Disposable {
 			this.updateLabels(titleElement, buttonElement, menubarMenu.label);
 
 			if (menubarMenu.enabled) {
-				this._register(addDisposableListener(buttonElement, EventType.KEY_UP, (e) => {
-					let event = new StandardKeyboardEvent(e as KeyboardEvent);
+				addDisposableListener(buttonElement, EventType.KEY_UP, (e) => {
+					let event = new StandardKeyboardEvent(e);
 					let eventHandled = true;
 
 					if ((event.equals(KeyCode.DownArrow) || event.equals(KeyCode.Enter)) && !this.isOpen) {
@@ -191,9 +186,9 @@ export class Menubar extends Disposable {
 						event.preventDefault();
 						event.stopPropagation();
 					}
-				}));
+				});
 
-				this._register(addDisposableListener(buttonElement, EventType.MOUSE_DOWN, (e) => {
+				addDisposableListener(buttonElement, EventType.MOUSE_DOWN, (e) => {
 					if (!this.isOpen) {
 						// Open the menu with mouse down and ignore the following mouse up event
 						this.ignoreNextMouseUp = true;
@@ -204,9 +199,9 @@ export class Menubar extends Disposable {
 
 					e.preventDefault();
 					e.stopPropagation();
-				}));
+				});
 
-				this._register(addDisposableListener(buttonElement, EventType.MOUSE_UP, () => {
+				addDisposableListener(buttonElement, EventType.MOUSE_UP, () => {
 					if (!this.ignoreNextMouseUp) {
 						if (this.isFocused) {
 							this.onMenuTriggered(menuIndex, true);
@@ -214,9 +209,9 @@ export class Menubar extends Disposable {
 					} else {
 						this.ignoreNextMouseUp = false;
 					}
-				}));
+				});
 
-				this._register(addDisposableListener(buttonElement, EventType.MOUSE_ENTER, () => {
+				addDisposableListener(buttonElement, EventType.MOUSE_ENTER, () => {
 					if (this.isOpen && !this.isCurrentMenu(menuIndex)) {
 						this.menuItems[menuIndex].buttonElement.focus();
 						this.cleanupMenu();
@@ -227,7 +222,7 @@ export class Menubar extends Disposable {
 						this.focusedMenu = { index: menuIndex };
 						buttonElement.focus();
 					}
-				}));
+				});
 
 				this.menuItems.push({
 					menuItem: menubarMenu,
@@ -241,7 +236,7 @@ export class Menubar extends Disposable {
 
 	private onClick(menuIndex: number) {
 		const item = this.menuItems[menuIndex].menuItem;
-		this.options.onMenuItemClick(item.commandId);
+		ipcRenderer.send('menu-event', item.commandId);
 	}
 
 	public get onVisibilityChange(): Event<boolean> {
@@ -253,8 +248,6 @@ export class Menubar extends Disposable {
 	}
 
 	dispose(): void {
-		super.dispose();
-
 		this.menuItems.forEach(menuBarMenu => {
 			removeNode(menuBarMenu.titleElement);
 			removeNode(menuBarMenu.buttonElement);
@@ -274,7 +267,7 @@ export class Menubar extends Disposable {
 
 		// Update the button label to reflect mnemonics
 
-		if (this.options.enableMnemonics) {
+		if (this.options?.enableMnemonics) {
 			let innerHtml = escape(label);
 
 			// This is global so reset it
@@ -302,7 +295,7 @@ export class Menubar extends Disposable {
 		if (mnemonicMatches) {
 			let mnemonic = !!mnemonicMatches[1] ? mnemonicMatches[1] : mnemonicMatches[3];
 
-			if (this.options.enableMnemonics) {
+			if (this.options?.enableMnemonics) {
 				buttonElement.setAttribute('aria-keyshortcuts', 'Alt+' + mnemonic.toLocaleLowerCase());
 			} else {
 				buttonElement.removeAttribute('aria-keyshortcuts');
@@ -482,24 +475,24 @@ export class Menubar extends Disposable {
 		}
 	}
 
-	private updateMnemonicVisibility(visible: boolean): void {
+	private updateMnemonicVisibility(visible: boolean | undefined): void {
 		if (this.menuItems) {
 			this.menuItems.forEach(menuBarMenu => {
 				if (menuBarMenu.titleElement.children.length) {
 					let child = menuBarMenu.titleElement.children.item(0) as HTMLElement;
-					if (child) {
-						child.style.textDecoration = visible ? 'underline' : null;
+					if (child && visible) {
+						child.style.textDecoration = 'underline';
 					}
 				}
 			});
 		}
 	}
 
-	private get mnemonicsInUse(): boolean {
+	private get mnemonicsInUse(): boolean | undefined {
 		return this._mnemonicsInUse;
 	}
 
-	private set mnemonicsInUse(value: boolean) {
+	private set mnemonicsInUse(value: boolean | undefined) {
 		this._mnemonicsInUse = value;
 	}
 
@@ -559,7 +552,7 @@ export class Menubar extends Disposable {
 			this.awaitingAltRelease = false;
 		}
 
-		if (this.options.enableMnemonics && this.menuItems && !this.isOpen) {
+		if (this.options?.enableMnemonics && this.menuItems && !this.isOpen) {
 			this.updateMnemonicVisibility((!this.awaitingAltRelease && modifierKeyStatus.altKey) || this.mnemonicsInUse);
 		}
 	}
@@ -600,28 +593,26 @@ export class Menubar extends Disposable {
 		const menuHolder = $('ul.cet-menubar-menu-container');
 
 		addClass(btnElement, 'open');
-		menuHolder.setAttribute('role', 'menu');
 		menuHolder.tabIndex = 0;
 		menuHolder.style.top = `${btnRect.bottom - 5}px`;
 		menuHolder.style.left = `${btnRect.left}px`;
 
 		btnElement.appendChild(menuHolder);
 
-		// menuHolder.style.maxHeight = `200px`;
 		menuHolder.style.maxHeight = `${Math.max(10, window.innerHeight - btnRect.top - 50)}px`;
 
 		let menuOptions: IMenuOptions = {
-			enableMnemonics: this.mnemonicsInUse && this.options.enableMnemonics,
-			ariaLabel: btnElement.attributes['aria-label'].value
+			enableMnemonics: this.mnemonicsInUse && this.options?.enableMnemonics,
+			ariaLabel: btnElement.attributes.getNamedItem('aria-label')?.value
 		};
 
 		let menuWidget = new CETMenu(menuHolder, this.options, menuOptions, this.closeSubMenu);
-		menuWidget.createMenu(customMenu.submenu.items);
+		menuWidget.createMenu(customMenu.submenu?.items);
 		menuWidget.style(this.menuStyle);
 
-		this._register(menuWidget.onDidCancel(() => {
+		menuWidget.onDidCancel(() => {
 			this.focusState = MenubarState.FOCUSED;
-		}));
+		});
 
 		menuWidget.focus(selectFirst);
 

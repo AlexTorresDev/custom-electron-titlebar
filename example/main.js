@@ -2,10 +2,11 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main');
+
 // setup the titlebar main process
 setupTitlebar();
 
-createWindow = () => {
+const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -13,6 +14,7 @@ createWindow = () => {
     titleBarStyle: 'hidden',
     //frame: false, // needed if process.versions.electron < 14
     webPreferences: {
+      sandbox: false,
       preload: path.join(__dirname, 'preload.js')
     }
   });
@@ -20,13 +22,11 @@ createWindow = () => {
   const menu = Menu.buildFromTemplate(exampleMenuTemplate());
   Menu.setApplicationMenu(menu);
 
-
-
   // and load the index.html of the app.
   mainWindow.loadFile('index.html');
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   //attach fullscreen(f11 and not 'maximized') && focus listeners
   attachTitlebarToWindow(mainWindow);
@@ -54,7 +54,7 @@ app.on('window-all-closed', function () {
 
 const exampleMenuTemplate = () => [
   {
-    label: "Simple Options",
+    label: "Simple O&ptions",
     submenu: [
       {
         label: "Quit",
@@ -70,7 +70,7 @@ const exampleMenuTemplate = () => [
         type: "radio",
       },
       {
-        label: "Checkbox1",
+        label: "Check&box1",
         type: "checkbox",
         checked: true,
         click: (item) => {
@@ -79,7 +79,7 @@ const exampleMenuTemplate = () => [
       },
       { type: "separator" },
       {
-        label: "Checkbox2",
+        label: "Che&ckbox2",
         type: "checkbox",
         checked: false,
         click: (item) => {
@@ -89,7 +89,7 @@ const exampleMenuTemplate = () => [
     ]
   },
   {
-    label: "Advanced Options",
+    label: "A&dvanced Options",
     submenu: [
       {
         label: "Quit",
@@ -125,7 +125,7 @@ const exampleMenuTemplate = () => [
         label: "Radio Test",
         submenu: [
           {
-            label: "Sample Checkbox",
+            label: "S&ample Checkbox",
             type: "checkbox",
             checked: true
           },
@@ -178,7 +178,7 @@ const exampleMenuTemplate = () => [
     ]
   },
   {
-    label: "View",
+    label: "&View",
     submenu: [
       { role: "reload" },
       { role: "forceReload" },

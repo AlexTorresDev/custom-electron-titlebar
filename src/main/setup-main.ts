@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresSk. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 export = () => {
     if (process.type !== 'browser') return;
 
@@ -14,16 +19,16 @@ export = () => {
 
         switch (eventName) {
             case 'window-minimize':
-                window.minimize()
+                window?.minimize()
                 break
             case 'window-maximize':
-                window.isMaximized() ? window.unmaximize() : window.maximize()
+                window?.isMaximized() ? window.unmaximize() : window?.maximize()
                 break
             case 'window-close':
-                window.close();
+                window?.close();
                 break
             case 'window-is-maximized':
-                event.returnValue = window.isMaximized()
+                event.returnValue = window?.isMaximized()
                 break
             default:
                 break
@@ -36,8 +41,8 @@ export = () => {
     });
 }
 
-function getMenuItemByCommandId(commandId: Number, menu: Electron.Menu) {
-    for (const item of menu.items) {
+function getMenuItemByCommandId(commandId: Number, menu: Electron.Menu | null): Electron.MenuItem | undefined {
+    for (const item of menu!.items) {
         if (item.submenu) {
             const submenuItem = getMenuItemByCommandId(commandId, item.submenu);
             if (submenuItem) return submenuItem;

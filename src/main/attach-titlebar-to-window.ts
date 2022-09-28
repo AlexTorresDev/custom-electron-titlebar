@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresSk. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 export = (browserWindow: Electron.BrowserWindow) => {
     browserWindow.on("enter-full-screen", () => {
         browserWindow.webContents.send("window-fullscreen", true);

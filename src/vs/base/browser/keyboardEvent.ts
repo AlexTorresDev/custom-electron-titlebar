@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { KeyCode, KeyCodeUtils, KeyMod, SimpleKeybinding } from '../common/keyCodes';
-import * as platform from '../common/platform';
+import { KeyCode, KeyCodeUtils, KeyMod, SimpleKeybinding } from 'vs/base/common/keyCodes';
+import * as platform from 'vs/base/common/platform';
 
 let KEY_CODE_MAP: { [keyCode: number]: KeyCode } = new Array(230);
 let INVERSE_KEY_CODE_MAP: KeyCode[] = new Array(KeyCode.MAX_VALUE);

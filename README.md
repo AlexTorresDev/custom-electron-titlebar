@@ -4,6 +4,7 @@ This project is a typescript library for electron that allows you to configure a
 
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
+[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar)](https://packagephobia.com/result?p=custom-electron-titlebar)
 
 ![Screenshot 1](screenshots/cet-001.jpg)
 
@@ -30,6 +31,17 @@ import { setupTitlebar, attachTitlebarToWindow } from "custom-electron-titlebar/
 setupTitlebar();
 
 function createWindow() {
+  // Create the browser window.
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    titleBarStyle: 'hidden',
+    //frame: false, // needed if process.versions.electron < 14
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  });
+  
   ...
 
   // attach fullscreen(f11 and not 'maximized') && focus listeners

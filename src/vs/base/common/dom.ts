@@ -3,16 +3,16 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as browser from '../browser/browser';
-import { domEvent } from '../browser/event';
-import { IKeyboardEvent, StandardKeyboardEvent } from '../browser/keyboardEvent';
-import { IMouseEvent, StandardMouseEvent } from '../browser/mouseEvent';
-import { TimeoutTimer } from './async';
-import { CharCode } from './charCode';
-import { Emitter, Event } from './event';
-import { Disposable, IDisposable, dispose, toDisposable } from './lifecycle';
-import * as platform from './platform';
-import { coalesce } from './arrays';
+import * as browser from 'vs/base/browser/browser';
+import { domEvent } from 'vs/base/browser/event';
+import { IKeyboardEvent, StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+import { IMouseEvent, StandardMouseEvent } from 'vs/base/browser/mouseEvent';
+import { TimeoutTimer } from 'vs/base/common/async';
+import { CharCode } from 'vs/base/common/charCode';
+import { Emitter, Event } from 'vs/base/common/event';
+import { Disposable, IDisposable, dispose, toDisposable } from 'vs/base/common/lifecycle';
+import * as platform from 'vs/base/common/platform';
+import { coalesce } from 'vs/base/common/arrays';
 
 export function clearNode(node: HTMLElement): void {
 	while (node.firstChild) {
@@ -47,8 +47,8 @@ interface IDomClassList {
 
 const _manualClassList = new class implements IDomClassList {
 
-	private _lastStart: number;
-	private _lastEnd: number;
+	private _lastStart?: number;
+	private _lastEnd?: number;
 
 	private _findClassName(node: HTMLElement, className: string): void {
 
@@ -136,7 +136,7 @@ const _manualClassList = new class implements IDomClassList {
 		if (this._lastStart === -1) {
 			return; // Prevent styles invalidation if not necessary
 		} else {
-			node.className = node.className.substring(0, this._lastStart) + node.className.substring(this._lastEnd);
+			node.className = node.className.substring(0, this._lastStart) + node.className.substring(this._lastEnd || 0);
 		}
 	}
 
@@ -424,7 +424,7 @@ export interface DOMEvent {
 }
 
 const MINIMUM_TIME_MS = 16;
-const DEFAULT_EVENT_MERGER: IEventMerger<DOMEvent, DOMEvent> = function (lastEvent: DOMEvent, currentEvent: DOMEvent) {
+const DEFAULT_EVENT_MERGER: any = function (lastEvent: DOMEvent, currentEvent: DOMEvent) {
 	return currentEvent;
 };
 

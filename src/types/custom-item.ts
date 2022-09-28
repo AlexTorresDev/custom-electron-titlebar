@@ -3,7 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import setupTitlebar from './setup-main';
-import attachTitlebarToWindow from './attach-titlebar-to-window'; 
+import { Menu, MenuItem } from "electron";
 
-export = { setupTitlebar, attachTitlebarToWindow };
+export interface CustomItem {
+    menuItem: MenuItem;
+    buttonElement: HTMLElement;
+    titleElement: HTMLElement;
+    submenu?: Menu;
+}
