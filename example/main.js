@@ -14,6 +14,7 @@ const createWindow = () => {
     titleBarStyle: 'hidden',
     //frame: false, // needed if process.versions.electron < 14
     webPreferences: {
+      sandbox: false,
       preload: path.join(__dirname, 'preload.js')
     }
   });
@@ -25,7 +26,7 @@ const createWindow = () => {
   mainWindow.loadFile('index.html');
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   //attach fullscreen(f11 and not 'maximized') && focus listeners
   attachTitlebarToWindow(mainWindow);

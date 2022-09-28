@@ -13,7 +13,7 @@ This project is a typescript library for electron that allows you to configure a
 ![Screenshot 3](screenshots/cet-003.jpg)
 <br><br>
 
-# 📦 Intalling
+# 📦 Installing
 You can install this package with `npm`.
 ```sh
 npm install custom-electron-titlebar
