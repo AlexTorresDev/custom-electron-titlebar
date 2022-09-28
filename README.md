@@ -38,6 +38,7 @@ function createWindow() {
     titleBarStyle: 'hidden',
     //frame: false, // needed if process.versions.electron < 14
     webPreferences: {
+      sandbox: false,
       preload: path.join(__dirname, 'preload.js')
     }
   });
