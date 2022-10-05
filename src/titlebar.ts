@@ -8,7 +8,6 @@
  *  Licensed under the MIT License. See License in the project root for license information.
  *-------------------------------------------------------------------------------------------------------*/
 
-import fs from 'fs';
 import { Menu, ipcRenderer } from 'electron';
 import { platform, PlatformToString, isLinux, isMacintosh, isWindows } from 'vs/base/common/platform';
 import { Color, RGBA } from 'vs/base/common/color';
@@ -103,9 +102,7 @@ export default class Titlebar {
 
 	_loadIcons() {
 		if (this._options.icons) {
-			const icons = fs.readFileSync(this._options.icons, 'utf8');
-			const jsonIcons = JSON.parse(icons);
-			this._platformIcons = jsonIcons[PlatformToString(platform).toLocaleLowerCase()];
+			this._platformIcons = this._options.icons[PlatformToString(platform).toLocaleLowerCase()];
 		}
 	}
 
