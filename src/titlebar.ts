@@ -202,7 +202,7 @@ export default class Titlebar {
 			const icon = append(this._windowIcon, $('img'));
 
 			if (typeof this._options.icon === 'string') icon.setAttribute('src', `${this._options.icon}`);
-			else icon.setAttribute('src', this._options.icon!.toDataURL());
+			else icon.setAttribute('src', this._options.icon && this._options.icon.toDataURL() || '');
 
 			this._setIconSize(this._options.iconSize);
 
