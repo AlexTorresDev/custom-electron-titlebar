@@ -102,7 +102,8 @@ export default class Titlebar {
 
 	_loadIcons() {
 		if (this._options.icons) {
-			this._platformIcons = this._options.icons[PlatformToString(platform).toLocaleLowerCase()];
+			const jsonIcons = JSON.parse(this._options.icons);
+			this._platformIcons = jsonIcons[PlatformToString(platform).toLocaleLowerCase()];
 		}
 	}
 
@@ -157,23 +158,25 @@ export default class Titlebar {
 	}
 
 	_loadEvents() {
-		this._onDidChangeMaximized();
+		ipcRenderer.on('window-maximize', (_, isMaximized: boolean) => this._onDidChangeMaximized(isMaximized));
+		ipcRenderer.on('window-fullscreen', (_, isFullScreen: boolean) => this.onWindowFullScreen(isFullScreen));
+		ipcRenderer.on('window-focus', (_, isFocused: boolean) => this.onWindowFocus(isFocused));
 
-		ipcRenderer.on('window-fullscreen', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen));
-		ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused));
+		if (this._options.minimizable) addDisposableListener(this._windowControlIcons.minimize, EventType.CLICK, () => {
+			ipcRenderer.send('window-event', 'window-minimize');
+		});
 
 		if (isMacintosh) addDisposableListener(this._titlebar, EventType.DBLCLICK, () => {
 			ipcRenderer.send('window-event', 'window-maximize');
-			this._onDidChangeMaximized();
 		});
 
-		if (this._options.minimizable) addDisposableListener(this._windowControlIcons.minimize, EventType.CLICK, () => ipcRenderer.send('window-event', 'window-minimize'));
 		if (this._options.maximizable) addDisposableListener(this._windowControlIcons.maximize, EventType.CLICK, () => {
 			ipcRenderer.send('window-event', 'window-maximize');
-			this._onDidChangeMaximized();
 		});
 
-		if (this._options.closeable) addDisposableListener(this._windowControlIcons.close, EventType.CLICK, () => ipcRenderer.send('window-event', 'window-close'));
+		if (this._options.closeable) addDisposableListener(this._windowControlIcons.close, EventType.CLICK, () => {
+			ipcRenderer.send('window-event', 'window-close');
+		});
 	}
 
 	_closeMenu = () => {
@@ -278,9 +281,7 @@ export default class Titlebar {
 		}
 	}
 
-	_onDidChangeMaximized() {
-		let isMaximized = ipcRenderer.sendSync('window-event', 'window-is-maximized');
-
+	_onDidChangeMaximized(isMaximized: Boolean) {
 		if (this._windowControlIcons.maximize) {
 			this._windowControlIcons.maximize.title = isMaximized ? "Restore Down" : "Maximize";
 			this._windowControlIcons.maximize.innerHTML = isMaximized ? this._platformIcons['restore'] : this._platformIcons['maximize'];

@@ -1,9 +1,15 @@
 {
   "name": "custom-electron-titlebar",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Library for electron that allows you to configure a fully customizable title bar.",
-  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "main": [
+        "./dist/main/index.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": "./dist/index.js",
     "./main": "./dist/main.js"
@@ -11,8 +17,8 @@
   "scripts": {
     "build:develop": "webpack --mode=development",
     "build": "webpack --mode=production",
-    "example": "electron example/main.js",
-    "start": "npm run build:develop && npm run example",
+    "dev": "electron example/main.js",
+    "start": "npm run build:develop && npm run dev",
     "prepare": "npm run build"
   },
   "author": "AlexTorresSk <alextorressk@gmail.com>",
@@ -41,14 +47,14 @@
     "electron": ">20"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.3",
-    "@babel/preset-env": "^7.19.3",
-    "@types/node": "^18.7.23",
-    "babel-loader": "^8.2.5",
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
+    "@types/node": "^18.11.9",
+    "babel-loader": "^9.1.0",
     "css-loader": "^6.7.1",
-    "electron": "^21.0.0",
-    "sass": "^1.55.0",
-    "sass-loader": "^13.0.2",
+    "electron": "^21.2.2",
+    "sass": "^1.56.0",
+    "sass-loader": "^13.1.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.1",
     "tsconfig-paths-webpack-plugin": "^4.0.0",

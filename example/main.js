@@ -12,7 +12,7 @@ const createWindow = () => {
     width: 800,
     height: 600,
     titleBarStyle: 'hidden',
-    //frame: false, // needed if process.versions.electron < 14
+    frame: false, // needed if process.versions.electron < 14
     webPreferences: {
       sandbox: false,
       preload: path.join(__dirname, 'preload.js')
