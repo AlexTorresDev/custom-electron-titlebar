@@ -19,4 +19,12 @@ export = (browserWindow: Electron.BrowserWindow) => {
     browserWindow.on("blur", () => {
         browserWindow.webContents.send("window-focus", false);
     });
+
+    browserWindow.on("maximize", () => {
+        browserWindow.webContents.send("window-maximize", true);
+    });
+
+    browserWindow.on("unmaximize", () => {
+        browserWindow.webContents.send("window-maximize", false);
+    });
 };
