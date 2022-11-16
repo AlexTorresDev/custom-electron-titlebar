@@ -51,7 +51,7 @@ module.exports = [
     Object.assign(
         {
             target: "electron-main",
-            entry: { main: path.join(srcPath, 'main', 'main.ts') },
+            entry: { main: path.join(srcPath, 'main', 'index.ts') },
             output: {
                 path: distPath,
                 filename: "main.js",
