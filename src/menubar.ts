@@ -366,7 +366,7 @@ export class Menubar {
 
 				if (isFocused) {
 					if (this.focusedMenu) {
-						this.menuItems[this.focusedMenu.index].buttonElement.blur();
+						this.menuItems[this.focusedMenu.index]?.buttonElement.blur();
 					}
 
 					this.focusedMenu = undefined;
@@ -389,7 +389,7 @@ export class Menubar {
 				}
 
 				if (this.focusedMenu) {
-					this.menuItems[this.focusedMenu.index].buttonElement.focus();
+					this.menuItems[this.focusedMenu.index]?.buttonElement.focus();
 				}
 
 				break;
