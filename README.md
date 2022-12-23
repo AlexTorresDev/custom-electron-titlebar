@@ -2,7 +2,7 @@
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
-[![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
+[![LICENSE](https://img.shields.io/github/license/AlexTorresDev/custom-electron-titlebar.svg)](https://github.com/AlexTorresDev/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
 [![install size](https://packagephobia.com/badge?p=custom-electron-titlebar)](https://packagephobia.com/result?p=custom-electron-titlebar)
 
@@ -59,12 +59,12 @@ window.addEventListener('DOMContentLoaded', () => {
   new Titlebar();
 });
 ```
-To see the options you can include in the Title Bar constructor, such as color of elements, icons, menu position, and much more, and the methods you can use, go to the [wiki](https://github.com/AlexTorresSk/custom-electron-titlebar/wiki)
+To see the options you can include in the Title Bar constructor, such as color of elements, icons, menu position, and much more, and the methods you can use, go to the [wiki](https://github.com/AlexTorresDev/custom-electron-titlebar/wiki)
 <br><br>
 
 ## 💰 Support
-If you want to support my development, you can do so by donating through [Buy me a coffee](https://www.buymeacoffee.com/AlexTorresSk) or [Patreon](https://www.patreon.com/AlexTorresSk)
+If you want to support my development, you can do so by donating through [Buy me a coffee](https://www.buymeacoffee.com/AlexTorresDev)
 <br><br>
 
 ## ✅ License
-This project is under the [MIT](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE) license.
+This project is under the [MIT](https://github.com/AlexTorresDev/custom-electron-titlebar/blob/master/LICENSE) license.
