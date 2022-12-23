@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------------------------
- *  This file has been modified by @AlexTorresSk (http://github.com/AlexTorresSk)
+ *  This file has been modified by @AlexTorresDev (http://github.com/AlexTorresDev)
  *  to work in custom-electron-titlebar.
  *
  *  The original copy of this file and its respective license are in https://github.com/Microsoft/vscode/
