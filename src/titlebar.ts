@@ -158,9 +158,9 @@ export default class Titlebar {
 	}
 
 	_loadEvents() {
-		ipcRenderer.on('window-maximize', (_, isMaximized: boolean) => this._onDidChangeMaximized(isMaximized));
-		ipcRenderer.on('window-fullscreen', (_, isFullScreen: boolean) => this.onWindowFullScreen(isFullScreen));
-		ipcRenderer.on('window-focus', (_, isFocused: boolean) => this.onWindowFocus(isFocused));
+		ipcRenderer.on('window-maximize', (_: any, isMaximized: boolean) => this._onDidChangeMaximized(isMaximized));
+		ipcRenderer.on('window-fullscreen', (_: any, isFullScreen: boolean) => this.onWindowFullScreen(isFullScreen));
+		ipcRenderer.on('window-focus', (_: any, isFocused: boolean) => this.onWindowFocus(isFocused));
 
 		if (this._options.minimizable) addDisposableListener(this._windowControlIcons.minimize, EventType.CLICK, () => {
 			ipcRenderer.send('window-event', 'window-minimize');
@@ -214,7 +214,7 @@ export default class Titlebar {
 		if (this._options.menu) {
 			this.updateMenu(this._options.menu);
 		} else if (this._options.menu !== null) {
-			ipcRenderer.invoke('request-application-menu').then(menu => this.updateMenu(menu));
+			ipcRenderer.invoke('request-application-menu').then((menu: Menu) => this.updateMenu(menu));
 		}
 
 		if (this._options.menuPosition) {
@@ -429,7 +429,9 @@ export default class Titlebar {
 	public updateMenu(menu: Menu): Titlebar {
 		if (!isMacintosh) {
 			if (this._menubar) this._menubar.dispose();
-			if (menu) this._options.menu = menu;
+			if (!menu) return this;
+
+			this._options.menu = menu;
 
 			this._menubar = new Menubar(this._menubarContainer, this._options, this._closeMenu);
 			this._menubar.setupMenubar();
@@ -447,7 +449,7 @@ export default class Titlebar {
 	 * Update the menu from Menu.getApplicationMenu()
 	 */
 	public async refreshMenu(): Promise<void> {
-		if (!isMacintosh) ipcRenderer.invoke('request-application-menu').then(menu => this.updateMenu(menu));
+		if (!isMacintosh) ipcRenderer.invoke('request-application-menu').then((menu: Menu) => this.updateMenu(menu));
 	}
 
 	/**
