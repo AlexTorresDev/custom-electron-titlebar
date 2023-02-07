@@ -13,14 +13,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "strict": true,
-    "paths": {
-      "vs": [
-        "vs/*"
-      ],
-      "static": [
-        "static/*"
-      ],
-    },
     "skipLibCheck": true,
   },
   "include": [
