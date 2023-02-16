@@ -1,0 +1,28 @@
+{
+  "plugins": [
+    "rewire",
+    [
+      "module-resolver",
+      {
+        "root": [
+          "./dist"
+        ],
+        "alias": {
+          "base": "./dist/base",
+          "static": "./static"
+        },
+        "extensions": [
+          ".js"
+        ]
+      }
+    ],
+    [
+      "import-require-as-string",
+      {
+        "extensions": [
+          ".css"
+        ]
+      }
+    ]
+  ]
+}
