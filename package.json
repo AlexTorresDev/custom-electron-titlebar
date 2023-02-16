@@ -1,6 +1,6 @@
 {
   "name": "custom-electron-titlebar",
-  "version": "4.1.2",
+  "version": "4.2.0",
   "description": "Library for electron that allows you to configure a fully customizable title bar.",
   "types": "./dist/index.d.ts",
   "typesVersions": {
@@ -12,14 +12,13 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./main": "./dist/main.js"
+    "./main": "./dist/main/index.js"
   },
   "scripts": {
-    "build:develop": "webpack --mode=development",
-    "build": "webpack --mode=production",
-    "dev": "electron example/main.js",
-    "start": "npm run build:develop && npm run dev",
-    "prepare": "npm run build"
+    "clean": "rimraf ./dist",
+    "build": "tsc && babel ./dist --out-dir ./dist --extensions \".js\"",
+    "example": "electron example/main.js",
+    "start": "npm run clean && npm run build && npm run example"
   },
   "author": "AlexTorresSk <alextorressk@gmail.com>",
   "license": "MIT",
@@ -44,22 +43,24 @@
     "dist": "dist"
   },
   "peerDependencies": {
-    "electron": ">20"
+    "electron": ">20.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.2",
-    "@babel/preset-env": "^7.20.2",
-    "@types/node": "^18.11.9",
-    "babel-loader": "^9.1.0",
-    "css-loader": "^6.7.1",
-    "electron": "^21.2.2",
-    "sass": "^1.56.0",
-    "sass-loader": "^13.1.0",
-    "style-loader": "^3.3.1",
-    "ts-loader": "^9.4.1",
-    "tsconfig-paths-webpack-plugin": "^4.0.0",
-    "typescript": "^4.8.4",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "@babel/cli": "7.20.7",
+    "@babel/core": "7.20.12",
+    "@typescript-eslint/eslint-plugin": "5.52.0",
+		"@typescript-eslint/parser": "5.52.0",
+    "babel-plugin-import-require-as-string": "1.0.2",
+    "babel-plugin-module-resolver": "5.0.0",
+    "babel-plugin-rewire": "1.2.0",
+    "electron": "23.1.0",
+    "eslint": "8.34.0",
+		"eslint-config-prettier": "8.6.0",
+		"eslint-config-standard": "17.0.0",
+		"eslint-plugin-import": "2.27.5",
+		"eslint-plugin-n": "15.6.1",
+		"eslint-plugin-promise": "6.1.1",
+    "rimraf": "4.1.2",
+    "typescript": "4.9.5"
   }
 }
