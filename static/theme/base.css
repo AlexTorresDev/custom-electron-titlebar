@@ -1,16 +1,112 @@
 body {
-  margin: 0!important;
-  overflow: hidden!important;
+  margin: 0 !important;
+  overflow: hidden !important;
 }
 
+/* Titlebar */
 .cet-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  font-size: 13px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  overflow: hidden;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  zoom: 1;
+  width: 100%;
   height: 31px;
+  line-height: 31px;
+  z-index: 99999;
 }
 
+.cet-titlebar.cet-windows,
+.cet-titlebar.cet-linux {
+  padding: 0;
+  height: 30px;
+  line-height: 30px;
+  justify-content: left;
+  overflow: visible;
+}
+
+/* Shadow */
+.cet-titlebar.cet-shadow {
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Icon */
+.cet-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 30px;
+  z-index: 99;
+  overflow: hidden;
+}
+
+/* Title */
+.cet-title {
+  flex: 0 1 auto;
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  zoom: 1;
+}
+
+/* Title alignment */
+.cet-title-left {
+  margin-left: 8px;
+  margin-right: auto;
+}
+
+.cet-title-right {
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.cet-title-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Window controls */
+.cet-window-controls-container {
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  text-align: center;
+  position: relative;
+  z-index: 99;
+  -webkit-app-region: no-drag;
+  height: 30px;
+  font-family: initial;
+}
+
+.cet-control-icon {
+  width: 46px;
+}
+
+.cet-control-icon svg {
+  width: 10px;
+  height: -webkit-fill-available;
+  fill: #eee
+}
+
+/* Container */
 .cet-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow: auto;
 }
