@@ -3,11 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------- */
 
-import { CustomTitlebar } from './titlebar'
-import { Color } from 'base/common/color'
+import attachTitlebarToWindow from './attach-titlebar-to-window'
+import setupTitlebar from './setup-titlebar'
 
 export {
-	CustomTitlebar,
-	CustomTitlebar as Titlebar,
-	Color as TitlebarColor
+	setupTitlebar,
+	attachTitlebarToWindow
 }

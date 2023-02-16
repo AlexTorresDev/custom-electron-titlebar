@@ -1,13 +1,13 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) AlexTorresSk. All rights reserved.
+/* ---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresDev. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+ *-------------------------------------------------------------------------------------------- */
 
-import { NativeImage } from "electron";
-import { Color } from "../vs/base/common/color";
-import { MenubarOptions } from "./menubar-options";
+import { NativeImage } from 'electron'
+import { Color } from 'base/common/color'
+import { MenuBarOptions } from '../menubar/menubar-options'
 
-export interface TitlebarOptions extends MenubarOptions {
+export interface TitleBarOptions extends MenuBarOptions {
     /**
      * The background color of titlebar.
      * **The default is `#ffffff`**
@@ -50,20 +50,15 @@ export interface TitlebarOptions extends MenubarOptions {
      * When the close button is clicked, the window is hidden instead of closed.
      * **The default is false**
      */
-    //hideWhenClickingClose?: boolean;
+    hideWhenClickingClose?: boolean;
     /**
      * Set the order of the elements on the title bar. You can use `inverted`, `first-buttons` or don't add for.
      * **The default is undefined**
      */
-    order?: "inverted" | "first-buttons";
+    order?: 'inverted' | 'first-buttons';
     /**
      * Set horizontal alignment of the window title.
      * **The default value is center**
      */
-    titleHorizontalAlignment?: "left" | "center" | "right";
-    /**
-     * Sets the value for the overflow of the container after title bar.
-     * **The default value is auto**
-     */
-    containerOverflow?: "auto" | "hidden" | "visible";
+    titleHorizontalAlignment?: 'left' | 'center' | 'right';
 }

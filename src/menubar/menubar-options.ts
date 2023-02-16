@@ -1,23 +1,16 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) AlexTorresSk. All rights reserved.
+/* ---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresDev. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+ *-------------------------------------------------------------------------------------------- */
 
-import { Menu } from "electron";
-import { Color } from "../vs/base/common/color";
+import { Color } from 'base/common/color'
 
-export interface MenubarOptions {
-    /**
-     * The menu to show in the title bar.
-     * You can use `Menu` or not add this option and the menu created in the main process will be taken.
-     * **The default menu is undefined**
-     */
-    menu?: Menu;
+export interface MenuBarOptions {
     /**
      * The position of menubar on titlebar.
      * **The default is left**
      */
-    menuPosition?: "left" | "bottom";
+    menuPosition?: 'left' | 'bottom';
     /**
      * Enable the mnemonics on menubar and menu items
      * **The default is true**
@@ -29,7 +22,7 @@ export interface MenubarOptions {
      */
     itemBackgroundColor?: Color;
     /**
-     * The menu conatiner transparency
+     * The menu container transparency
      * **The default is 100**
      */
      menuTransparency?: number;
