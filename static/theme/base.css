@@ -87,8 +87,9 @@ body {
 }
 
 .cet-title-center {
-  margin-left: auto;
-  margin-right: auto;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Window controls */
@@ -101,17 +102,58 @@ body {
   z-index: 99;
   -webkit-app-region: no-drag;
   height: 30px;
-  font-family: initial;
+  font-family: initial !important;
+  margin-left: auto;
 }
 
 .cet-control-icon {
   width: 46px;
 }
 
+.cet-control-icon:active,
+.cet-control-icon:focus,
+.cet-control-icon:focus-visible,
+.cet-control-icon:focus-within,
+.cet-control-icon:target,
+.cet-control-icon:visited {
+  background-color: rgba(148, 21, 21);
+}
+
+.cet-control-icon:not(.inactive):hover {
+  background-color: rgb(255 255 255 / 12%);
+}
+
+.cet-control-icon.inactive svg {
+  opacity: 0.4;
+}
+
+.cet-control-close:not(.inactive):hover {
+  background-color: rgba(232 17 35 / 90%) !important;
+}
+
 .cet-control-icon svg {
   width: 10px;
   height: -webkit-fill-available;
   fill: #eee
+}
+
+/* Resizer */
+.cet-resizer {
+  -webkit-app-region: no-drag;
+  position: absolute;
+}
+
+.cet-resizer.left {
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+}
+
+.cet-resizer.top {
+  top: 0;
+  width: 100%;
+  height: 6px;
 }
 
 /* Container */

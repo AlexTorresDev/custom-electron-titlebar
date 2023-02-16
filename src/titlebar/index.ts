@@ -3,35 +3,37 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Color } from "base/common/color";
-import { $, addClass, append, prepend } from "base/common/dom";
-import { isMacintosh, platform, PlatformToString } from "base/common/platform";
-import { MenuBar } from "menubar";
+import { ipcRenderer, Menu } from "electron"
+import { Color } from "base/common/color"
+import { $, addClass, addDisposableListener, append, EventType, hide, prepend, removeClass, runAtThisOrScheduleAtNextAnimationFrame, show } from "base/common/dom"
+import { isLinux, isMacintosh, isWindows, platform, PlatformToString } from "base/common/platform"
+import { MenuBar } from "menubar"
 import { TitleBarOptions } from "./options"
-import { ThemeBar } from "./themebar";
+import { ThemeBar } from "./themebar"
+import { BOTTOM_TITLEBAR_HEIGHT, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from "consts"
 
 export class CustomTitlebar extends ThemeBar {
-  private titlebar: HTMLElement;
-  private dragRegion: HTMLElement;
-  private icon: HTMLElement;
-  private menuBarContainer: HTMLElement;
-  private title: HTMLElement;
-  private windowControlsContainer: HTMLElement;
-  private container: HTMLElement;
+  private titlebar: HTMLElement
+  private dragRegion: HTMLElement
+  private icon: HTMLElement
+  private menuBarContainer: HTMLElement
+  private title: HTMLElement
+  private windowControlsContainer: HTMLElement
+  private container: HTMLElement
 
-  private menuBar?: MenuBar;
+  private menuBar?: MenuBar
 
-  private isInactive: boolean = false;
+  private isInactive: boolean = false
 
   private windowControls: {
-    minimize: HTMLElement;
-    maximize: HTMLElement;
-    close: HTMLElement;
+    minimize: HTMLElement
+    maximize: HTMLElement
+    close: HTMLElement
   }
 
   private resizer: {
-    top: HTMLElement;
-    left: HTMLElement;
+    top: HTMLElement
+    left: HTMLElement
   }
 
   private currentOptions: TitleBarOptions = {
@@ -80,15 +82,19 @@ export class CustomTitlebar extends ThemeBar {
     this.container = $('.cet-container')
 
     this.windowControls = {
-      minimize: $('.cet-window-controls-minimize'),
-      maximize: $('.cet-window-controls-maximize'),
-      close: $('.cet-window-controls-close')
+      minimize: $('.cet-control-minimize'),
+      maximize: $('.cet-control-maximize'),
+      close: $('.cet-control-close')
     }
 
     this.resizer = {
-      top: $('.cet-resizer-top'),
-      left: $('.cet-resizer-left')
+      top: $('.cet-resizer.top'),
+      left: $('.cet-resizer.left')
     }
+
+    append(this.titlebar, this.dragRegion)
+    append(this.titlebar, this.resizer.left)
+    append(this.titlebar, this.resizer.top)
 
     this.loadWindowIcons()
 
@@ -99,6 +105,8 @@ export class CustomTitlebar extends ThemeBar {
     this.setupWindowControls()
     this.setupContainer()
     this.setupTitleBar()
+
+    this.loadEvents()
 
     //this.registerTheme(ThemeBar.win)
   }
@@ -161,7 +169,7 @@ export class CustomTitlebar extends ThemeBar {
     if (size < 16) size = 16
     if (size > 24) size = 24
 
-    this.icon.firstElementChild!.setAttribute('style', `height: ${size}px;`)
+    this.icon.firstElementChild!.setAttribute('style', `height: ${size}px`)
   }
 
   private setupMenubar() {
@@ -203,17 +211,12 @@ export class CustomTitlebar extends ThemeBar {
 
   private setupContainer() {
     while (document.body.firstChild) {
-      append(this.container, document.body.firstChild);
+      append(this.container, document.body.firstChild)
     }
 
-    // TODO: Change for constant value *TOP_TITLEBAR_HEIGHT_WIN*
-    this.container.style.top = '30px'
+    this.container.style.top = TOP_TITLEBAR_HEIGHT_WIN
 
-    append(this.titlebar, this.dragRegion)
-    /* append(this.container, this.resizer.left)
-    append(this.container, this.resizer.top) */
-
-    append(document.body, this.container);
+    append(document.body, this.container)
   }
 
   private setupTitleBar() {
@@ -237,7 +240,140 @@ export class CustomTitlebar extends ThemeBar {
     prepend(document.body, this.titlebar)
   }
 
-  /** Public methods */
+  private loadEvents() {
+    const minimizable = this.currentOptions.minimizable
+    const maximizable = this.currentOptions.maximizable
+    const closeable = this.currentOptions.closeable
+
+    ipcRenderer.on('window-maximize', (_, isMaximized) => this.onDidChangeMaximized(isMaximized))
+    ipcRenderer.on('window-minimize', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen))
+    ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused))
+
+
+    if (minimizable) {
+      addDisposableListener(this.windowControls.minimize, EventType.CLICK, () => {
+        ipcRenderer.send('window-event', 'window-minimize')
+      })
+    }
+
+    if (isMacintosh) {
+      addDisposableListener(this.titlebar, EventType.DBLCLICK, () => {
+        ipcRenderer.send('window-event', 'window-maximize')
+      })
+    }
+
+    if (maximizable) {
+      addDisposableListener(this.windowControls.maximize, EventType.CLICK, () => {
+        ipcRenderer.send('window-event', 'window-maximize')
+      })
+    }
+
+    if (closeable) {
+      addDisposableListener(this.windowControls.close, EventType.CLICK, () => {
+        ipcRenderer.send('window-event', 'window-close')
+      })
+    }
+  }
+
+  /** X */
+  private onBlur() {
+    this.isInactive = true
+    // this.updateStyles()
+  }
+
+  private onFocus() {
+    this.isInactive = false
+    // this.updateStyles()
+  }
+
+  private onMenubarVisibilityChanged(visible: boolean) {
+    if (isWindows || isLinux) {
+      if (visible) {
+        // Hack to fix issue #52522 with layered webkit-app-region elements appearing under cursor
+        hide(this.dragRegion)
+        setTimeout(() => show(this.dragRegion), 50)
+      }
+    }
+  }
+
+  private onMenubarFocusChanged(focused: boolean) {
+    if (isWindows || isLinux) {
+      if (focused) hide(this.dragRegion)
+      else show(this.dragRegion)
+    }
+  }
+
+  private onDidChangeMaximized(isMaximized: Boolean) {
+    const maximize = this.windowControls.maximize
+
+    if (maximize) {
+      maximize.title = isMaximized ? "Restore Down" : "Maximize"
+      maximize.innerHTML = isMaximized ? this.platformIcons['restore'] : this.platformIcons['maximize']
+    }
+
+    if (this.resizer) {
+      if (isMaximized) hide(this.resizer.top, this.resizer.left)
+      else show(this.resizer.top, this.resizer.left)
+    }
+  }
+
+  public updateMenu(menu: Menu) {
+    if (!isMacintosh) {
+      //if (this.menuBar) this.menuBar.dispose()
+      if (!menu) return
+
+
+      /*this.menuBar = new Menubar(this._menubarContainer, this._options, this._closeMenu)
+      this.menuBar.setupMenubar()
+
+      this.menuBar.onVisibilityChange(e => this._onMenubarVisibilityChanged(e))
+      this.menuBar.onFocusStateChange(e => this._onMenubarFocusChanged(e))
+
+      this._updateStyles()*/
+    }
+  }
+
+  /// Public methods
+
+  /**
+   * Update title bar styles based on focus state.
+   * @param hasFocus focus state of the window 
+   */
+  public onWindowFocus(focus: boolean) {
+    if (this.titlebar) {
+      if (focus) {
+        removeClass(this.titlebar, 'inactive')
+        this.onFocus()
+      } else {
+        addClass(this.titlebar, 'inactive')
+        // this.closeMenu()
+        this.onBlur()
+      }
+    }
+  }
+
+  /**
+   * Update the full screen state and hide or show the title bar.
+   * @param fullscreen Fullscreen state of the window
+   */
+  public onWindowFullScreen(fullscreen: boolean) {
+    if (!isMacintosh) {
+      if (fullscreen) {
+        hide(this.titlebar)
+        this.container.style.top = '0px'
+      } else {
+        show(this.titlebar)
+        if (this.currentOptions.menuPosition === 'bottom') this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
+        else this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
+      }
+    }
+  }
+
+  /**
+   * Update the title of the title bar.
+   * You can use this method if change the content of `<title>` tag on your html.
+   * @param title The title of the title bar and document.
+   */
   public updateTitle(title: string) {
     this.title.innerText = title
     document.title = title
@@ -245,11 +381,27 @@ export class CustomTitlebar extends ThemeBar {
     return this
   }
 
+  /**
+   * It method set new icon to title-bar-icon of title-bar.
+   * @param path path to icon
+   */
+  public updateIcon(path: string) {
+    if (this.icon) {
+      this.icon.firstElementChild!.setAttribute('src', path)
+    }
+
+    return this
+  }
+
+  /**
+   * Horizontal alignment of the title.
+   * @param side `left`, `center` or `right`.
+   */
   public updateTitleAlignment(side: 'left' | 'center' | 'right') {
     const order = this.currentOptions.order
     const menuPosition = this.currentOptions.menuPosition
 
-    if (side === 'left' || (side === 'center' && order === 'inverted')) {
+    if (side === 'left' || (side === 'right' && order === 'inverted')) {
       addClass(this.title, 'cet-title-left')
     }
 
@@ -259,7 +411,13 @@ export class CustomTitlebar extends ThemeBar {
 
     if (!side || side === 'center') {
       if (menuPosition !== 'bottom') {
-        addClass(this.title, 'cet-title-center')
+        addDisposableListener(window, 'resize', () => {
+          if (window.innerWidth >= 1188) {
+            addClass(this.title, 'cet-title-center')
+          } else {
+            removeClass(this.title, 'cet-title-center')
+          }
+        })
       }
 
       if (!isMacintosh && order === 'first-buttons') {
@@ -270,5 +428,70 @@ export class CustomTitlebar extends ThemeBar {
     }
 
     return this
+  }
+
+  /**
+   * Update the background color of the title bar
+   * @param backgroundColor The color for the background 
+   */
+  public updateBackground(backgroundColor: Color) {
+    this.currentOptions.backgroundColor = backgroundColor
+    // this.updateStyles()
+
+    return this
+  }
+
+  /**
+   * Update the item background color of the menubar
+   * @param itemBGColor The color for the item background
+   */
+  public updateItemBGColor(itemBGColor: Color) {
+    this.currentOptions.itemBackgroundColor = itemBGColor
+    // this._updateStyles()
+
+    return this
+  }
+
+  /**
+   * Update the menu from Menu.getApplicationMenu()
+   */
+  public async refreshMenu() {
+    if (!isMacintosh) {
+      ipcRenderer.invoke('request-application-menu')
+        .then((menu: Menu) => this.updateMenu(menu))
+    }
+
+    return this
+  }
+
+  /**
+   * Update the position of menubar.
+   * @param menuPosition The position of the menu `left` or `bottom`.
+   */
+  public updateMenuPosition(menuPosition: "left" | "bottom") {
+    const height = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
+
+    this.currentOptions.menuPosition = menuPosition
+    this.titlebar.style.height = menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : height
+    this.container.style.top = menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : height
+
+    if (menuPosition === 'bottom') {
+      addClass(this.menuBarContainer, 'bottom')
+    }
+    else {
+      removeClass(this.menuBarContainer, 'bottom')
+    }
+
+    return this
+  }
+
+  /**
+   * Remove the titlebar, menubar and all methods.
+   */
+  public dispose() {
+    // if (this.menuBar) this.menuBar.dispose()
+    this.titlebar.remove()
+    while (this.container.firstChild) append(document.body, this.container.firstChild)
+    this.container.remove()
   }
 }
