@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	// eslint-disable-next-line no-new
 	new CustomTitlebar({
 		backgroundColor: TitlebarColor.fromHex('#2f3241'),
-		icon: path.resolve('example/assets', 'logo.svg'),
+		// icon: path.resolve('example/assets', 'logo.svg'),
 		icons: path.resolve('example/assets', 'icons.json'),
 	})
 })
