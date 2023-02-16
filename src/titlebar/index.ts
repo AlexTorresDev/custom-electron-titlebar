@@ -31,7 +31,7 @@ export class CustomTitlebar extends ThemeBar {
 
   private resizer: {
     top: HTMLElement;
-    bottom: HTMLElement;
+    left: HTMLElement;
   }
 
   private currentOptions: TitleBarOptions = {
@@ -87,7 +87,7 @@ export class CustomTitlebar extends ThemeBar {
 
     this.resizer = {
       top: $('.cet-resizer-top'),
-      bottom: $('.cet-resizer-bottom')
+      left: $('.cet-resizer-left')
     }
 
     this.loadWindowIcons()
@@ -208,6 +208,10 @@ export class CustomTitlebar extends ThemeBar {
 
     // TODO: Change for constant value *TOP_TITLEBAR_HEIGHT_WIN*
     this.container.style.top = '30px'
+
+    append(this.titlebar, this.dragRegion)
+    /* append(this.container, this.resizer.left)
+    append(this.container, this.resizer.top) */
 
     append(document.body, this.container);
   }
