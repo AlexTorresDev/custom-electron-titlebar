@@ -68,7 +68,7 @@ body {
 /* Title */
 .cet-title {
   flex: 0 1 auto;
-  font-size: 13px;
+  font-size: 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -134,7 +134,9 @@ body {
 .cet-control-icon svg {
   width: 10px;
   height: -webkit-fill-available;
-  fill: #eee
+  fill: #eee;
+  display: initial !important;
+  vertical-align: unset !important;
 }
 
 /* Resizer */
