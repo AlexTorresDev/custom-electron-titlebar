@@ -163,7 +163,6 @@ body {
   display: flex;
   flex-shrink: 1;
   box-sizing: border-box;
-  height: -webkit-fill-available;
   overflow: hidden;
   flex-wrap: wrap;
   margin-right: 20px;
@@ -173,6 +172,7 @@ body {
   order: 1;
   width: 100%;
   padding: 0 5px 5px;
+  margin-right: 0;
 }
 
 .cet-menubar.bottom .cet-menubar-menu-button {
