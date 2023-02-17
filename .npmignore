@@ -25,6 +25,7 @@ test/
 example/
 screenshots/
 src/
+static/
 .gitignore
 .editorconfig
 circle.yml
@@ -34,6 +35,6 @@ tslint.json
 tsconfig.json
 
 npm-debug.log
-.balerc
-.pretierrc.json
+.babelrc
 .eslintrc
+.prettierrc.json

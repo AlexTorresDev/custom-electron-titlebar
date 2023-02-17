@@ -2,11 +2,20 @@
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
+> ## 📢 NOTE:
+> ### This is a Beta version, so it may have some bugs and not all the features of the stable version 
+
 [![LICENSE](https://img.shields.io/github/license/AlexTorresSk/custom-electron-titlebar.svg)](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
-[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar)](https://packagephobia.com/result?p=custom-electron-titlebar)
+[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar@4.2.0-beta.0)](https://packagephobia.com/result?p=custom-electron-titlebar@4.2.0-beta.0)
+
+Standard Title Bar
 
 ![Screenshot 1](screenshots/cet-screen-1.png)
+
+Bottom Menu Bar
+
+![Screenshot 2](screenshots/cet-screen-2.png)
 
 # 📦 Installing
 You can install this package with `npm`.
@@ -39,7 +48,7 @@ function createWindow() {
   
   ...
 
-  // attach fullscreen(f11 and not 'maximized') && focus listeners
+  // attach fullScreen(f11 and not 'maximized') && focus listeners
   attachTitlebarToWindow(mainWindow);
 }
 ```
@@ -49,7 +58,7 @@ In the preload file (preload.js or .ts)
 import { Titlebar } from "custom-electron-titlebar";
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Title bar implemenation
+  // Title bar implementation
   new Titlebar();
 });
 ```
