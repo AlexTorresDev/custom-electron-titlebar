@@ -7,6 +7,11 @@ import { Color } from 'base/common/color'
 
 export interface MenuBarOptions {
     /**
+     * Define if is only rendering the menubar without the titlebar.
+     * **The default is false**
+     */
+    onlyShowMenuBar?: boolean;
+    /**
      * The position of menubar on titlebar.
      * **The default is left**
      */

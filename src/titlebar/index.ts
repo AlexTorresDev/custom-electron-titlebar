@@ -47,6 +47,7 @@ export class CustomTitlebar extends ThemeBar {
     menuPosition: "left",
     menuTransparency: 100,
     minimizable: true,
+    onlyShowMenuBar: false,
     shadow: true,
     titleHorizontalAlignment: "center",
   }
@@ -76,9 +77,9 @@ export class CustomTitlebar extends ThemeBar {
     this.titlebar = $('.cet-titlebar')
     this.dragRegion = $('.cet-drag-region')
     this.icon = $('.cet-icon')
-    this.menuBarContainer = $('.cet-menubar-container')
+    this.menuBarContainer = $('.cet-menubar')
     this.title = $('.cet-title')
-    this.windowControlsContainer = $('.cet-window-controls-container')
+    this.windowControlsContainer = $('.cet-window-controls')
     this.container = $('.cet-container')
 
     this.windowControls = {
@@ -136,7 +137,9 @@ export class CustomTitlebar extends ThemeBar {
   }
 
   private createIcon() {
-    if (isMacintosh) return
+    const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
+
+    if (isMacintosh || onlyRendererMenuBar) return
 
     let icon = this.currentOptions.icon
 
@@ -173,10 +176,22 @@ export class CustomTitlebar extends ThemeBar {
   }
 
   private setupMenubar() {
+    ipcRenderer.invoke('request-application-menu').then((menu: Menu) => this.updateMenu(menu))
 
+    const menuPosition = this.currentOptions.menuPosition
+
+    if (menuPosition) {
+      this.updateMenuPosition(menuPosition)
+    }
+
+    append(this.titlebar, this.menuBarContainer)
   }
 
   private setupTitle() {
+    const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
+
+    if (onlyRendererMenuBar) return
+
     this.updateTitle(document.title)
     this.updateTitleAlignment(this.currentOptions.titleHorizontalAlignment!)
     append(this.titlebar, this.title)
@@ -194,7 +209,9 @@ export class CustomTitlebar extends ThemeBar {
   }
 
   private setupWindowControls() {
-    if (isMacintosh) return
+    const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
+
+    if (isMacintosh || onlyRendererMenuBar) return
 
     const order = this.currentOptions.order
 
@@ -241,6 +258,10 @@ export class CustomTitlebar extends ThemeBar {
   }
 
   private loadEvents() {
+    const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
+
+    if (onlyRendererMenuBar) return
+
     const minimizable = this.currentOptions.minimizable
     const maximizable = this.currentOptions.maximizable
     const closeable = this.currentOptions.closeable
@@ -272,6 +293,12 @@ export class CustomTitlebar extends ThemeBar {
       addDisposableListener(this.windowControls.close, EventType.CLICK, () => {
         ipcRenderer.send('window-event', 'window-close')
       })
+    }
+  }
+
+  private closeMenu = () => {
+    if (this.menuBar) {
+      this.menuBar.blur()
     }
   }
 
@@ -317,19 +344,18 @@ export class CustomTitlebar extends ThemeBar {
     }
   }
 
-  public updateMenu(menu: Menu) {
+  private updateMenu(menu: Menu) {
     if (!isMacintosh) {
       //if (this.menuBar) this.menuBar.dispose()
       if (!menu) return
 
+      this.menuBar = new MenuBar(this.menuBarContainer, this.currentOptions, menu, this.closeMenu)
+      // this.menuBar.setupMenubar()
 
-      /*this.menuBar = new Menubar(this._menubarContainer, this._options, this._closeMenu)
-      this.menuBar.setupMenubar()
+      this.menuBar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e))
+      this.menuBar.onFocusStateChange(e => this.onMenubarFocusChanged(e))
 
-      this.menuBar.onVisibilityChange(e => this._onMenubarVisibilityChanged(e))
-      this.menuBar.onFocusStateChange(e => this._onMenubarFocusChanged(e))
-
-      this._updateStyles()*/
+      //this._updateStyles()
     }
   }
 
@@ -401,6 +427,10 @@ export class CustomTitlebar extends ThemeBar {
     const order = this.currentOptions.order
     const menuPosition = this.currentOptions.menuPosition
 
+    removeClass(this.title, 'cet-title-left')
+    removeClass(this.title, 'cet-title-right')
+    removeClass(this.title, 'cet-title-center')
+
     if (side === 'left' || (side === 'right' && order === 'inverted')) {
       addClass(this.title, 'cet-title-left')
     }
@@ -411,13 +441,14 @@ export class CustomTitlebar extends ThemeBar {
 
     if (!side || side === 'center') {
       if (menuPosition !== 'bottom') {
-        addDisposableListener(window, 'resize', () => {
+        /* addDisposableListener(window, 'resize', () => {
           if (window.innerWidth >= 1188) {
             addClass(this.title, 'cet-title-center')
           } else {
             removeClass(this.title, 'cet-title-center')
           }
-        })
+        }) */
+        addClass(this.title, 'cet-title-center')
       }
 
       if (!isMacintosh && order === 'first-buttons') {
