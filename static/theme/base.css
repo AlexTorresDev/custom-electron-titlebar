@@ -93,7 +93,7 @@ body {
 }
 
 /* Window controls */
-.cet-window-controls-container {
+.cet-window-controls {
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
@@ -108,15 +108,6 @@ body {
 
 .cet-control-icon {
   width: 46px;
-}
-
-.cet-control-icon:active,
-.cet-control-icon:focus,
-.cet-control-icon:focus-visible,
-.cet-control-icon:focus-within,
-.cet-control-icon:target,
-.cet-control-icon:visited {
-  background-color: rgba(148, 21, 21);
 }
 
 .cet-control-icon:not(.inactive):hover {
@@ -166,3 +157,55 @@ body {
   bottom: 0;
   overflow: auto;
 }
+
+/* MenuBar */
+.cet-menubar {
+  display: flex;
+  flex-shrink: 1;
+  box-sizing: border-box;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  flex-wrap: wrap;
+  margin-right: 20px;
+}
+
+.cet-menubar.bottom {
+  order: 1;
+  width: 100%;
+  padding: 0 5px 5px;
+}
+
+.cet-menubar.bottom .cet-menubar-menu-button {
+  border-radius: 4px;
+}
+
+.cet-menubar.bottom .cet-menubar-menu-button .cet-menubar-menu-title {
+  line-height: 26px;
+}
+
+.cet-menubar .cet-menubar-menu-button {
+  box-sizing: border-box;
+  padding: 0px 8px;
+  height: 100%;
+  cursor: default;
+  zoom: 1;
+  white-space: nowrap;
+  -webkit-app-region: no-drag;
+  outline: 0;
+}
+
+.cet-menubar .cet-menubar-menu-button .cet-menubar-menu-title {
+  font-size: 12px;
+}
+
+.cet-menubar .cet-menubar-menu-button.disabled {
+  opacity: 0.4;
+}
+
+.cet-menubar .cet-menubar-menu-button:not(.disabled):focus,
+.cet-menubar .cet-menubar-menu-button:not(.disabled):hover,
+.cet-menubar .cet-menubar-menu-button:not(.disabled).open {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Line 50 migrate design */
