@@ -231,8 +231,6 @@ export class CustomTitlebar extends ThemeBar {
       append(this.container, document.body.firstChild)
     }
 
-    this.container.style.top = TOP_TITLEBAR_HEIGHT_WIN
-
     append(document.body, this.container)
   }
 
