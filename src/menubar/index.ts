@@ -12,7 +12,11 @@ export class MenuBar {
     this._onVisibilityChange = new Emitter<boolean>();
     this._onFocusStateChange = new Emitter<boolean>();
 
-    const topLevelMenus = menu.items
+    this.setupMenu()
+  }
+
+  private setupMenu() {
+    const topLevelMenus = this.menu.items
 
     topLevelMenus.forEach((menuItem) => {
       const button = $('.cet-menubar-menu-button', { 'tabindex': 0, 'aria-haspopup': true })
