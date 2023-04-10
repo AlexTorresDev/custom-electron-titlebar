@@ -5,8 +5,9 @@
 
 import { ipcRenderer, Menu } from "electron"
 import { Color } from "base/common/color"
-import { $, addClass, addDisposableListener, append, EventType, hide, prepend, removeClass, runAtThisOrScheduleAtNextAnimationFrame, show } from "base/common/dom"
+import { $, addClass, addDisposableListener, append, EventType, hide, prepend, removeClass, show } from "base/common/dom"
 import { isLinux, isMacintosh, isWindows, platform, PlatformToString } from "base/common/platform"
+import { RunOnceScheduler } from "base/common/async"
 import { MenuBar } from "menubar"
 import { TitleBarOptions } from "./options"
 import { ThemeBar } from "./themebar"
@@ -176,7 +177,7 @@ export class CustomTitlebar extends ThemeBar {
   }
 
   private setupMenubar() {
-    ipcRenderer.invoke('request-application-menu').then((menu: Menu) => this.updateMenu(menu))
+    ipcRenderer.invoke('request-application-menu').then((menu?: Menu) => this.updateMenu(menu))
 
     const menuPosition = this.currentOptions.menuPosition
 
@@ -265,7 +266,7 @@ export class CustomTitlebar extends ThemeBar {
     const closeable = this.currentOptions.closeable
 
     ipcRenderer.on('window-maximize', (_, isMaximized) => this.onDidChangeMaximized(isMaximized))
-    ipcRenderer.on('window-minimize', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen))
+    ipcRenderer.on('window-fullscreen', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen))
     ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused))
 
 
@@ -342,19 +343,12 @@ export class CustomTitlebar extends ThemeBar {
     }
   }
 
-  private updateMenu(menu: Menu) {
-    if (!isMacintosh) {
-      //if (this.menuBar) this.menuBar.dispose()
-      if (!menu) return
+  private updateMenu(menu?: Menu) {
+    if (isMacintosh || !menu) return
 
-      this.menuBar = new MenuBar(this.menuBarContainer, this.currentOptions, menu, this.closeMenu)
-      // this.menuBar.setupMenubar()
-
-      this.menuBar.onVisibilityChange(e => this.onMenubarVisibilityChanged(e))
-      this.menuBar.onFocusStateChange(e => this.onMenubarFocusChanged(e))
-
-      //this._updateStyles()
-    }
+    this.menuBar = new MenuBar(this.menuBarContainer, this.currentOptions, menu, this.closeMenu)
+    this.menuBar?.onVisibilityChange(e => this.onMenubarVisibilityChanged(e))
+    this.menuBar?.onFocusStateChange(e => this.onMenubarFocusChanged(e))
   }
 
   /// Public methods
