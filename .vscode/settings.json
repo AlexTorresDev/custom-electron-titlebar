@@ -4,6 +4,7 @@
     "cmax",
     "cmin",
     "consts",
+    "haspopup",
     "maximizable",
     "minimizable",
     "paren",

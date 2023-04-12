@@ -13,3 +13,43 @@ export const TOP_TITLEBAR_HEIGHT_WIN = '30px'
 
 export const WINDOW_MIN_WIDTH = 400
 export const WINDOW_MIN_HEIGHT = 270
+
+export const MENU_MNEMONIC_REGEX = /\(&([^\s&])\)|(^|[^&])&([^\s&])/
+export const MENU_ESCAPED_MNEMONIC_REGEX = /(&amp;)?(&amp;)([^\s&])/g
+
+/**
+ * Handles mnemonics for menu items. Depending on OS:
+ * - Windows: Supported via & character (replace && with &)
+ * - Linux: Supported via & character (replace && with &)
+ * - macOS: Unsupported (replace && with empty string)
+ */
+export function mnemonicMenuLabel(label: string, forceDisableMnemonics?: boolean): string {
+	if (isMacintosh || forceDisableMnemonics) {
+		return label.replace(/\(&&\w\)|&&/g, '').replace(/&/g, isMacintosh ? '&' : '&&');
+	}
+
+	return label.replace(/&&|&/g, m => m === '&' ? '&&' : '&');
+}
+
+export function parseAccelerator(accelerator: Electron.Accelerator | string): string {
+	let acc = accelerator.toString();
+
+	if (!isMacintosh) {
+		acc = acc.replace(/(Cmd)|(Command)/gi, '');
+	} else {
+		acc = acc.replace(/(Ctrl)|(Control)/gi, '');
+	}
+
+	acc = acc.replace(/(Or)/gi, '');
+
+	return acc;
+}
+
+export function applyFill(element: Element | undefined | null, svgColor: Color | undefined, fgColor: Color | undefined) {
+	let fillColor = ''
+
+	if (svgColor) fillColor = svgColor.toString()
+	else if (fgColor) fillColor = fgColor.toString()
+
+	if (element && element !== null) element.setAttribute('fill', fillColor)
+}
