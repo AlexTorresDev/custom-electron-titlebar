@@ -6,6 +6,8 @@ import { Menu, MenuItem } from "electron";
 import { MenuBarOptions } from "./menubar-options";
 import { StandardKeyboardEvent } from "base/browser/keyboardEvent";
 import { KeyCode } from "base/common/keyCodes";
+import { mnemonicMenuLabel } from "consts";
+import { CETMenu, IMenuOptions } from "./menu";
 
 enum MenuBarState {
   HIDDEN,
@@ -59,9 +61,10 @@ export class MenuBar extends Disposable {
 
     topLevelMenus.forEach((menuItem) => {
       const menuIndex = this.menuItems.length;
+      const menuLabel = mnemonicMenuLabel(menuItem.label)
 
-      const button = $('.cet-menubar-menu-button', { 'tabindex': 0, 'aria-haspopup': true })
-      const title = $('.cet-menubar-menu-title', { 'aria-hidden': true }, menuItem.label)
+      const button = $('.cet-menubar-menu-button', { 'tabindex': 0, 'aria-label': menuLabel, 'aria-haspopup': true })
+      const title = $('.cet-menubar-menu-title', { 'aria-hidden': true }, menuLabel)
 
       if (!menuItem.enabled) {
         addClass(button, 'disabled')
@@ -344,41 +347,40 @@ export class MenuBar extends Disposable {
   }
 
   private showMenu(menuIndex: number, selectFirst = true): void {
-    const selectedMenu = this.menuItems[menuIndex];
-    const btnElement = selectedMenu.buttonElement;
-    const btnRect = btnElement.getBoundingClientRect();
-    const menuHolder = $('ul.cet-menubar-menu-container');
+    const selectedMenu = this.menuItems[menuIndex]
+    const btnElement = selectedMenu.buttonElement
+    const btnRect = btnElement.getBoundingClientRect()
+    const menuHolder = $('ul.cet-menubar-menu-container')
 
-    addClass(btnElement, 'open');
-    menuHolder.tabIndex = 0;
-    menuHolder.style.top = `${btnRect.bottom - 5}px`;
-    menuHolder.style.left = `${btnRect.left}px`;
+    addClass(btnElement, 'open')
+    menuHolder.tabIndex = 0
+    menuHolder.style.top = `${btnRect.bottom - 5}px`
+    menuHolder.style.left = `${btnRect.left}px`
 
-    btnElement.appendChild(menuHolder);
+    btnElement.appendChild(menuHolder)
 
-    menuHolder.style.maxHeight = `${Math.max(10, window.innerHeight - btnRect.top - 50)}px`;
+    menuHolder.style.maxHeight = `${Math.max(10, window.innerHeight - btnRect.top - 50)}px`
 
-    console.log("Enter for menu create for " + menuIndex)
-
-    /* let menuOptions: IMenuOptions = {
-      enableMnemonics: this.mnemonicsInUse && this.options?.enableMnemonics,
+    let menuOptions: IMenuOptions = {
+      enableMnemonics: this.mnemonicsInUse && this.currentOptions?.enableMnemonics,
       ariaLabel: btnElement.attributes.getNamedItem('aria-label')?.value
-    };
+    }
 
-    let menuWidget = new CETMenu(menuHolder, this.options, menuOptions, this.closeSubMenu);
-    menuWidget.createMenu(customMenu.submenu?.items);
-    menuWidget.style(this.menuStyle);
+    // let menuWidget = new CETMenu(menuHolder, this.options, menuOptions, this.closeSubMenu)
+    let menuWidget = new CETMenu(menuHolder, menuOptions)
+    menuWidget.createMenu(selectedMenu.submenu?.items)
+    /* menuWidget.style(this.menuStyle);
 
     menuWidget.onDidCancel(() => {
       this.focusState = MenuBarState.FOCUSED;
     });
 
-    menuWidget.focus(selectFirst);
+    menuWidget.focus(selectFirst); */
 
     this.focusedMenu = {
       index: menuIndex,
       holder: menuHolder,
       widget: menuWidget
-    }; */
+    };
   }
 }
