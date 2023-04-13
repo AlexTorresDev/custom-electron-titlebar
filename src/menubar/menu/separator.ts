@@ -18,7 +18,7 @@ export class CETSeparator extends CETMenuItem {
     }
   }
 
-  style(style: IMenuStyle) {
+  updateStyle(style: IMenuStyle) {
     if (this.separatorElement && style.separatorColor)
       this.separatorElement.style.borderBottomColor = style.separatorColor.toString()
   }
