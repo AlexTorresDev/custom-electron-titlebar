@@ -4,13 +4,22 @@
     "cmax",
     "cmin",
     "consts",
+    "forcereload",
     "haspopup",
+    "keyshortcuts",
     "maximizable",
     "minimizable",
     "paren",
     "posx",
+    "resetzoom",
     "resizer",
+    "selectall",
+    "sublabel",
     "themebar",
-    "unmaximize"
+    "toggledevtools",
+    "togglefullscreen",
+    "unmaximize",
+    "zoomin",
+    "zoomout"
   ]
 }
