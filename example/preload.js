@@ -20,9 +20,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// eslint-disable-next-line no-new
 	new CustomTitlebar({
-		backgroundColor: TitlebarColor.fromHex('#059669'),
+		// backgroundColor: TitlebarColor.fromHex('#059669'),
 		// icon: path.resolve('example/assets', 'logo.svg'),
-		icons: path.resolve('example/assets', 'icons.json'),
-		menuPosition: 'bottom',
+		// icons: path.resolve('example/assets', 'icons.json'),
+		// menuPosition: 'bottom',
 	})
 })
