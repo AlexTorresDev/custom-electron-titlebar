@@ -1,6 +1,6 @@
 import { Disposable } from "base/common/lifecycle";
 import { MenuItem, ipcRenderer } from "electron";
-import { IMenuOptions } from "./menu";
+import { IMenuOptions } from ".";
 import { KeyCode, KeyCodeUtils } from "base/common/keyCodes";
 import { MENU_MNEMONIC_REGEX, applyFill, parseAccelerator } from "consts";
 import { $, EventHelper, EventLike, EventType, addClass, addDisposableListener, append, hasClass, removeClass, removeNode } from "base/common/dom";
@@ -8,10 +8,11 @@ import { mnemonicMenuLabel } from "consts";
 import { MENU_ESCAPED_MNEMONIC_REGEX } from "consts";
 import { PlatformToString, platform } from "base/common/platform";
 import { Color } from "base/common/color";
-import { MenuBarOptions } from "./menubar-options";
+import { MenuBarOptions } from "../menubar-options";
 
 export interface IMenuItem {
 	render(element: HTMLElement): void
+	updateStyle(style: IMenuStyle): void
 	isEnabled(): boolean
 	isSeparator(): boolean
 	onClick(event: EventLike): void
@@ -20,7 +21,7 @@ export interface IMenuItem {
 	dispose(): void
 }
 
-interface IMenuStyle {
+export interface IMenuStyle {
 	foregroundColor?: Color
 	backgroundColor?: Color
 	selectionForegroundColor?: Color
@@ -32,11 +33,11 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	private _mnemonic?: KeyCode
 	private _currentElement?: HTMLElement
 
-	protected itemElement?: HTMLElement
 	private labelElement?: HTMLElement
 	private iconElement?: HTMLElement
-
-	private menuStyle?: IMenuStyle
+	
+	protected itemElement?: HTMLElement
+	protected menuStyle?: IMenuStyle
 
 	private radioGroup?: { start: number, end: number }; // used only if item.type === "radio"
 
@@ -52,10 +53,12 @@ export class CETMenuItem extends Disposable implements IMenuItem {
     }
   }`
 
-	private platformIcons: { [key: string]: string }
+	protected platformIcons: { [key: string]: string }
 
-	constructor(private _item: MenuItem, private menuItems: IMenuItem[], private parentOptions: MenuBarOptions, private options: IMenuOptions) {
+	constructor(private _item: MenuItem, private options: IMenuOptions,  private menuItems?: IMenuItem[], protected parentOptions?: MenuBarOptions) {
 		super()
+
+		console.log('Generate menu item', this._item)
 
 		const jWindowsIcons = JSON.parse(this.windowIcons)[PlatformToString(platform).toLocaleLowerCase()]
 		this.platformIcons = jWindowsIcons
@@ -74,10 +77,6 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	render(el: HTMLElement): void {
 		this._currentElement = el
-
-		console.log('constructor', this.menuItems)
-		console.log('constructor options', this.options)
-		console.log('render', this.element)
 
 		this._register(addDisposableListener(this.element!, EventType.MOUSE_DOWN, e => {
 			if (this.item.enabled && e.button === 0 && this.element) {
@@ -137,7 +136,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 		}
 	}
 
-	private applyStyle(): void {
+	protected applyStyle(): void {
 		if (!this.menuStyle) {
 			return
 		}
