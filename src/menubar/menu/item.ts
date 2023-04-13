@@ -1,24 +1,22 @@
-import { Disposable } from "base/common/lifecycle";
-import { MenuItem, ipcRenderer } from "electron";
-import { IMenuOptions } from ".";
-import { KeyCode, KeyCodeUtils } from "base/common/keyCodes";
-import { MENU_MNEMONIC_REGEX, applyFill, parseAccelerator } from "consts";
-import { $, EventHelper, EventLike, EventType, addClass, addDisposableListener, append, hasClass, removeClass, removeNode } from "base/common/dom";
-import { mnemonicMenuLabel } from "consts";
-import { MENU_ESCAPED_MNEMONIC_REGEX } from "consts";
-import { PlatformToString, platform } from "base/common/platform";
-import { Color } from "base/common/color";
-import { MenuBarOptions } from "../menubar-options";
+import { MenuItem, ipcRenderer } from "electron"
+import { Color } from "base/common/color"
+import { $, EventHelper, EventLike, EventType, addClass, addDisposableListener, append, hasClass, removeClass, removeNode } from "base/common/dom"
+import { KeyCode, KeyCodeUtils } from "base/common/keyCodes"
+import { Disposable } from "base/common/lifecycle"
+import { PlatformToString, platform } from "base/common/platform"
+import { mnemonicMenuLabel, MENU_ESCAPED_MNEMONIC_REGEX, MENU_MNEMONIC_REGEX, applyFill, parseAccelerator } from "consts"
+import { MenuBarOptions } from "../menubar-options"
+import { IMenuOptions } from "."
 
 export interface IMenuItem {
 	render(element: HTMLElement): void
 	updateStyle(style: IMenuStyle): void
+	onClick(event: EventLike): void
+	dispose(): void
 	isEnabled(): boolean
 	isSeparator(): boolean
-	onClick(event: EventLike): void
 	focus(): void
 	blur(): void
-	dispose(): void
 }
 
 export interface IMenuStyle {
@@ -35,11 +33,11 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	private labelElement?: HTMLElement
 	private iconElement?: HTMLElement
-	
+
 	protected itemElement?: HTMLElement
 	protected menuStyle?: IMenuStyle
 
-	private radioGroup?: { start: number, end: number }; // used only if item.type === "radio"
+	private radioGroup?: { start: number, end: number } // used only if item.type === "radio"
 
 	// Temp
 	private windowIcons = `{
@@ -55,10 +53,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	protected platformIcons: { [key: string]: string }
 
-	constructor(private _item: MenuItem, private options: IMenuOptions,  private menuItems?: IMenuItem[], protected parentOptions?: MenuBarOptions) {
+	constructor(private _item: MenuItem, private options: IMenuOptions, private menuItems?: IMenuItem[], protected parentOptions?: MenuBarOptions) {
 		super()
-
-		console.log('Generate menu item', this._item)
 
 		const jWindowsIcons = JSON.parse(this.windowIcons)[PlatformToString(platform).toLocaleLowerCase()]
 		this.platformIcons = jWindowsIcons
@@ -94,15 +90,15 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			EventHelper.stop(e, true)
 		}))
 
-			;
-		[EventType.MOUSE_UP, EventType.MOUSE_OUT].forEach(event => {
-			this._register(addDisposableListener(this.element!, event, e => {
-				EventHelper.stop(e)
-				removeClass(this.element!, 'active')
-			}))
-		})
 
-		this.itemElement = append(this.element!, $('a.cet-action-menu-item'));
+			;[EventType.MOUSE_UP, EventType.MOUSE_OUT].forEach(event => {
+				this._register(addDisposableListener(this.element!, event, e => {
+					EventHelper.stop(e)
+					removeClass(this.element!, 'active')
+				}))
+			})
+
+		this.itemElement = append(this.element!, $('a.cet-action-menu-item'))
 
 		if (this.mnemonic) {
 			this.itemElement.setAttribute('aria-keyshortcuts', `${this.mnemonic}`)
@@ -123,16 +119,16 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	}
 
 	onClick(event: EventLike) {
-		EventHelper.stop(event, true);
-		ipcRenderer.send('menu-event', this.item.commandId);
+		EventHelper.stop(event, true)
+		ipcRenderer.send('menu-event', this.item.commandId)
 
 		if (this.item.type === 'checkbox') {
-			this.item.checked = !this.item.checked;
-			this.updateChecked();
+			this.item.checked = !this.item.checked
+			this.updateChecked()
 		} else if (this.item.type === 'radio') {
-			this.updateRadioGroup();
+			this.updateRadioGroup()
 		} else {
-			// this.closeSubMenu();
+			// this.closeSubMenu()
 		}
 	}
 
@@ -149,7 +145,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.itemElement.style.color = fgColor ? fgColor.toString() : ''
 			this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : ''
 
-			 if (this.iconElement) applyFill(this.iconElement.firstElementChild, this.parentOptions?.svgColor, fgColor)
+			if (this.iconElement) applyFill(this.iconElement.firstElementChild, this.parentOptions?.svgColor, fgColor)
 		}
 	}
 
@@ -160,215 +156,215 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	focus(): void {
 		if (this.element) {
-			this.element.focus();
-			addClass(this.element, 'focused');
+			this.element.focus()
+			addClass(this.element, 'focused')
 		}
 
-		this.applyStyle();
+		this.applyStyle()
 	}
 
 	blur(): void {
 		if (this.element) {
-			this.element.blur();
-			removeClass(this.element, 'focused');
+			this.element.blur()
+			removeClass(this.element, 'focused')
 		}
 
-		this.applyStyle();
+		this.applyStyle()
 	}
 
 	setAccelerator(): void {
-		var accelerator = null;
+		let accelerator = null
 
 		if (this.item.role) {
 			switch (this.item.role.toLocaleLowerCase()) {
 				case 'undo':
-					accelerator = 'CtrlOrCmd+Z';
-					break;
+					accelerator = 'CtrlOrCmd+Z'
+					break
 				case 'redo':
-					accelerator = 'CtrlOrCmd+Y';
-					break;
+					accelerator = 'CtrlOrCmd+Y'
+					break
 				case 'cut':
-					accelerator = 'CtrlOrCmd+X';
-					break;
+					accelerator = 'CtrlOrCmd+X'
+					break
 				case 'copy':
-					accelerator = 'CtrlOrCmd+C';
-					break;
+					accelerator = 'CtrlOrCmd+C'
+					break
 				case 'paste':
-					accelerator = 'CtrlOrCmd+V';
-					break;
+					accelerator = 'CtrlOrCmd+V'
+					break
 				case 'selectall':
-					accelerator = 'CtrlOrCmd+A';
-					break;
+					accelerator = 'CtrlOrCmd+A'
+					break
 				case 'minimize':
-					accelerator = 'CtrlOrCmd+M';
-					break;
+					accelerator = 'CtrlOrCmd+M'
+					break
 				case 'close':
-					accelerator = 'CtrlOrCmd+W';
-					break;
+					accelerator = 'CtrlOrCmd+W'
+					break
 				case 'reload':
-					accelerator = 'CtrlOrCmd+R';
-					break;
+					accelerator = 'CtrlOrCmd+R'
+					break
 				case 'forcereload':
-					accelerator = 'CtrlOrCmd+Shift+R';
-					break;
+					accelerator = 'CtrlOrCmd+Shift+R'
+					break
 				case 'toggledevtools':
-					accelerator = 'CtrlOrCmd+Shift+I';
-					break;
+					accelerator = 'CtrlOrCmd+Shift+I'
+					break
 				case 'togglefullscreen':
-					accelerator = 'F11';
-					break;
+					accelerator = 'F11'
+					break
 				case 'resetzoom':
-					accelerator = 'CtrlOrCmd+0';
-					break;
+					accelerator = 'CtrlOrCmd+0'
+					break
 				case 'zoomin':
-					accelerator = 'CtrlOrCmd+Shift+=';
-					break;
+					accelerator = 'CtrlOrCmd++'
+					break
 				case 'zoomout':
-					accelerator = 'CtrlOrCmd+-';
-					break;
+					accelerator = 'CtrlOrCmd+-'
+					break
 			}
 		}
 
 		if (this.item.label && this.item.accelerator) {
-			accelerator = this.item.accelerator;
+			accelerator = this.item.accelerator
 		}
 
 		if (this.itemElement && accelerator !== null) {
-			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(accelerator);
+			append(this.itemElement, $('span.keybinding')).textContent = parseAccelerator(accelerator)
 		}
 	}
 
 	updateLabel(): void {
 		if (this.item.label) {
-			let label = this.item.label;
+			let label = this.item.label
 
 			if (label) {
-				const cleanLabel = mnemonicMenuLabel(label);
+				const cleanLabel = mnemonicMenuLabel(label)
 
 				if (!this.options.enableMnemonics) {
-					label = cleanLabel;
+					label = cleanLabel
 				}
 
 				if (this.labelElement) {
-					this.labelElement.setAttribute('aria-label', cleanLabel.replace(/&&/g, '&'));
+					this.labelElement.setAttribute('aria-label', cleanLabel.replace(/&&/g, '&'))
 				}
 
-				const matches = MENU_MNEMONIC_REGEX.exec(label);
+				const matches = MENU_MNEMONIC_REGEX.exec(label)
 
 				if (matches) {
-					label = escape(label);
+					label = encodeURI(label)
 
 					// This is global, reset it
-					MENU_ESCAPED_MNEMONIC_REGEX.lastIndex = 0;
-					let escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(label);
+					MENU_ESCAPED_MNEMONIC_REGEX.lastIndex = 0
+					let escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(label)
 
 					// We can't use negative lookbehind so if we match our negative and skip
 					while (escMatch && escMatch[1]) {
-						escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(label);
+						escMatch = MENU_ESCAPED_MNEMONIC_REGEX.exec(label)
 					}
 
 					if (escMatch) {
-						label = `${label.substr(0, escMatch.index)}<u aria-hidden="true">${escMatch[3]}</u>${label.substr(escMatch.index + escMatch[0].length)}`;
+						label = `${label.substring(0, escMatch.index)}<u aria-hidden="true">${escMatch[3]}</u>${label.substring(escMatch.index + escMatch[0].length)}`
 					}
 
-					label = label.replace(/&amp;&amp;/g, '&amp;');
+					label = label.replace(/&amp&amp/g, '&amp')
 					if (this.itemElement) {
-						this.itemElement.setAttribute('aria-keyshortcuts', (!!matches[1] ? matches[1] : matches[3]).toLocaleLowerCase());
+						this.itemElement.setAttribute('aria-keyshortcuts', (!!matches[1] ? matches[1] : matches[3]).toLocaleLowerCase())
 					}
 				} else {
-					label = label.replace(/&&/g, '&');
+					label = label.replace(/&&/g, '&')
 				}
 			}
 
 			if (this.labelElement) {
-				this.labelElement.innerHTML = label.trim();
+				this.labelElement.innerHTML = label.trim()
 			}
 		}
 	}
 
 	updateIcon(): void {
 		if (this.item.icon) {
-			const icon = this.item.icon;
+			const icon = this.item.icon
 
 			if (this.iconElement && icon) {
-				const iconE = append(this.iconElement, $('img'));
-				iconE.setAttribute('src', icon.toString());
+				const iconE = append(this.iconElement, $('img'))
+				iconE.setAttribute('src', icon.toString())
 			}
 		} else if (this.iconElement && this.item.type === 'checkbox') {
-			addClass(this.iconElement, 'checkbox');
-			this.iconElement.innerHTML = this.platformIcons.check;
+			addClass(this.iconElement, 'checkbox')
+			this.iconElement.innerHTML = this.platformIcons.check
 		} else if (this.item.type === 'radio') {
-			addClass(this.iconElement!, 'radio');
-			this.iconElement!.innerHTML = this.item.checked ? this.platformIcons.checked : '';
+			addClass(this.iconElement!, 'radio')
+			this.iconElement!.innerHTML = this.item.checked ? this.platformIcons.checked : ''
 		}
 
-		// applyFill(this.iconElement?.firstElementChild, this.menubarOptions?.svgColor, this.menuStyle?.foregroundColor);
+		applyFill(this.iconElement?.firstElementChild, this.parentOptions?.svgColor, this.menuStyle?.foregroundColor)
 	}
 
 	updateTooltip(): void {
-		let title: string | null = null;
+		let title: string | null = null
 
 		if (this.item.sublabel) {
-			title = this.item.sublabel;
+			title = this.item.sublabel
 		} else if (!this.item.label && this.item.label && this.item.icon) {
-			title = this.item.label;
+			title = this.item.label
 
 			if (this.item.accelerator) {
-				title = parseAccelerator(this.item.accelerator);
+				title = parseAccelerator(this.item.accelerator)
 			}
 		}
 
 		if (this.itemElement && title) {
-			this.itemElement.title = title;
+			this.itemElement.title = title
 		}
 	}
 
 	updateEnabled(): void {
 		if (this.element) {
 			if (this.item.enabled && this.item.type !== 'separator') {
-				removeClass(this.element, 'disabled');
-				this.element.tabIndex = 0;
+				removeClass(this.element, 'disabled')
+				this.element.tabIndex = 0
 			} else {
-				addClass(this.element, 'disabled');
+				addClass(this.element, 'disabled')
 			}
 		}
 	}
 
 	updateVisibility(): void {
 		if (this.item.visible === false && this.itemElement) {
-			this.itemElement.remove();
+			this.itemElement.remove()
 		}
 	}
 
 	updateChecked(): void {
 		if (this.itemElement) {
 			if (this.item.checked) {
-				addClass(this.itemElement, 'checked');
-				this.itemElement.setAttribute('aria-checked', 'true');
+				addClass(this.itemElement, 'checked')
+				this.itemElement.setAttribute('aria-checked', 'true')
 			} else {
-				removeClass(this.itemElement, 'checked');
-				this.itemElement.setAttribute('aria-checked', 'false');
+				removeClass(this.itemElement, 'checked')
+				this.itemElement.setAttribute('aria-checked', 'false')
 			}
 		}
 	}
 
 	updateRadioGroup(): void {
 		if (this.radioGroup === undefined) {
-			this.radioGroup = this.getRadioGroup();
+			this.radioGroup = this.getRadioGroup()
 		}
 
 		/* if (this.menuContainer) {
-			for (let i = this.radioGroup.start; i < this.radioGroup.end; i++) {
-				const menuItem = this.menuContainer[i];
+			for (let i = this.radioGroup.start i < this.radioGroup.end i++) {
+				const menuItem = this.menuContainer[i]
 				if (menuItem instanceof CETMenuItem && menuItem.item.type === 'radio') {
 					// update item.checked for each radio button in group
-					menuItem.item.checked = menuItem === this;
-					menuItem.updateIcon();
+					menuItem.item.checked = menuItem === this
+					menuItem.updateIcon()
 					// updateChecked() *all* radio buttons in group
-					menuItem.updateChecked();
+					menuItem.updateChecked()
 					// set the radioGroup property of all the other radio buttons since it was already calculated
 					if (menuItem !== this) {
-						menuItem.radioGroup = this.radioGroup;
+						menuItem.radioGroup = this.radioGroup
 					}
 				}
 			}
@@ -377,19 +373,19 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	/** radioGroup index's starts with (previous separator +1 OR menuContainer[0]) and ends with (next separator OR menuContainer[length]) */
 	getRadioGroup(): { start: number, end: number } {
-		let startIndex = 0;
-		let endIndex =/*  this.menuContainer ? this.menuContainer.length : */ 0;
-		let found = false;
+		let startIndex = 0
+		let endIndex =/*  this.menuContainer ? this.menuContainer.length : */ 0
+		let found = false
 
 		/* if (this.menuContainer) {
 			for (const index in this.menuContainer) {
 				const menuItem = this.menuContainer[index]
 				if (menuItem === this) {
-					found = true;
+					found = true
 				} else if (menuItem instanceof CETMenuItem && menuItem.isSeparator()) {
 					if (found) {
 						endIndex = Number.parseInt(index)
-						break;
+						break
 					} else {
 						startIndex = Number.parseInt(index) + 1
 					}
