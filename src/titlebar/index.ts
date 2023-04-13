@@ -7,26 +7,26 @@ import { ipcRenderer, Menu } from "electron"
 import { Color, RGBA } from "base/common/color"
 import { $, addClass, addDisposableListener, append, EventType, hide, prepend, removeClass, show } from "base/common/dom"
 import { isLinux, isMacintosh, isWindows, platform, PlatformToString } from "base/common/platform"
-import { RunOnceScheduler } from "base/common/async"
 import { MenuBar } from "menubar"
 import { TitleBarOptions } from "./options"
 import { ThemeBar } from "./themebar"
 import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from "consts"
 
 export class CustomTitlebar extends ThemeBar {
+
   private titlebar: HTMLElement
   private dragRegion: HTMLElement
   private icon: HTMLElement
   private menuBarContainer: HTMLElement
   private title: HTMLElement
-  private windowControlsContainer: HTMLElement
+  private controlsContainer: HTMLElement
   private container: HTMLElement
 
   private menuBar?: MenuBar
 
   private isInactive: boolean = false
 
-  private windowControls: {
+  private controls: {
     minimize: HTMLElement
     maximize: HTMLElement
     close: HTMLElement
@@ -38,10 +38,9 @@ export class CustomTitlebar extends ThemeBar {
   }
 
   private currentOptions: TitleBarOptions = {
-    backgroundColor: Color.WHITE,
     closeable: true,
     enableMnemonics: true,
-    hideWhenClickingClose: true,
+    hideWhenClickingClose: false,
     iconSize: 16,
     itemBackgroundColor: undefined,
     maximizable: true,
@@ -67,23 +66,27 @@ export class CustomTitlebar extends ThemeBar {
 
   private platformIcons: { [key: string]: string }
 
+  /**
+   * Create a new TitleBar instance
+   * @param options The options for the title bar
+   */
   constructor(options: TitleBarOptions) {
     super()
 
     this.currentOptions = { ...this.currentOptions, ...options }
 
-    const jWindowsIcons = JSON.parse(this.windowIcons)[PlatformToString(platform).toLocaleLowerCase()]
-    this.platformIcons = jWindowsIcons
+    const jWindowIcons = JSON.parse(this.windowIcons)[PlatformToString(platform).toLocaleLowerCase()]
+    this.platformIcons = jWindowIcons
 
     this.titlebar = $('.cet-titlebar')
     this.dragRegion = $('.cet-drag-region')
     this.icon = $('.cet-icon')
     this.menuBarContainer = $('.cet-menubar')
     this.title = $('.cet-title')
-    this.windowControlsContainer = $('.cet-window-controls')
+    this.controlsContainer = $('.cet-window-controls')
     this.container = $('.cet-container')
 
-    this.windowControls = {
+    this.controls = {
       minimize: $('.cet-control-minimize'),
       maximize: $('.cet-control-maximize'),
       close: $('.cet-control-close')
@@ -122,6 +125,10 @@ export class CustomTitlebar extends ThemeBar {
     this.platformIcons = jWindowsIcons[PlatformToString(platform).toLocaleLowerCase()]
   }
 
+  /**
+   * Setup the background color of the title bar
+   * By default, it will use the meta theme-color or msapplication-TileColor and if it doesn't exist, it will use white
+   */
   private setupBackgroundColor() {
     let color = this.currentOptions.backgroundColor
 
@@ -131,16 +138,22 @@ export class CustomTitlebar extends ThemeBar {
         color = Color.fromHex(meta.getAttribute('content')!)
       })
 
+      if (!color) color = Color.WHITE
+
       this.currentOptions.backgroundColor = color
     }
 
     this.titlebar.style.backgroundColor = color!.toString()
   }
 
+  /**
+   * Render the icon of the title bar, if is mac, it will not render
+   * By default, it will use the first icon found in the head of the document
+   */
   private createIcon() {
-    const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
+    //const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
 
-    if (isMacintosh || onlyRendererMenuBar) return
+    if (isMacintosh) return
 
     let icon = this.currentOptions.icon
 
@@ -206,7 +219,7 @@ export class CustomTitlebar extends ThemeBar {
       addClass(element, 'inactive')
     }
 
-    append(this.windowControlsContainer, element)
+    append(this.controlsContainer, element)
   }
 
   private setupWindowControls() {
@@ -217,14 +230,14 @@ export class CustomTitlebar extends ThemeBar {
     const order = this.currentOptions.order
 
     if (order === 'inverted') {
-      this.windowControlsContainer.style.flexDirection = 'row-reverse'
+      this.controlsContainer.style.flexDirection = 'row-reverse'
     }
 
-    this.createControlButton(this.windowControls.minimize, this.platformIcons.minimize, this.currentOptions.minimizable)
-    this.createControlButton(this.windowControls.maximize, this.platformIcons.maximize, this.currentOptions.maximizable)
-    this.createControlButton(this.windowControls.close, this.platformIcons.close, this.currentOptions.closeable)
+    this.createControlButton(this.controls.minimize, this.platformIcons.minimize, this.currentOptions.minimizable)
+    this.createControlButton(this.controls.maximize, this.platformIcons.maximize, this.currentOptions.maximizable)
+    this.createControlButton(this.controls.close, this.platformIcons.close, this.currentOptions.closeable)
 
-    append(this.titlebar, this.windowControlsContainer)
+    append(this.titlebar, this.controlsContainer)
   }
 
   private setupContainer() {
@@ -271,7 +284,7 @@ export class CustomTitlebar extends ThemeBar {
 
 
     if (minimizable) {
-      addDisposableListener(this.windowControls.minimize, EventType.CLICK, () => {
+      addDisposableListener(this.controls.minimize, EventType.CLICK, () => {
         ipcRenderer.send('window-event', 'window-minimize')
       })
     }
@@ -283,25 +296,26 @@ export class CustomTitlebar extends ThemeBar {
     }
 
     if (maximizable) {
-      addDisposableListener(this.windowControls.maximize, EventType.CLICK, () => {
+      addDisposableListener(this.controls.maximize, EventType.CLICK, () => {
         ipcRenderer.send('window-event', 'window-maximize')
       })
     }
 
     if (closeable) {
-      addDisposableListener(this.windowControls.close, EventType.CLICK, () => {
+      addDisposableListener(this.controls.close, EventType.CLICK, () => {
         ipcRenderer.send('window-event', 'window-close')
       })
     }
   }
 
+
+  // TODO: Refactor, verify if is possible use into menubar
   private closeMenu = () => {
     if (this.menuBar) {
       this.menuBar.blur()
     }
   }
 
-  /** X */
   private onBlur() {
     this.isInactive = true
     this.updateStyles()
@@ -312,7 +326,7 @@ export class CustomTitlebar extends ThemeBar {
     this.updateStyles()
   }
 
-  private onMenubarVisibilityChanged(visible: boolean) {
+  private onMenuBarVisibilityChanged(visible: boolean) {
     if (isWindows || isLinux) {
       if (visible) {
         // Hack to fix issue #52522 with layered webkit-app-region elements appearing under cursor
@@ -322,7 +336,7 @@ export class CustomTitlebar extends ThemeBar {
     }
   }
 
-  private onMenubarFocusChanged(focused: boolean) {
+  private onMenuBarFocusChanged(focused: boolean) {
     if (isWindows || isLinux) {
       if (focused) hide(this.dragRegion)
       else show(this.dragRegion)
@@ -330,7 +344,7 @@ export class CustomTitlebar extends ThemeBar {
   }
 
   private onDidChangeMaximized(isMaximized: Boolean) {
-    const maximize = this.windowControls.maximize
+    const maximize = this.controls.maximize
 
     if (maximize) {
       maximize.title = isMaximized ? "Restore Down" : "Maximize"
@@ -347,8 +361,8 @@ export class CustomTitlebar extends ThemeBar {
     if (isMacintosh || !menu) return
 
     this.menuBar = new MenuBar(this.menuBarContainer, this.currentOptions, menu, this.closeMenu)
-    this.menuBar?.onVisibilityChange(e => this.onMenubarVisibilityChanged(e))
-    this.menuBar?.onFocusStateChange(e => this.onMenubarFocusChanged(e))
+    this.menuBar.onVisibilityChange(e => this.onMenuBarVisibilityChanged(e))
+    this.menuBar.onFocusStateChange(e => this.onMenuBarFocusChanged(e))
 
     this.updateStyles()
   }
@@ -360,34 +374,34 @@ export class CustomTitlebar extends ThemeBar {
       removeClass(this.titlebar, 'inactive')
     }
 
-    const titleBackground = this.isInactive
+    const backgroundColor = this.isInactive
       ? this.currentOptions.backgroundColor?.lighten(.15)
       : this.currentOptions.backgroundColor
 
-    if (titleBackground) {
-      this.titlebar.style.backgroundColor = titleBackground.toString()
+    if (backgroundColor) {
+      this.titlebar.style.backgroundColor = backgroundColor.toString()
     }
 
-    let titleForeground: Color
+    let foregroundColor: Color
 
-    if (titleBackground?.isLighter()) {
+    if (backgroundColor?.isLighter()) {
       addClass(this.titlebar, 'light')
 
-      titleForeground = this.isInactive
+      foregroundColor = this.isInactive
         ? INACTIVE_FOREGROUND_DARK
         : ACTIVE_FOREGROUND_DARK
     } else {
       removeClass(this.titlebar, 'light')
 
-      titleForeground = this.isInactive
+      foregroundColor = this.isInactive
         ? INACTIVE_FOREGROUND
         : ACTIVE_FOREGROUND
     }
 
-    this.titlebar.style.color = titleForeground.toString()
+    this.titlebar.style.color = foregroundColor.toString()
 
     if (this.menuBar) {
-      const backgroundColor = this.currentOptions.backgroundColor?.darken(.16)
+      const backgroundColor = this.currentOptions.backgroundColor?.darken(.10)
 
       const foregroundColor = backgroundColor?.isLighter()
         ? INACTIVE_FOREGROUND_DARK
@@ -398,7 +412,6 @@ export class CustomTitlebar extends ThemeBar {
         : this.currentOptions.itemBackgroundColor
 
       const fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
-
 
       this.menuBar.setStyles({
         backgroundColor: backgroundColor,
@@ -490,7 +503,7 @@ export class CustomTitlebar extends ThemeBar {
       addClass(this.title, 'cet-title-right')
     }
 
-    if (!side || side === 'center') {
+    if (side === 'center') {
       if (menuPosition !== 'bottom') {
         /* addDisposableListener(window, 'resize', () => {
           if (window.innerWidth >= 1188) {
@@ -503,7 +516,7 @@ export class CustomTitlebar extends ThemeBar {
       }
 
       if (!isMacintosh && order === 'first-buttons') {
-        this.windowControlsContainer.style.marginLeft = 'auto'
+        this.controlsContainer.style.marginLeft = 'auto'
       }
 
       this.title.style.maxWidth = 'calc(100% - 296px)'
@@ -554,13 +567,15 @@ export class CustomTitlebar extends ThemeBar {
     const height = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
 
     this.currentOptions.menuPosition = menuPosition
-    this.titlebar.style.height = menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : height
-    this.container.style.top = menuPosition === 'bottom' ? BOTTOM_TITLEBAR_HEIGHT : height
 
     if (menuPosition === 'bottom') {
+      this.titlebar.style.height = BOTTOM_TITLEBAR_HEIGHT
+      this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
       addClass(this.menuBarContainer, 'bottom')
     }
     else {
+      this.titlebar.style.height = height
+      this.container.style.top = height
       removeClass(this.menuBarContainer, 'bottom')
     }
 

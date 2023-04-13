@@ -74,6 +74,7 @@ export class CETMenu extends Disposable {
 
         if (this.currentOptions.enableMnemonics) {
           const mnemonic = item.mnemonic
+          
           if (mnemonic && item.isEnabled()) {
             let actionItems: CETMenuItem[] = []
             if (this.mnemonics.has(mnemonic)) {
