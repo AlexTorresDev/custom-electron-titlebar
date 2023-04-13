@@ -8,6 +8,7 @@ import { StandardKeyboardEvent } from "base/browser/keyboardEvent";
 import { KeyCode } from "base/common/keyCodes";
 import { mnemonicMenuLabel } from "consts";
 import { CETMenu, IMenuOptions } from "./menu";
+import { IMenuStyle } from "./menu/item";
 
 enum MenuBarState {
   HIDDEN,
@@ -39,6 +40,9 @@ export class MenuBar extends Disposable {
 
   private _onVisibilityChange: Emitter<boolean>
   private _onFocusStateChange: Emitter<boolean>
+
+  private menuStyle: IMenuStyle = {}
+  private closeSubMenu: () => void = () => { } // TODO: Apply to blur and close menu on click outside
 
   constructor(private container: HTMLElement, private currentOptions: MenuBarOptions, private menu: Menu, private closeMenu: () => void) {
     super()
@@ -136,6 +140,10 @@ export class MenuBar extends Disposable {
         })
       }
     })
+  }
+
+  setStyles(style: IMenuStyle) {
+    this.menuStyle = style
   }
 
   public get onVisibilityChange(): Event<boolean> {
@@ -367,15 +375,15 @@ export class MenuBar extends Disposable {
     }
 
     // let menuWidget = new CETMenu(menuHolder, this.options, menuOptions, this.closeSubMenu)
-    let menuWidget = new CETMenu(menuHolder, menuOptions)
+    let menuWidget = new CETMenu(menuHolder, this.currentOptions, menuOptions)
     menuWidget.createMenu(selectedMenu.submenu?.items)
-    /* menuWidget.style(this.menuStyle);
+    menuWidget.applyStyle(this.menuStyle);
 
     menuWidget.onDidCancel(() => {
       this.focusState = MenuBarState.FOCUSED;
     });
 
-    menuWidget.focus(selectFirst); */
+    menuWidget.focus(selectFirst);
 
     this.focusedMenu = {
       index: menuIndex,

@@ -4,14 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ipcRenderer, Menu } from "electron"
-import { Color } from "base/common/color"
+import { Color, RGBA } from "base/common/color"
 import { $, addClass, addDisposableListener, append, EventType, hide, prepend, removeClass, show } from "base/common/dom"
 import { isLinux, isMacintosh, isWindows, platform, PlatformToString } from "base/common/platform"
 import { RunOnceScheduler } from "base/common/async"
 import { MenuBar } from "menubar"
 import { TitleBarOptions } from "./options"
 import { ThemeBar } from "./themebar"
-import { BOTTOM_TITLEBAR_HEIGHT, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from "consts"
+import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from "consts"
 
 export class CustomTitlebar extends ThemeBar {
   private titlebar: HTMLElement
@@ -304,12 +304,12 @@ export class CustomTitlebar extends ThemeBar {
   /** X */
   private onBlur() {
     this.isInactive = true
-    // this.updateStyles()
+    this.updateStyles()
   }
 
   private onFocus() {
     this.isInactive = false
-    // this.updateStyles()
+    this.updateStyles()
   }
 
   private onMenubarVisibilityChanged(visible: boolean) {
@@ -349,6 +349,65 @@ export class CustomTitlebar extends ThemeBar {
     this.menuBar = new MenuBar(this.menuBarContainer, this.currentOptions, menu, this.closeMenu)
     this.menuBar?.onVisibilityChange(e => this.onMenubarVisibilityChanged(e))
     this.menuBar?.onFocusStateChange(e => this.onMenubarFocusChanged(e))
+
+    this.updateStyles()
+  }
+
+  private updateStyles() {
+    if (this.isInactive) {
+      addClass(this.titlebar, 'inactive')
+    } else {
+      removeClass(this.titlebar, 'inactive')
+    }
+
+    const titleBackground = this.isInactive
+      ? this.currentOptions.backgroundColor?.lighten(.15)
+      : this.currentOptions.backgroundColor
+
+    if (titleBackground) {
+      this.titlebar.style.backgroundColor = titleBackground.toString()
+    }
+
+    let titleForeground: Color
+
+    if (titleBackground?.isLighter()) {
+      addClass(this.titlebar, 'light')
+
+      titleForeground = this.isInactive
+        ? INACTIVE_FOREGROUND_DARK
+        : ACTIVE_FOREGROUND_DARK
+    } else {
+      removeClass(this.titlebar, 'light')
+
+      titleForeground = this.isInactive
+        ? INACTIVE_FOREGROUND
+        : ACTIVE_FOREGROUND
+    }
+
+    this.titlebar.style.color = titleForeground.toString()
+
+    if (this.menuBar) {
+      const backgroundColor = this.currentOptions.backgroundColor?.darken(.16)
+
+      const foregroundColor = backgroundColor?.isLighter()
+        ? INACTIVE_FOREGROUND_DARK
+        : INACTIVE_FOREGROUND
+
+      const bgColor = !this.currentOptions.itemBackgroundColor || this.currentOptions.itemBackgroundColor.equals(backgroundColor!)
+        ? new Color(new RGBA(0, 0, 0, .12))
+        : this.currentOptions.itemBackgroundColor
+
+      const fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
+
+
+      this.menuBar.setStyles({
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        selectionBackgroundColor: bgColor,
+        selectionForegroundColor: fgColor,
+        separatorColor: foregroundColor
+      })
+    }
   }
 
   /// Public methods
