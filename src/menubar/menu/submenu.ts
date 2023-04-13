@@ -97,14 +97,6 @@ export class CETSubMenu extends CETMenuItem {
     }
   }
 
-  onClick(e: EventLike): void {
-    // stop clicking from trying to run an action
-    EventHelper.stop(e, true);
-
-    this.cleanupExistingSubmenu(false);
-    this.createSubmenu(false);
-  }
-
   private cleanupExistingSubmenu(force: boolean): void {
     if (this.parentData.submenu && (force || (this.parentData.submenu !== this.mySubmenu))) {
       this.parentData.submenu.dispose();
@@ -191,7 +183,7 @@ export class CETSubMenu extends CETMenuItem {
     }
   }
 
-  applyStyle(): void {
+  protected applyStyle(): void {
     super.applyStyle();
 
     if (!this.menuStyle) return;
@@ -201,6 +193,14 @@ export class CETSubMenu extends CETMenuItem {
     applyFill(this.submenuIndicator?.firstElementChild, this.parentOptions?.svgColor, fgColor);
 
     if (this.parentData.submenu) this.parentData.submenu.applyStyle(this.menuStyle);
+  }
+
+  onClick(e: EventLike): void {
+    // stop clicking from trying to run an action
+    EventHelper.stop(e, true);
+
+    this.cleanupExistingSubmenu(false);
+    this.createSubmenu(false);
   }
 
   dispose(): void {
