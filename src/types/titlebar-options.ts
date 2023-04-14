@@ -6,6 +6,7 @@
 import { NativeImage } from "electron";
 import { Color } from "../vs/base/common/color";
 import { MenubarOptions } from "./menubar-options";
+import { TooltipOptions } from "./tooltip-options"
 
 export interface TitlebarOptions extends MenubarOptions {
     /**
@@ -66,4 +67,8 @@ export interface TitlebarOptions extends MenubarOptions {
      * **The default value is auto**
      */
     containerOverflow?: "auto" | "hidden" | "visible";
+    /**
+     * Set tooltips for the default buttons in the title bar.
+     */
+    tooltips?: TooltipOptions
 }
