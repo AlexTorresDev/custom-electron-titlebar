@@ -5,6 +5,7 @@ export const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222')
 export const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333')
 export const INACTIVE_FOREGROUND = Color.fromHex('#EEEEEE')
 export const ACTIVE_FOREGROUND = Color.fromHex('#FFFFFF')
+export const DEFAULT_ITEM_SELECTOR = Color.fromHex('#0000001F')
 
 export const IS_MAC_BIGSUR_OR_LATER = isMacintosh && parseInt(process.getSystemVersion().split(".")[0]) >= 11
 export const BOTTOM_TITLEBAR_HEIGHT = '60px'
