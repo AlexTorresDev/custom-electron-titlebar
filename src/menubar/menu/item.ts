@@ -6,7 +6,7 @@ import { Disposable } from "base/common/lifecycle"
 import { PlatformToString, platform } from "base/common/platform"
 import { mnemonicMenuLabel, MENU_ESCAPED_MNEMONIC_REGEX, MENU_MNEMONIC_REGEX, applyFill, parseAccelerator } from "consts"
 import { MenuBarOptions } from "../menubar-options"
-import { IMenuOptions } from "."
+import { IMenuOptions } from "./index"
 
 export interface IMenuItem {
 	render(element: HTMLElement): void
@@ -56,8 +56,8 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 	constructor(private _item: MenuItem, private options: IMenuOptions, private menuItems?: IMenuItem[], protected parentOptions?: MenuBarOptions) {
 		super()
 
-		const jWindowsIcons = JSON.parse(this.windowIcons)[PlatformToString(platform).toLocaleLowerCase()]
-		this.platformIcons = jWindowsIcons
+		const jWindowIcons = JSON.parse(this.windowIcons)
+		this.platformIcons = jWindowIcons
 
 		// Set mnemonic
 		if (this._item.label && options.enableMnemonics) {
@@ -295,7 +295,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.iconElement.innerHTML = this.platformIcons.check
 		} else if (this.item.type === 'radio') {
 			addClass(this.iconElement!, 'radio')
-			this.iconElement!.innerHTML = this.item.checked ? this.platformIcons.checked : ''
+			this.iconElement!.innerHTML = this.item.checked ? this.platformIcons.check : ''
 		}
 
 		applyFill(this.iconElement?.firstElementChild, this.parentOptions?.svgColor, this.menuStyle?.foregroundColor)

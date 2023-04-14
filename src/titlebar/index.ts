@@ -10,7 +10,7 @@ import { isLinux, isMacintosh, isWindows, platform, PlatformToString } from "bas
 import { MenuBar } from "menubar"
 import { TitleBarOptions } from "./options"
 import { ThemeBar } from "./themebar"
-import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from "consts"
+import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, DEFAULT_ITEM_SELECTOR, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from "consts"
 
 export class CustomTitlebar extends ThemeBar {
 
@@ -401,17 +401,23 @@ export class CustomTitlebar extends ThemeBar {
     this.titlebar.style.color = foregroundColor.toString()
 
     if (this.menuBar) {
-      const backgroundColor = this.currentOptions.backgroundColor?.darken(.10)
+      let fgColor
+      const backgroundColor = this.currentOptions.backgroundColor?.darken(.12)
 
       const foregroundColor = backgroundColor?.isLighter()
         ? INACTIVE_FOREGROUND_DARK
         : INACTIVE_FOREGROUND
 
       const bgColor = !this.currentOptions.itemBackgroundColor || this.currentOptions.itemBackgroundColor.equals(backgroundColor!)
-        ? new Color(new RGBA(0, 0, 0, .12))
+        ? DEFAULT_ITEM_SELECTOR
         : this.currentOptions.itemBackgroundColor
 
-      const fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
+
+      if (bgColor.equals(DEFAULT_ITEM_SELECTOR)) {
+        fgColor = backgroundColor?.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
+      } else {
+        fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
+      }
 
       this.menuBar.setStyles({
         backgroundColor: backgroundColor,

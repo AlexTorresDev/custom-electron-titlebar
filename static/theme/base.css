@@ -114,6 +114,10 @@ body {
   background-color: rgb(255 255 255 / 12%);
 }
 
+.light .cet-control-icon:not(.inactive):hover {
+  background-color: rgb(0 0 0 / 12%);
+}
+
 .cet-control-icon.inactive svg {
   opacity: 0.4;
 }
@@ -122,12 +126,20 @@ body {
   background-color: rgba(232 17 35 / 90%) !important;
 }
 
+.cet-control-close:not(.inactive):hover svg {
+  fill: #fff !important;
+}
+
 .cet-control-icon svg {
   width: 10px;
   height: -webkit-fill-available;
-  fill: #eee;
+  fill: #fff;
   display: initial !important;
   vertical-align: unset !important;
+}
+
+.light .cet-control-icon svg {
+  fill: #000 !important;
 }
 
 /* Resizer */
@@ -220,6 +232,7 @@ body {
   margin: 0 auto;
   padding: 2px 0;
   margin-left: 0;
+  font-size: inherit;
   overflow-x: visible;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
@@ -254,6 +267,7 @@ body {
 
 .cet-menubar-menu-container .cet-action-item {
   padding: 0;
+  margin: 0;
   transform: none;
   display: -ms-flexbox;
   display: flex;

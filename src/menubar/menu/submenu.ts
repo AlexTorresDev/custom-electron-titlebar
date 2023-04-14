@@ -3,11 +3,10 @@ import { CETMenuItem } from "./item";
 import { IDisposable, dispose } from "base/common/lifecycle";
 import { $, EventHelper, EventLike, EventType, addClass, addClasses, addDisposableListener, append, hasClass, isAncestor } from "base/common/dom";
 import { StandardKeyboardEvent } from "base/browser/keyboardEvent";
-import { CETMenu } from ".";
+import { CETMenu, IMenuOptions } from "./index";
 import { RunOnceScheduler } from "base/common/async";
 import { MenuItem } from "electron";
 import { MenuBarOptions } from "menubar/menubar-options";
-import { IMenuOptions } from ".";
 import { KeyCode } from "base/common/keyCodes";
 
 export interface ISubMenuData {

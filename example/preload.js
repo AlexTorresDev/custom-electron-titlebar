@@ -23,6 +23,6 @@ window.addEventListener('DOMContentLoaded', () => {
 		// backgroundColor: TitlebarColor.fromHex('#059669'),
 		// icon: path.resolve('example/assets', 'logo.svg'),
 		// icons: path.resolve('example/assets', 'icons.json'),
-		// menuPosition: 'bottom',
+		menuPosition: 'bottom',
 	})
 })

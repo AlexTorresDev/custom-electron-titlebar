@@ -1,6 +1,6 @@
 import { MenuItem } from "electron";
 import { CETMenuItem, IMenuStyle } from "./item";
-import { IMenuOptions } from ".";
+import { IMenuOptions } from "./index";
 import { $, append } from "base/common/dom";
 
 export class CETSeparator extends CETMenuItem {
