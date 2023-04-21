@@ -8,7 +8,7 @@ specifiers:
   babel-plugin-import-require-as-string: 1.0.2
   babel-plugin-module-resolver: 5.0.0
   babel-plugin-rewire: 1.2.0
-  electron: 23.1.0
+  electron: 24.1.2
   eslint: 8.34.0
   eslint-config-prettier: 8.6.0
   eslint-config-standard: 17.0.0
@@ -26,7 +26,7 @@ devDependencies:
   babel-plugin-import-require-as-string: 1.0.2
   babel-plugin-module-resolver: 5.0.0
   babel-plugin-rewire: 1.2.0
-  electron: 23.1.0
+  electron: 24.1.2
   eslint: 8.34.0
   eslint-config-prettier: 8.6.0_eslint@8.34.0
   eslint-config-standard: 17.0.0_rwq7hzy2vtlwiajbw6pmw3rkzy
@@ -396,7 +396,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.1
       '@types/keyv': 3.1.4
-      '@types/node': 16.18.12
+      '@types/node': 18.15.13
       '@types/responselike': 1.0.0
     dev: true
 
@@ -415,17 +415,17 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 16.18.12
+      '@types/node': 18.15.13
     dev: true
 
-  /@types/node/16.18.12:
-    resolution: {integrity: sha512-vzLe5NaNMjIE3mcddFVGlAXN1LEWueUsMsOJWaT6wWMJGyljHAWHznqfnKUQWGzu7TLPrGvWdNAsvQYW+C0xtw==}
+  /@types/node/18.15.13:
+    resolution: {integrity: sha512-N+0kuo9KgrUQ1Sn/ifDXsvg0TTleP7rIy4zOBGECxAljqvqfqpTfzx0Q1NUedOixRMBfe2Whhb056a42cWs26Q==}
     dev: true
 
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 16.18.12
+      '@types/node': 18.15.13
     dev: true
 
   /@types/semver/7.3.13:
@@ -436,7 +436,7 @@ packages:
     resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
     requiresBuild: true
     dependencies:
-      '@types/node': 16.18.12
+      '@types/node': 18.15.13
     dev: true
     optional: true
 
@@ -935,14 +935,14 @@ packages:
     resolution: {integrity: sha512-lQ7ijJghH6pCGbfWXr6EY+KYCMaRSjgsY925r1p/TlpSfVM1VjHTcn1gAc15VM4uwti283X6QtjPTXdpoSGiZQ==}
     dev: true
 
-  /electron/23.1.0:
-    resolution: {integrity: sha512-LRgACMpVrmjfYWPgCSyJ+TFQ/FPeniOowpO57z0xUcTchfC7EH+5rUncgYN+uMvqePiYDce+ywZeCIFaO8x/Nw==}
+  /electron/24.1.2:
+    resolution: {integrity: sha512-V0isWbyLYiXrSCcB4lrSVhS/U56NFGfuqHyc+yEPkyhhvY+h4F85cYGdEiZlXp6XjHT+/CLHmw0ltK54g9lvDw==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
     dependencies:
       '@electron/get': 2.0.2
-      '@types/node': 16.18.12
+      '@types/node': 18.15.13
       extract-zip: 2.0.1
     transitivePeerDependencies:
       - supports-color

@@ -16,7 +16,7 @@
 	},
 	"rules": {
 		"indent": ["warn", "tab"],
-		"no-unused-vars": "warn",
+		"no-unused-vars": "off",
 		"no-multiple-empty-lines": "off",
 		"no-tabs": "off",
 		"quotes": ["warn", "single"],
@@ -25,6 +25,8 @@
 		"@typescript-eslint/no-explicit-any": "off",
 		"no-undef": "off",
 		"no-redeclare": "off",
-		"no-useless-constructor": "off"
+		"no-useless-constructor": "off",
+		"no-dupe-class-members": "off",
+		"no-extra-boolean-cast": "off"
 	}
 }
