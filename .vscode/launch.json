@@ -1,0 +1,51 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Electron Main",
+      "request": "launch",
+      "type": "node",
+      "presentation": {
+        "hidden": true,
+      },
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "preLaunchTask": "npm: build",
+      "args": [
+        "--remote-debugging-port=9223",
+        "./example/main.js"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/example/**/*.js"
+      ]
+    },
+    {
+      "name": "Electron Renderer",
+      "type": "chrome",
+      "request": "attach",
+      "presentation": {
+        "hidden": true,
+      },
+      "port": 9223,
+      "urlFilter": "*index.html",
+      "timeout": 30000,
+      "skipFiles": [
+        "${workspaceFolder}/node_modules/**/*.js",
+        "${workspaceFolder}/dist/**/*.js",
+        "<node_internals>/**/*.js"
+      ],
+      "trace": true,
+      "smartStep": true,
+      "showAsyncStacks": true,
+      "webRoot": "${workspaceFolder}",
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug CET",
+      "configurations": [
+        "Electron Main",
+        "Electron Renderer"
+      ]
+    }
+  ]
+}
