@@ -5,8 +5,8 @@
  *
  * https://www.electronjs.org/docs/latest/tutorial/sandbox
  */
-const { CustomTitlebar, TitlebarColor } = require('custom-electron-titlebar')
-const path = require('path')
+const { CustomTitlebar } = require('custom-electron-titlebar')
+// const path = require('path')
 
 window.addEventListener('DOMContentLoaded', () => {
 	const replaceText = (selector, text) => {
@@ -20,10 +20,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// eslint-disable-next-line no-new
 	new CustomTitlebar({
-		//backgroundColor: TitlebarColor.fromHex('#059669'),
-		//icon: path.resolve('example/assets', 'logo.svg'),
-		//icons: path.resolve('example/assets', 'icons.json'),
-		menuPosition: 'bottom',
-		//enableMnemonics: false,
+		// backgroundColor: TitlebarColor.fromHex('#059669'),
+		// icon: path.resolve('example/assets', 'logo.svg'),
+		// icons: path.resolve('example/assets', 'icons.json'),
+		menuPosition: 'bottom'
+		// enableMnemonics: false,
 	})
 })
