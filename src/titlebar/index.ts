@@ -40,16 +40,22 @@ export class CustomTitlebar extends ThemeBar {
   private currentOptions: TitleBarOptions = {
     closeable: true,
     enableMnemonics: true,
-    hideWhenClickingClose: false,
+    //hideWhenClickingClose: false,
     iconSize: 16,
     itemBackgroundColor: undefined,
     maximizable: true,
     menuPosition: "left",
-    menuTransparency: 100,
+    menuTransparency: 0,
     minimizable: true,
     onlyShowMenuBar: false,
-    shadow: true,
+    shadow: false,
     titleHorizontalAlignment: "center",
+    tooltips: {
+      close: "Close",
+      maximize: "Maximize",
+      minimize: "Minimize",
+      restoreDown: "Restore Down",
+    }
   }
 
   // Temp
@@ -211,9 +217,10 @@ export class CustomTitlebar extends ThemeBar {
     append(this.titlebar, this.title)
   }
 
-  private createControlButton(element: HTMLElement, icon: string, active: boolean = true) {
+  private createControlButton(element: HTMLElement, icon: string, title: string, active: boolean = true) {
     addClass(element, 'cet-control-icon')
     element.innerHTML = icon
+    element.title = title
 
     if (!active) {
       addClass(element, 'inactive')
@@ -224,18 +231,13 @@ export class CustomTitlebar extends ThemeBar {
 
   private setupWindowControls() {
     const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
+    const tooltips = this.currentOptions.tooltips!
 
     if (isMacintosh || onlyRendererMenuBar) return
 
-    const order = this.currentOptions.order
-
-    if (order === 'inverted') {
-      this.controlsContainer.style.flexDirection = 'row-reverse'
-    }
-
-    this.createControlButton(this.controls.minimize, this.platformIcons.minimize, this.currentOptions.minimizable)
-    this.createControlButton(this.controls.maximize, this.platformIcons.maximize, this.currentOptions.maximizable)
-    this.createControlButton(this.controls.close, this.platformIcons.close, this.currentOptions.closeable)
+    this.createControlButton(this.controls.minimize, this.platformIcons.minimize, tooltips.minimize!, this.currentOptions.minimizable)
+    this.createControlButton(this.controls.maximize, this.platformIcons.maximize, tooltips.maximize!, this.currentOptions.maximizable)
+    this.createControlButton(this.controls.close, this.platformIcons.close, tooltips.close!, this.currentOptions.closeable)
 
     append(this.titlebar, this.controlsContainer)
   }
@@ -347,8 +349,8 @@ export class CustomTitlebar extends ThemeBar {
     const maximize = this.controls.maximize
 
     if (maximize) {
-      maximize.title = isMaximized ? "Restore Down" : "Maximize"
-      maximize.innerHTML = isMaximized ? this.platformIcons['restore'] : this.platformIcons['maximize']
+      maximize.title = isMaximized ? this.currentOptions.tooltips?.restoreDown! : this.currentOptions.tooltips?.maximize!
+      maximize.innerHTML = isMaximized ? this.platformIcons.restore : this.platformIcons.maximize
     }
 
     if (this.resizer) {
@@ -360,7 +362,9 @@ export class CustomTitlebar extends ThemeBar {
   private updateMenu(menu?: Menu) {
     if (isMacintosh || !menu) return
 
-    this.menuBar = new MenuBar(this.menuBarContainer, this.currentOptions, menu, this.closeMenu)
+    this.menuBar = new MenuBar(this.menuBarContainer, this.currentOptions, { enableMnemonics: true }, this.closeMenu) // TODO: Verify menubaroptions
+    this.menuBar.push(menu)
+    this.menuBar.update()
     this.menuBar.onVisibilityChange(e => this.onMenuBarVisibilityChanged(e))
     this.menuBar.onFocusStateChange(e => this.onMenuBarFocusChanged(e))
 
@@ -424,7 +428,8 @@ export class CustomTitlebar extends ThemeBar {
         foregroundColor: foregroundColor,
         selectionBackgroundColor: bgColor,
         selectionForegroundColor: fgColor,
-        separatorColor: foregroundColor
+        separatorColor: foregroundColor,
+        svgColor: this.currentOptions.svgColor,
       })
     }
   }
@@ -442,7 +447,7 @@ export class CustomTitlebar extends ThemeBar {
         this.onFocus()
       } else {
         addClass(this.titlebar, 'inactive')
-        // this.closeMenu()
+        this.menuBar?.blur()
         this.onBlur()
       }
     }
@@ -459,8 +464,12 @@ export class CustomTitlebar extends ThemeBar {
         this.container.style.top = '0px'
       } else {
         show(this.titlebar)
-        if (this.currentOptions.menuPosition === 'bottom') this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
-        else this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
+        if (this.currentOptions.menuPosition === 'bottom') {
+          this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
+          this.controlsContainer.style.height = TOP_TITLEBAR_HEIGHT_WIN
+        } else {
+          this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
+        }
       }
     }
   }
@@ -497,19 +506,29 @@ export class CustomTitlebar extends ThemeBar {
     const order = this.currentOptions.order
     const menuPosition = this.currentOptions.menuPosition
 
-    removeClass(this.title, 'cet-title-left')
-    removeClass(this.title, 'cet-title-right')
-    removeClass(this.title, 'cet-title-center')
-
     if (side === 'left' || (side === 'right' && order === 'inverted')) {
+      removeClass(this.title, 'cet-title-left')
+      removeClass(this.title, 'cet-title-right')
+      removeClass(this.title, 'cet-title-center')
       addClass(this.title, 'cet-title-left')
     }
 
     if (side === 'right' || (side === 'left' && order === 'inverted')) {
+      if (side !== 'left' && order !== 'inverted') {
+        this.controlsContainer.style.marginLeft = '10px'
+      }
+
+      removeClass(this.title, 'cet-title-left')
+      removeClass(this.title, 'cet-title-right')
+      removeClass(this.title, 'cet-title-center')
       addClass(this.title, 'cet-title-right')
     }
 
     if (side === 'center') {
+      removeClass(this.title, 'cet-title-left')
+      removeClass(this.title, 'cet-title-right')
+      removeClass(this.title, 'cet-title-center')
+
       if (menuPosition !== 'bottom') {
         /* addDisposableListener(window, 'resize', () => {
           if (window.innerWidth >= 1188) {
@@ -571,18 +590,19 @@ export class CustomTitlebar extends ThemeBar {
    */
   public updateMenuPosition(menuPosition: "left" | "bottom") {
     const height = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
+    const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
 
     this.currentOptions.menuPosition = menuPosition
 
-    if (menuPosition === 'bottom') {
-      this.titlebar.style.height = BOTTOM_TITLEBAR_HEIGHT
-      this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
-      addClass(this.menuBarContainer, 'bottom')
-    }
-    else {
+    if (menuPosition === 'left' || onlyRendererMenuBar) {
       this.titlebar.style.height = height
       this.container.style.top = height
       removeClass(this.menuBarContainer, 'bottom')
+    } else {
+      this.titlebar.style.height = BOTTOM_TITLEBAR_HEIGHT
+      this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
+      this.controlsContainer.style.height = height
+      addClass(this.menuBarContainer, 'bottom')
     }
 
     return this
