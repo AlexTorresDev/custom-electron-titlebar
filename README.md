@@ -17,10 +17,14 @@ Bottom Menu Bar
 
 ![Screenshot 2](screenshots/cet-screen-2.png)
 
+Menu
+
+![Screenshot 3](screenshots/cet-screen-3.png)
+
 # 📦 Installing
 You can install this package with `npm`.
 ```sh
-npm install custom-electron-titlebar
+npm install custom-electron-titlebar@beta
 ```
 
 # 🛠️ Usage
@@ -65,7 +69,12 @@ window.addEventListener('DOMContentLoaded', () => {
 To see the options you can include in the Title Bar constructor, such as color of elements, icons, menu position, and much more, and the methods you can use, go to the [wiki](https://github.com/AlexTorresSk/custom-electron-titlebar/wiki)
 
 ## 💰 Support
-If you want to support my development, you can do so by donating through [Buy me a coffee](https://www.buymeacoffee.com/AlexTorresSk) or [Patreon](https://www.patreon.com/AlexTorresSk)
+If you want to support my development, you can do so by donating through [Buy me a coffee](https://www.buymeacoffee.com/AlexTorresSk)
+
+
+## 📝 Collaborators
+I would like to express my sincere gratitude to all the people who have collaborated in the development and advancement of this project. I appreciate your contributions.
+
 
 ## ✅ License
 This project is under the [MIT](https://github.com/AlexTorresSk/custom-electron-titlebar/blob/master/LICENSE) license.
