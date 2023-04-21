@@ -13,7 +13,6 @@ function createWindow() {
 		height: 600,
 		frame: false,
 		titleBarStyle: 'hidden',
-		// titleBarOverlay: true,
 		webPreferences: {
 			sandbox: false,
 			preload: path.join(__dirname, 'preload.js')
@@ -24,11 +23,11 @@ function createWindow() {
 	Menu.setApplicationMenu(menu)
 
 	// and load the index.html of the app.
-	// mainWindow.loadFile('index.html')
-	mainWindow.loadURL('https://dev.alextrs.dev')
+	//mainWindow.loadFile('index.html')
+	mainWindow.loadURL('https://dev.alextrs.dev/proyectos')
 
 	// Open the DevTools.
-	// mainWindow.webContents.openDevTools()
+	//mainWindow.webContents.openDevTools()
 
 	// Attach listeners
 	attachTitlebarToWindow(mainWindow)
