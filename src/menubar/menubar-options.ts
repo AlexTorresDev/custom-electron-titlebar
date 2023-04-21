@@ -7,6 +7,10 @@ import { Color } from 'base/common/color'
 
 export interface MenuBarOptions {
     /**
+	 * The path of the icons of menubar.
+	 */
+	icons?: string;
+    /**
      * Define if is only rendering the menubar without the titlebar.
      * **The default is false**
      */

@@ -24,10 +24,6 @@ export interface TitleBarOptions extends MenuBarOptions {
 	 */
 	iconSize?: number;
 	/**
-	 * The path of the icons of titlebar.
-	 */
-	icons?: string;
-	/**
 	 * Show shadow of titlebar.
 	 * **The default is false*
 	 */
@@ -51,7 +47,7 @@ export interface TitleBarOptions extends MenuBarOptions {
 	 * When the close button is clicked, the window is hidden instead of closed.
 	 * **The default is false**
 	 */
-	//hideWhenClickingClose?: boolean;
+	// hideWhenClickingClose?: boolean;
 	/**
 	 * Set the order of the elements on the title bar. You can use `inverted`, `first-buttons` or don't add for.
 	 * **The default is undefined**
