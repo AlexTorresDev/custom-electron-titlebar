@@ -29,6 +29,12 @@ body {
   z-index: 99999;
 }
 
+.cet-titlebar *,
+.cet-titlebar *:before,
+.cet-titlebar *:after {
+  box-sizing: border-box;
+}
+
 .cet-titlebar.cet-windows,
 .cet-titlebar.cet-linux {
   padding: 0;
@@ -56,7 +62,7 @@ body {
   margin: 0 5px 0 0;
 }
 
-.cet-titlebar.cet-inverted .cet-window-controls{
+.cet-titlebar.cet-inverted .cet-window-controls {
   margin: 0 5px 0 0;
 }
 
@@ -196,6 +202,7 @@ body {
   right: 0;
   bottom: 0;
   overflow: auto;
+  z-index: 1;
 }
 
 /* MenuBar */
@@ -328,6 +335,7 @@ body {
   align-items: center;
   position: relative;
   border-radius: 4px;
+  text-decoration: none;
 }
 
 .cet-menubar-menu-container .cet-action-label {
