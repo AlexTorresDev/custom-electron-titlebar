@@ -32,8 +32,6 @@ export class CETMenu extends Disposable {
 
   private mnemonics: Map<KeyCode, Array<CETMenuItem>>
 
-  private closeSubMenu: () => void = () => { }
-
   private triggerKeys: ActionTrigger = {
     keys: [KeyCode.Enter, KeyCode.Space],
     keyDown: true
@@ -45,7 +43,7 @@ export class CETMenu extends Disposable {
 
   private _onDidCancel = this._register(new Emitter<void>())
 
-  constructor(private menuContainer: HTMLElement, private parentOptions: MenuBarOptions, private currentOptions: IMenuOptions) {
+  constructor(private menuContainer: HTMLElement, private parentOptions: MenuBarOptions, private currentOptions: IMenuOptions, private closeSubMenu = () => { }) {
     super()
 
     this.mnemonics = new Map<KeyCode, Array<CETMenuItem>>()
@@ -177,6 +175,17 @@ export class CETMenu extends Disposable {
     }
   }
 
+  trigger(index: number): void {
+    if (index <= this.items.length && index >= 0) {
+      const item = this.items[index];
+      if (item instanceof CETSubMenu) {
+        this.focus(index);
+      } else {
+        return;
+      }
+    }
+  }
+
   createMenu(menuItems: MenuItem[] | undefined) {
     if (!menuItems) return
 
@@ -194,10 +203,10 @@ export class CETMenu extends Disposable {
       let item: CETMenuItem
 
       if (menuItem.type === 'separator') {
-        item = new CETSeparator(menuItem, this.currentOptions)
+        item = new CETSeparator(menuItem, this.parentOptions, this.currentOptions)
       } else if (menuItem.type === 'submenu' || menuItem.submenu) {
         const submenuItems = (menuItem.submenu as Menu).items
-        item = new CETSubMenu(menuItem, submenuItems, this.parentData, this.parentOptions, this.currentOptions/* , this.closeSubMenu */)
+        item = new CETSubMenu(menuItem, submenuItems, this.parentData, this.parentOptions, this.currentOptions, this.closeSubMenu)
 
         if (this.currentOptions.enableMnemonics) {
           const mnemonic = item.mnemonic
@@ -214,8 +223,7 @@ export class CETMenu extends Disposable {
           }
         }
       } else {
-        const menuItemOptions: IMenuOptions = { enableMnemonics: this.currentOptions.enableMnemonics }
-        item = new CETMenuItem(menuItem, menuItemOptions, this.items, this.currentOptions)
+        item = new CETMenuItem(menuItem, this.parentOptions, this.currentOptions, this.items, this.closeSubMenu)
 
         if (this.currentOptions.enableMnemonics) {
           const mnemonic = item.mnemonic
@@ -387,15 +395,15 @@ export class CETMenu extends Disposable {
   }
 
   applyStyle(style: IMenuStyle) {
-    const container = this.container
+    const container = this.menuContainer
 
     if (style?.backgroundColor) {
-      let transparency = this.parentOptions?.menuTransparency ?? 100
+      let transparency = this.parentOptions?.menuTransparency!
 
-      if (transparency < 0 || transparency >= 100) transparency = 100
-      const transparencyPercent = transparency / 100
+      if (transparency < 0) transparency = 0
+      if (transparency > 1) transparency = 1
       const rgba = style.backgroundColor?.rgba
-      const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, transparencyPercent))
+      const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, 1 - transparency))
       container.style.backgroundColor = color.toString()
     }
 

@@ -22,11 +22,12 @@ export class CETSubMenu extends CETMenuItem {
   private mouseOver = false;
   private showScheduler: RunOnceScheduler;
   private hideScheduler: RunOnceScheduler;
+  private _closeSubMenu = () => { }
 
-  constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, parentOptions: MenuBarOptions, private submenuOptions: IMenuOptions, closeSubMenu = () => { }) {
-    super(item, submenuOptions);
+  constructor(item: MenuItem, private submenuItems: MenuItem[], private parentData: ISubMenuData, private submenuParentOptions: MenuBarOptions, private submenuOptions: IMenuOptions, closeSubMenu = () => { }) {
+    super(item, submenuParentOptions, submenuOptions);
 
-    console.log('Generate submenu', item);
+    this._closeSubMenu = closeSubMenu;
 
     this.showScheduler = new RunOnceScheduler(() => {
       if (this.mouseOver) {
@@ -56,7 +57,7 @@ export class CETSubMenu extends CETMenuItem {
     this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'));
     this.submenuIndicator.innerHTML = this.platformIcons.arrow;
 
-    applyFill(this.submenuIndicator.firstElementChild, this.parentOptions?.svgColor, this.menuStyle?.foregroundColor);
+    applyFill(this.submenuIndicator.firstElementChild, this.menuStyle?.svgColor, this.menuStyle?.foregroundColor);
     this.submenuIndicator.setAttribute('aria-hidden', 'true');
 
     if (this.element) {
@@ -114,10 +115,10 @@ export class CETSubMenu extends CETMenuItem {
 
     if (this.element) {
       if (!this.parentData.submenu) {
-        this.submenuContainer = append(this.element, $('ul.cet-submenu'));
+        this.submenuContainer = append(this.element, $('.cet-submenu'));
         addClasses(this.submenuContainer, 'cet-menubar-menu-container');
 
-        this.parentData.submenu = new CETMenu(this.submenuContainer, this.parentOptions!, this.submenuOptions/* , this.closeSubMenu */);
+        this.parentData.submenu = new CETMenu(this.submenuContainer, this.submenuParentOptions, this.submenuOptions, this._closeSubMenu);
         this.parentData.submenu.createMenu(this.submenuItems);
 
         if (this.menuStyle) {
@@ -189,7 +190,7 @@ export class CETSubMenu extends CETMenuItem {
 
     const isSelected = this.element && hasClass(this.element, 'focused');
     const fgColor = isSelected && this.menuStyle.selectionForegroundColor ? this.menuStyle.selectionForegroundColor : this.menuStyle.foregroundColor;
-    applyFill(this.submenuIndicator?.firstElementChild, this.parentOptions?.svgColor, fgColor);
+    applyFill(this.submenuIndicator?.firstElementChild, this.submenuParentOptions.svgColor, fgColor);
 
     if (this.parentData.submenu) this.parentData.submenu.applyStyle(this.menuStyle);
   }
