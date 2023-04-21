@@ -2,14 +2,14 @@ import { MenuItem } from "electron";
 import { CETMenuItem, IMenuStyle } from "./item";
 import { IMenuOptions } from "./index";
 import { $, append } from "base/common/dom";
+import { MenuBarOptions } from "menubar/menubar-options";
 
 export class CETSeparator extends CETMenuItem {
 
   private separatorElement?: HTMLElement
 
-  constructor(item: MenuItem, options: IMenuOptions) {
-    super(item, options)
-    console.log('Generate separator', item)
+  constructor(item: MenuItem, submenuParentOptions: MenuBarOptions, separatorOptions: IMenuOptions) {
+    super(item, submenuParentOptions, separatorOptions)
   }
 
   render(container: HTMLElement) {

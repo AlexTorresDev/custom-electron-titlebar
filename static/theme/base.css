@@ -15,6 +15,7 @@ body {
   left: 0;
   right: 0;
   font-size: 13px;
+  font-family: Arial, Helvetica, sans-serif;
   box-sizing: border-box;
   padding: 0 16px;
   overflow: hidden;
@@ -35,6 +36,28 @@ body {
   line-height: 30px;
   justify-content: left;
   overflow: visible;
+}
+
+/* Inverted */
+.cet-titlebar.cet-inverted {
+  flex-direction: row-reverse;
+}
+
+.cet-titlebar.cet-inverted .cet-menubar,
+.cet-titlebar.cet-inverted .cet-window-controls {
+  flex-direction: row-reverse;
+  margin-left: 20px;
+  margin-right: 0;
+}
+
+/* First buttons */
+.cet-titlebar.cet-first-buttons .cet-window-controls {
+  order: -1;
+  margin: 0 5px 0 0;
+}
+
+.cet-titlebar.cet-inverted .cet-window-controls{
+  margin: 0 5px 0 0;
 }
 
 /* Shadow */
@@ -76,20 +99,25 @@ body {
 }
 
 /* Title alignment */
-.cet-title-left {
+.cet-title.cet-title-left {
   margin-left: 8px;
   margin-right: auto;
 }
 
-.cet-title-right {
+.cet-title.cet-title-right {
   margin-left: auto;
   margin-right: 8px;
 }
 
-.cet-title-center {
+.cet-title.cet-title-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.cet-title.cet-bigsur {
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* Window controls */
@@ -123,7 +151,7 @@ body {
 }
 
 .cet-control-close:not(.inactive):hover {
-  background-color: rgba(232 17 35 / 90%) !important;
+  background-color: rgb(232 17 35 / 90%) !important;
 }
 
 .cet-control-close:not(.inactive):hover svg {
@@ -138,7 +166,7 @@ body {
   vertical-align: unset !important;
 }
 
-.light .cet-control-icon svg {
+.cet-titlebar.light .cet-control-icon svg {
   fill: #000 !important;
 }
 
@@ -217,10 +245,15 @@ body {
 .cet-menubar .cet-menubar-menu-button:not(.disabled):focus,
 .cet-menubar .cet-menubar-menu-button:not(.disabled):hover,
 .cet-menubar .cet-menubar-menu-button:not(.disabled).open {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgb(255 255 255 / 12%);
 }
 
-/* Line 50 migrate design */
+.cet-titlebar.light .cet-menubar .cet-menubar-menu-button:not(.disabled):focus,
+.cet-titlebar.light .cet-menubar .cet-menubar-menu-button:not(.disabled):hover,
+.cet-titlebar.light .cet-menubar .cet-menubar-menu-button:not(.disabled).open {
+  background-color: rgb(0 0 0 / 12%);
+}
+
 .cet-menubar-menu-container {
   position: absolute;
   display: block;
@@ -230,7 +263,6 @@ body {
   border: none;
   text-align: left;
   margin: 0 auto;
-  padding: 2px 0;
   margin-left: 0;
   font-size: inherit;
   overflow-x: visible;
@@ -248,12 +280,12 @@ body {
   width: 8px;
   height: 4px;
   cursor: pointer;
-  background-color: rbga(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .cet-menubar-menu-container::-webkit-scrollbar-track {
   border: none;
-  background-color: rbga(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .cet-menubar-menu-container::-webkit-scrollbar-thumb {
@@ -292,10 +324,10 @@ body {
   display: -ms-flexbox;
   display: flex;
   height: 2.231em;
-  margin: 2px 4px;
+  margin: 4px 3px;
   align-items: center;
   position: relative;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 
 .cet-menubar-menu-container .cet-action-label {
@@ -322,7 +354,6 @@ body {
 .cet-menubar-menu-container .cet-action-label.separator {
   opacity: 0.1;
   font-size: inherit;
-  margin: 1px 0;
   width: 100%;
   border-bottom: 1px solid transparent;
 }
@@ -337,16 +368,12 @@ body {
   color: inherit;
 }
 
-.cet-menubar-menu-container .keybinding {
-  padding: 0 2em 0 1em;
-}
-
 .cet-menubar-menu-container .keybinding,
 .cet-menubar-menu-container .cet-submenu-indicator {
   display: inline-block;
   -ms-flex: 2 1 auto;
   flex: 2 1 auto;
-  padding: 0 3.1em 0 1em;
+  padding: 0 2em 0 1em;
   text-align: right;
   font-size: 11px;
   line-height: 1;
@@ -376,7 +403,7 @@ body {
 .cet-menubar-menu-container .cet-menu-item-icon {
   width: 14px;
   height: 14px;
-  margin: 0 0 0 0.4em;
+  margin: 0 0 0 12px;
 }
 
 .cet-menubar-menu-container .cet-menu-item-icon.checkbox {
