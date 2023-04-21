@@ -28,7 +28,7 @@ export interface MenuBarOptions {
     itemBackgroundColor?: Color;
     /**
      * The menu container transparency
-     * **The default is 100**
+     * **The default is 0 (not apply transparency)*
      */
      menuTransparency?: number;
     /**
