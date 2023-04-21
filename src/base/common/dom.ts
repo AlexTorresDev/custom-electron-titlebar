@@ -195,37 +195,39 @@ export const removeClasses: (node: HTMLElement, ...classNames: string[]) => void
 export const toggleClass: (node: HTMLElement, className: string, shouldHaveIt?: boolean) => void = _classList.toggleClass.bind(_classList)
 
 class DomListener implements IDisposable {
-	private _handler: (e: any) => void
-	private _node: Element | Window | Document
-	private readonly _type: string
-	private readonly _useCapture: boolean
 
-	constructor(node: Element | Window | Document, type: string, handler: (e: any) => void, useCapture?: boolean) {
-		this._node = node
-		this._type = type
-		this._handler = handler
-		this._useCapture = (useCapture || false)
-		this._node.addEventListener(this._type, this._handler, this._useCapture)
+	private _handler: (e: any) => void;
+	private _node: EventTarget;
+	private readonly _type: string;
+	private readonly _options: boolean | AddEventListenerOptions;
+
+	constructor(node: EventTarget, type: string, handler: (e: any) => void, options?: boolean | AddEventListenerOptions) {
+		this._node = node;
+		this._type = type;
+		this._handler = handler;
+		this._options = (options || false);
+		this._node.addEventListener(this._type, this._handler, this._options);
 	}
 
 	public dispose(): void {
 		if (!this._handler) {
 			// Already disposed
-			return
+			return;
 		}
 
-		this._node.removeEventListener(this._type, this._handler, this._useCapture)
+		this._node.removeEventListener(this._type, this._handler, this._options);
 
 		// Prevent leakers from holding on to the dom or handler func
-		this._node = null!
-		this._handler = null!
+		this._node = null!;
+		this._handler = null!;
 	}
 }
 
-export function addDisposableListener<K extends keyof GlobalEventHandlersEventMap>(node: Element | Window | Document, type: K, handler: (event: GlobalEventHandlersEventMap[K]) => void, useCapture?: boolean): IDisposable;
-export function addDisposableListener(node: Element | Window | Document, type: string, handler: (event: any) => void, useCapture?: boolean): IDisposable;
-export function addDisposableListener(node: Element | Window | Document, type: string, handler: (event: any) => void, useCapture?: boolean): IDisposable {
-	return new DomListener(node, type, handler, useCapture)
+export function addDisposableListener<K extends keyof GlobalEventHandlersEventMap>(node: EventTarget, type: K, handler: (event: GlobalEventHandlersEventMap[K]) => void, useCapture?: boolean): IDisposable;
+export function addDisposableListener(node: EventTarget, type: string, handler: (event: any) => void, useCapture?: boolean): IDisposable;
+export function addDisposableListener(node: EventTarget, type: string, handler: (event: any) => void, options: AddEventListenerOptions): IDisposable;
+export function addDisposableListener(node: EventTarget, type: string, handler: (event: any) => void, useCaptureOrOptions?: boolean | AddEventListenerOptions): IDisposable {
+	return new DomListener(node, type, handler, useCaptureOrOptions);
 }
 
 export interface IAddStandardDisposableListenerSignature {
@@ -503,6 +505,24 @@ export function getClientArea(element: HTMLElement): Dimension {
 	}
 
 	throw new Error('Unable to figure out browser width and height')
+}
+
+/**
+ * Returns the effective zoom on a given element before window zoom level is applied
+ */
+export function getDomNodeZoomLevel(domNode: HTMLElement): number {
+	let testElement: HTMLElement | null = domNode;
+	let zoom = 1.0;
+	do {
+		const elementZoomLevel = (getComputedStyle(testElement) as any).zoom;
+		if (elementZoomLevel !== null && elementZoomLevel !== undefined && elementZoomLevel !== '1') {
+			zoom *= elementZoomLevel;
+		}
+
+		testElement = testElement.parentElement;
+	} while (testElement !== null && testElement !== document.documentElement);
+
+	return zoom;
 }
 
 const sizeUtils = {
@@ -824,62 +844,66 @@ export function isHTMLElement(o: any): o is HTMLElement {
 	}
 	return o && typeof o === 'object' && o.nodeType === 1 && typeof o.nodeName === 'string'
 }
-
 export const EventType = {
-	// Window
-	MINIMIZE: 'minimize' as const,
-	MAXIMIZE: 'maximize' as const,
-	UNMAXIMIZE: 'unmaximize' as const,
-	ENTER_FULLSCREEN: 'enter-full-screen' as const,
-	LEAVE_FULLSCREEN: 'leave-full-screen' as const,
 	// Mouse
-	CLICK: 'click' as const,
-	DBLCLICK: 'dblclick' as const,
-	MOUSE_UP: 'mouseup' as const,
-	MOUSE_DOWN: 'mousedown' as const,
-	MOUSE_OVER: 'mouseover' as const,
-	MOUSE_MOVE: 'mousemove' as const,
-	MOUSE_OUT: 'mouseout' as const,
-	MOUSE_ENTER: 'mouseenter' as const,
-	MOUSE_LEAVE: 'mouseleave' as const,
-	CONTEXT_MENU: 'contextmenu' as const,
-	WHEEL: 'wheel' as const,
+	CLICK: 'click',
+	AUXCLICK: 'auxclick',
+	DBLCLICK: 'dblclick',
+	MOUSE_UP: 'mouseup',
+	MOUSE_DOWN: 'mousedown',
+	MOUSE_OVER: 'mouseover',
+	MOUSE_MOVE: 'mousemove',
+	MOUSE_OUT: 'mouseout',
+	MOUSE_ENTER: 'mouseenter',
+	MOUSE_LEAVE: 'mouseleave',
+	MOUSE_WHEEL: 'wheel',
+	POINTER_UP: 'pointerup',
+	POINTER_DOWN: 'pointerdown',
+	POINTER_MOVE: 'pointermove',
+	POINTER_LEAVE: 'pointerleave',
+	CONTEXT_MENU: 'contextmenu',
+	WHEEL: 'wheel',
 	// Keyboard
-	KEY_DOWN: 'keydown' as const,
-	KEY_PRESS: 'keypress' as const,
-	KEY_UP: 'keyup' as const,
+	KEY_DOWN: 'keydown',
+	KEY_PRESS: 'keypress',
+	KEY_UP: 'keyup',
 	// HTML Document
-	LOAD: 'load' as const,
-	UNLOAD: 'unload' as const,
-	ABORT: 'abort' as const,
-	ERROR: 'error' as const,
-	RESIZE: 'resize' as const,
-	SCROLL: 'scroll' as const,
+	LOAD: 'load',
+	BEFORE_UNLOAD: 'beforeunload',
+	UNLOAD: 'unload',
+	PAGE_SHOW: 'pageshow',
+	PAGE_HIDE: 'pagehide',
+	ABORT: 'abort',
+	ERROR: 'error',
+	RESIZE: 'resize',
+	SCROLL: 'scroll',
+	FULLSCREEN_CHANGE: 'fullscreenchange',
+	WK_FULLSCREEN_CHANGE: 'webkitfullscreenchange',
 	// Form
-	SELECT: 'select' as const,
-	CHANGE: 'change' as const,
-	SUBMIT: 'submit' as const,
-	RESET: 'reset' as const,
-	FOCUS: 'focus' as const,
-	FOCUS_IN: 'focusin' as const,
-	FOCUS_OUT: 'focusout' as const,
-	BLUR: 'blur' as const,
-	INPUT: 'input' as const,
+	SELECT: 'select',
+	CHANGE: 'change',
+	SUBMIT: 'submit',
+	RESET: 'reset',
+	FOCUS: 'focus',
+	FOCUS_IN: 'focusin',
+	FOCUS_OUT: 'focusout',
+	BLUR: 'blur',
+	INPUT: 'input',
 	// Local Storage
-	STORAGE: 'storage' as const,
+	STORAGE: 'storage',
 	// Drag
-	DRAG_START: 'dragstart' as const,
-	DRAG: 'drag' as const,
-	DRAG_ENTER: 'dragenter' as const,
-	DRAG_LEAVE: 'dragleave' as const,
-	DRAG_OVER: 'dragover' as const,
-	DROP: 'drop' as const,
-	DRAG_END: 'dragend' as const,
+	DRAG_START: 'dragstart',
+	DRAG: 'drag',
+	DRAG_ENTER: 'dragenter',
+	DRAG_LEAVE: 'dragleave',
+	DRAG_OVER: 'dragover',
+	DROP: 'drop',
+	DRAG_END: 'dragend',
 	// Animation
 	ANIMATION_START: browser.isWebKit ? 'webkitAnimationStart' : 'animationstart',
 	ANIMATION_END: browser.isWebKit ? 'webkitAnimationEnd' : 'animationend',
 	ANIMATION_ITERATION: browser.isWebKit ? 'webkitAnimationIteration' : 'animationiteration'
-}
+} as const;
 
 export interface EventLike {
 	preventDefault(): void;
