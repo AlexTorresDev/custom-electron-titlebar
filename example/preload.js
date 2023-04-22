@@ -14,6 +14,13 @@ window.addEventListener('DOMContentLoaded', () => {
     //menuPosition: 'bottom',
     //menu: null // = do not automatically use Menu.applicationMenu
     menuTransparent: 80,
+    // you can localize tooltips for the default buttons in the title bar.
+    //tooltips: { 
+    //  minimize: '최소화',
+    //  maximize: '최대화',
+    //  restoreDown: '이전 크기로 복원',
+    //  close: '닫기'
+    //}
   })
 
   const replaceText = (selector, text) => {

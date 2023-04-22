@@ -16,6 +16,7 @@ import { Menubar } from './menubar';
 import { TitlebarOptions } from './types/titlebar-options';
 import defaultIcons from 'static/icons.json';
 import titlebarTheme from 'static/titlebar.scss';
+import { TooltipOptions } from 'types/tooltip-options';
 
 const INACTIVE_FOREGROUND_DARK = Color.fromHex('#222222');
 const ACTIVE_FOREGROUND_DARK = Color.fromHex('#333333');
@@ -58,13 +59,23 @@ export default class Titlebar {
 		//hideWhenClickingClose: false,
 		minimizable: true,
 		maximizable: true,
-		closeable: true,
+		closeable: true
+	}
+
+	_tooltipOptions: { [key: string]: string };
+
+	_defaultTooltipOptions: TooltipOptions = {
+		minimize: 'Minimize',
+		maximize: 'Maximize',
+		restoreDown: 'Restore Down',
+		close: 'Close'
 	}
 
 	_platformIcons: { [key: string]: string };
 
 	constructor(titlebarOptions?: TitlebarOptions) {
 		this._options = { ...this._defaultOptions, ...titlebarOptions };
+		this._tooltipOptions = { ...this._defaultTooltipOptions, ...this._options.tooltips }
 		this._platformIcons = (defaultIcons as any)[PlatformToString(platform).toLocaleLowerCase()];
 
 		this._titlebar = $('div.cet-titlebar');
@@ -246,9 +257,9 @@ export default class Titlebar {
 
 	_createControls() {
 		if (!isMacintosh) {
-			this._createControl(this._windowControlIcons.minimize, this._options.minimizable, "Minimize", this._platformIcons['minimize'], 'cet-window-minimize');
-			this._createControl(this._windowControlIcons.maximize, this._options.maximizable, "Maximize", this._platformIcons['maximize'], 'cet-max-restore');
-			this._createControl(this._windowControlIcons.close, this._options.closeable, "Close", this._platformIcons['close'], 'cet-window-close');
+			this._createControl(this._windowControlIcons.minimize, this._options.minimizable, this._tooltipOptions.minimize, this._platformIcons['minimize'], 'cet-window-minimize');
+			this._createControl(this._windowControlIcons.maximize, this._options.maximizable, this._tooltipOptions.maximize, this._platformIcons['maximize'], 'cet-max-restore');
+			this._createControl(this._windowControlIcons.close, this._options.closeable, this._tooltipOptions.close, this._platformIcons['close'], 'cet-window-close');
 
 			append(this._titlebar, this._windowControls);
 		}
@@ -283,7 +294,7 @@ export default class Titlebar {
 
 	_onDidChangeMaximized(isMaximized: Boolean) {
 		if (this._windowControlIcons.maximize) {
-			this._windowControlIcons.maximize.title = isMaximized ? "Restore Down" : "Maximize";
+			this._windowControlIcons.maximize.title = isMaximized ? this._tooltipOptions.restoreDown : this._tooltipOptions.maximize;
 			this._windowControlIcons.maximize.innerHTML = isMaximized ? this._platformIcons['restore'] : this._platformIcons['maximize'];
 		}
 
