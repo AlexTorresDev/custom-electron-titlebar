@@ -9,7 +9,7 @@ setupTitlebar()
 function createWindow() {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
-		width: 800,
+		width: 1000,
 		height: 600,
 		frame: false,
 		titleBarStyle: 'hidden',

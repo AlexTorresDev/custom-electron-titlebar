@@ -156,14 +156,6 @@ body {
   opacity: 0.4;
 }
 
-.cet-control-close:not(.inactive):hover {
-  background-color: rgb(232 17 35 / 90%) !important;
-}
-
-.cet-control-close:not(.inactive):hover svg {
-  fill: #fff !important;
-}
-
 .cet-control-icon svg {
   width: 10px;
   height: -webkit-fill-available;
@@ -173,7 +165,15 @@ body {
 }
 
 .cet-titlebar.light .cet-control-icon svg {
-  fill: #000 !important;
+  fill: #222222 !important;
+}
+
+.cet-control-close:not(.inactive):hover {
+  background-color: rgb(232 17 35 / 90%) !important;
+}
+
+.cet-control-close:not(.inactive):hover svg {
+  fill: #fff !important;
 }
 
 /* Resizer */
