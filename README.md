@@ -4,21 +4,25 @@ This project is a typescript library for electron that allows you to configure a
 
 [![LICENSE](https://img.shields.io/github/license/AlexTorresDev/custom-electron-titlebar.svg)](https://github.com/AlexTorresDev/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
-[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar)](https://packagephobia.com/result?p=custom-electron-titlebar)
+[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar@4.2.0-beta.0)](https://packagephobia.com/result?p=custom-electron-titlebar@4.2.0-beta.0)
 
-![Screenshot 1](screenshots/cet-001.jpg)
+Standard Title Bar
 
-![Screenshot 2](screenshots/cet-002.jpg)
+![Screenshot 1](screenshots/cet-screen-1.png)
 
-![Screenshot 3](screenshots/cet-003.jpg)
-<br><br>
+Bottom Menu Bar
+
+![Screenshot 2](screenshots/cet-screen-2.png)
+
+Menu
+
+![Screenshot 3](screenshots/cet-screen-3.png)
 
 # 📦 Installing
 You can install this package with `npm`.
 ```sh
-npm install custom-electron-titlebar
+npm install custom-electron-titlebar@beta
 ```
-<br>
 
 # 🛠️ Usage
 The implementation is done as follows:
@@ -45,7 +49,7 @@ function createWindow() {
   
   ...
 
-  // attach fullscreen(f11 and not 'maximized') && focus listeners
+  // attach fullScreen(f11 and not 'maximized') && focus listeners
   attachTitlebarToWindow(mainWindow);
 }
 ```
@@ -55,16 +59,19 @@ In the preload file (preload.js or .ts)
 import { Titlebar } from "custom-electron-titlebar";
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Title bar implemenation
+  // Title bar implementation
   new Titlebar();
 });
 ```
 To see the options you can include in the Title Bar constructor, such as color of elements, icons, menu position, and much more, and the methods you can use, go to the [wiki](https://github.com/AlexTorresDev/custom-electron-titlebar/wiki)
-<br><br>
 
 ## 💰 Support
 If you want to support my development, you can do so by donating through [Buy me a coffee](https://www.buymeacoffee.com/AlexTorresDev)
-<br><br>
+
+
+## 📝 Collaborators
+I would like to express my sincere gratitude to all the people who have collaborated in the development and advancement of this project. I appreciate your contributions.
+
 
 ## ✅ License
 This project is under the [MIT](https://github.com/AlexTorresDev/custom-electron-titlebar/blob/master/LICENSE) license.

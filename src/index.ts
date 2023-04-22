@@ -1,9 +1,13 @@
-/*-------------------------------------------------------------------------------------------
- *  Copyright (c) 2018 Alex Torres
- *  Licensed under the MIT License. See License in the project root for license information.
- *------------------------------------------------------------------------------------------*/
+/* ---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresDev. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *-------------------------------------------------------------------------------------------- */
 
-import Titlebar from './titlebar';
-import { Color } from 'vs/base/common/color';
+import { CustomTitlebar } from './titlebar'
+import { Color } from 'base/common/color'
 
-export = { Titlebar, Color };
+export {
+	CustomTitlebar,
+	CustomTitlebar as Titlebar,
+	Color as TitlebarColor
+}

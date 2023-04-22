@@ -2,20 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Electron: Main",
+      "name": "Electron Main",
       "request": "launch",
       "type": "node",
       "presentation": {
         "hidden": true,
       },
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-      "windows": {
-        "name": "Electron: Main",
-        "request": "launch",
-        "type": "node",
-        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-      },
-      "preLaunchTask": "electron-debug",
+      "preLaunchTask": "npm: build",
       "args": [
         "--remote-debugging-port=9223",
         "./example/main.js"
@@ -25,7 +19,7 @@
       ]
     },
     {
-      "name": "Electron: Renderer",
+      "name": "Electron Renderer",
       "type": "chrome",
       "request": "attach",
       "presentation": {
@@ -49,8 +43,8 @@
     {
       "name": "Debug CET",
       "configurations": [
-        "Electron: Main",
-        "Electron: Renderer"
+        "Electron Main",
+        "Electron Renderer"
       ]
     }
   ]

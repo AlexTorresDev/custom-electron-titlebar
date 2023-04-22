@@ -1,25 +1,33 @@
 {
   "compilerOptions": {
     "lib": [
-      "ES2021",
+      "ES2022",
       "DOM"
     ],
-    "target": "ES2021",
     "baseUrl": "./src",
-    "module": "commonjs",
+    "paths": {
+      "base/*": [
+        "./base/*"
+      ],
+      "static/*": [
+        "../static/*"
+      ],
+    },
+    "module": "CommonJS",
+    "target": "ES2021",
     "declaration": true,
     "outDir": "./dist",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
     "moduleResolution": "node",
     "strict": true,
-    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
-    "./node_modules",
+    "node_modules",
     "**/node_modules/*"
   ]
 }

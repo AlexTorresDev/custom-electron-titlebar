@@ -4,35 +4,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "electron-debug",
-      "type": "process",
-      "command": "./node_modules/.bin/webpack",
-      "windows": {
-        "command": "./node_modules/.bin/webpack.cmd"
-      },
-      "args": [
-        "--config",
-        "./webpack.config.js",
-        "--mode",
-        "development"
-      ],
-      "problemMatcher": {
-        "owner": "custom",
-        "pattern": {
-          "regexp": ""
-        },
-        "background": {
-          "beginsPattern": " ",
-          "endsPattern": " "
-        }
-      }
-    },
-    {
       "type": "npm",
-      "script": "start",
+      "script": "build",
+      "group": "build",
       "problemMatcher": [],
-      "label": "npm: start",
-      "detail": "npm run build && npm run dev"
+      "label": "npm: build",
+      "detail": "tsc && babel ./dist --out-dir ./dist --extensions \".js\""
     }
   ]
 }
