@@ -33,7 +33,6 @@ setup.sh
 Gruntfile.js
 tslint.json
 tsconfig.json
-
 npm-debug.log
 .babelrc
 .eslintrc
