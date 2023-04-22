@@ -1,5 +1,6 @@
 const path = require("path");
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const createTsTransformPaths = require('typescript-transform-paths').default;
 
 const srcPath = path.join(__dirname, "src");
 const distPath = path.join(__dirname, "dist");
@@ -14,7 +15,17 @@ const commonConfig = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: "ts-loader",
+                use: {
+                    loader: "ts-loader",
+                    options: {
+                        getCustomTransformers: (program) => ({
+                            before: [createTsTransformPaths(program, {})],
+                            afterDeclarations: [createTsTransformPaths(program, {
+                                afterDeclarations: true
+                            })]
+                        })
+                    }
+                },
                 exclude: /node_modules|\.d\.ts$/
             },
             {
