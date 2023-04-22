@@ -20,11 +20,11 @@
     "example": "electron example/main.js",
     "start": "npm run clean && npm run build && npm run example"
   },
-  "author": "AlexTorresSk <alextorressk@gmail.com>",
+  "author": "AlexTorresDev <alextorressk@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AlexTorresSk/custom-electron-titlebar.git"
+    "url": "https://github.com/AlexTorresDev/custom-electron-titlebar.git"
   },
   "keywords": [
     "typescript",
@@ -35,9 +35,9 @@
     "linux"
   ],
   "bugs": {
-    "url": "https://github.com/AlexTorresSk/custom-electron-titlebar/issues"
+    "url": "https://github.com/AlexTorresDev/custom-electron-titlebar/issues"
   },
-  "homepage": "https://github.com/AlexTorresSk/custom-electron-titlebar#readme",
+  "homepage": "https://github.com/AlexTorresDev/custom-electron-titlebar#readme",
   "directories": {
     "example": "example",
     "dist": "dist"
