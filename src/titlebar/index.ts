@@ -10,8 +10,7 @@ import { isLinux, isMacintosh, isWindows, platform, PlatformToString } from 'bas
 import { MenuBar } from 'menubar'
 import { TitleBarOptions } from './options'
 import { ThemeBar } from './themebar'
-import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, DEFAULT_ITEM_SELECTOR, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, loadWindowIcons, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from 'consts'
-const icons = require('static/icons.json')
+import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, DEFAULT_ITEM_SELECTOR, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, loadWindowIcons, menuIcons, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from 'consts'
 
 export class CustomTitlebar extends ThemeBar {
 	private titlebar: HTMLElement
@@ -69,7 +68,7 @@ export class CustomTitlebar extends ThemeBar {
 
 		this.currentOptions = { ...this.currentOptions, ...options }
 
-		const jWindowIcons = icons[PlatformToString(platform).toLocaleLowerCase()]
+		const jWindowIcons = (menuIcons as any)[PlatformToString(platform).toLocaleLowerCase()]
 		this.platformIcons = jWindowIcons
 
 		this.titlebar = $('.cet-titlebar')
@@ -349,7 +348,7 @@ export class CustomTitlebar extends ThemeBar {
 	private updateMenu(menu?: Menu) {
 		if (isMacintosh || !menu) return
 
-		this.menuBar = new MenuBar(this.menuBarContainer, icons, this.currentOptions, { enableMnemonics: true }, this.closeMenu) // TODO: Verify menubar options
+		this.menuBar = new MenuBar(this.menuBarContainer, menuIcons, this.currentOptions, { enableMnemonics: true }, this.closeMenu) // TODO: Verify menubar options
 		this.menuBar.push(menu)
 		this.menuBar.update()
 		this.menuBar.onVisibilityChange(e => this.onMenuBarVisibilityChanged(e))
