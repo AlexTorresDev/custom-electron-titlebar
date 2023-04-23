@@ -5,7 +5,7 @@
  *
  * https://www.electronjs.org/docs/latest/tutorial/sandbox
  */
-const { CustomTitlebar } = require('custom-electron-titlebar')
+const { CustomTitlebar, TitlebarColor } = require('custom-electron-titlebar')
 // const path = require('path')
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// eslint-disable-next-line no-new
 	new CustomTitlebar({
-		// backgroundColor: TitlebarColor.fromHex('#059669'),
+		backgroundColor: TitlebarColor.fromHex('#6538b9'),
 		// icon: path.resolve('example/assets', 'logo.svg'),
 		// icons: path.resolve('example/assets', 'icons.json'),
 		menuPosition: 'bottom'
