@@ -396,7 +396,7 @@ body {
 }
 
 .cet-menubar-menu-container .cet-submenu-indicator img,
-.cet-menubar-menu-container .cet-menu-item-icon img,
+.cet-menubar-menu-container .cet-menu-item-icon .icon,
 .cet-menubar-menu-container .cet-submenu-indicator svg,
 .cet-menubar-menu-container .cet-menu-item-icon svg {
   display: inherit;

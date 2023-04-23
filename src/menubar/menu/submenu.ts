@@ -62,9 +62,9 @@ export class CETSubMenu extends CETMenuItem {
 
 		this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'))
 		this.submenuIndicator.innerHTML = this.submenuIcons.submenuIndicator
+		this.submenuIndicator.setAttribute('aria-hidden', 'true')
 
 		applyFill(this.submenuIndicator, this.menuStyle?.svgColor, this.menuStyle?.foregroundColor)
-		this.submenuIndicator.setAttribute('aria-hidden', 'true')
 
 		if (this.element) {
 			addDisposableListener(this.element, EventType.KEY_UP, e => {
