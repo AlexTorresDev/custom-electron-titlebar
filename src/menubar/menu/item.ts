@@ -1,4 +1,9 @@
-import { MenuItem, ipcRenderer } from 'electron'
+/* ---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresDev. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *-------------------------------------------------------------------------------------------- */
+
+import { MenuItem, ipcRenderer, nativeImage } from 'electron'
 import { Color } from 'base/common/color'
 import { $, EventHelper, EventLike, EventType, addClass, addDisposableListener, append, hasClass, removeClass, removeNode } from 'base/common/dom'
 import { KeyCode, KeyCodeUtils } from 'base/common/keyCodes'
@@ -130,7 +135,13 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.itemElement.style.color = fgColor ? fgColor.toString() : ''
 			this.itemElement.style.backgroundColor = bgColor ? bgColor.toString() : ''
 
-			if (this.iconElement) applyFill(this.iconElement, this.parentOptions?.svgColor, fgColor)
+			if (this.iconElement) {
+				if (this.iconElement.firstElementChild?.className === 'icon') {
+					applyFill(this.iconElement.firstElementChild as HTMLElement, this.parentOptions?.svgColor, fgColor, false)
+				} else {
+					applyFill(this.iconElement, this.parentOptions?.svgColor, fgColor)
+				}
+			}
 		}
 	}
 
@@ -162,51 +173,51 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 		if (this.item.role) {
 			switch (this.item.role.toLocaleLowerCase()) {
-			case 'undo':
-				accelerator = 'CtrlOrCmd+Z'
-				break
-			case 'redo':
-				accelerator = 'CtrlOrCmd+Y'
-				break
-			case 'cut':
-				accelerator = 'CtrlOrCmd+X'
-				break
-			case 'copy':
-				accelerator = 'CtrlOrCmd+C'
-				break
-			case 'paste':
-				accelerator = 'CtrlOrCmd+V'
-				break
-			case 'selectall':
-				accelerator = 'CtrlOrCmd+A'
-				break
-			case 'minimize':
-				accelerator = 'CtrlOrCmd+M'
-				break
-			case 'close':
-				accelerator = 'CtrlOrCmd+W'
-				break
-			case 'reload':
-				accelerator = 'CtrlOrCmd+R'
-				break
-			case 'forcereload':
-				accelerator = 'CtrlOrCmd+Shift+R'
-				break
-			case 'toggledevtools':
-				accelerator = 'CtrlOrCmd+Shift+I'
-				break
-			case 'togglefullscreen':
-				accelerator = 'F11'
-				break
-			case 'resetzoom':
-				accelerator = 'CtrlOrCmd+0'
-				break
-			case 'zoomin':
-				accelerator = 'CtrlOrCmd++'
-				break
-			case 'zoomout':
-				accelerator = 'CtrlOrCmd+-'
-				break
+				case 'undo':
+					accelerator = 'CtrlOrCmd+Z'
+					break
+				case 'redo':
+					accelerator = 'CtrlOrCmd+Y'
+					break
+				case 'cut':
+					accelerator = 'CtrlOrCmd+X'
+					break
+				case 'copy':
+					accelerator = 'CtrlOrCmd+C'
+					break
+				case 'paste':
+					accelerator = 'CtrlOrCmd+V'
+					break
+				case 'selectall':
+					accelerator = 'CtrlOrCmd+A'
+					break
+				case 'minimize':
+					accelerator = 'CtrlOrCmd+M'
+					break
+				case 'close':
+					accelerator = 'CtrlOrCmd+W'
+					break
+				case 'reload':
+					accelerator = 'CtrlOrCmd+R'
+					break
+				case 'forcereload':
+					accelerator = 'CtrlOrCmd+Shift+R'
+					break
+				case 'toggledevtools':
+					accelerator = 'CtrlOrCmd+Shift+I'
+					break
+				case 'togglefullscreen':
+					accelerator = 'F11'
+					break
+				case 'resetzoom':
+					accelerator = 'CtrlOrCmd+0'
+					break
+				case 'zoomin':
+					accelerator = 'CtrlOrCmd++'
+					break
+				case 'zoomout':
+					accelerator = 'CtrlOrCmd+-'
+					break
 			}
 		}
 
@@ -253,18 +264,18 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			this.labelElement!.innerText = cleanMenuLabel.replace(/&&/g, '&')
 		}
 
-		// const mnemonicMatches = MENU_MNEMONIC_REGEX.exec(label)
+		const mnemonicMatches = MENU_MNEMONIC_REGEX.exec(label)
 
 		// Register mnemonics
-		/* if (mnemonicMatches) {
-			const mnemonic = !!mnemonicMatches[1] ? mnemonicMatches[1] : mnemonicMatches[3];
+		if (mnemonicMatches) {
+			const mnemonic = !!mnemonicMatches[1] ? mnemonicMatches[1] : mnemonicMatches[3]
 
 			if (this.options.enableMnemonics) {
-				buttonElement.setAttribute('aria-keyshortcuts', 'Alt+' + mnemonic.toLocaleLowerCase());
+				this.itemElement?.setAttribute('aria-keyshortcuts', 'Alt+' + mnemonic.toLocaleLowerCase())
 			} else {
-				buttonElement.removeAttribute('aria-keyshortcuts');
+				this.itemElement?.removeAttribute('aria-keyshortcuts')
 			}
-		} */
+		}
 	}
 
 	updateIcon(): void {
@@ -272,8 +283,17 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 			const icon = this.item.icon
 
 			if (this.iconElement && icon) {
-				const iconE = append(this.iconElement, $('img'))
-				iconE.setAttribute('src', icon.toString())
+				const iconE = append(this.iconElement, $('.icon'))
+				let iconData: string | undefined
+
+				if (typeof this.item.icon !== 'string') {
+					iconData = ipcRenderer.sendSync('menu-icon', this.item.commandId)
+				} else {
+					const iconPath = this.item.icon
+					iconData = nativeImage.createFromPath(iconPath).toDataURL()
+				}
+
+				if (iconData) iconE.style.webkitMaskBoxImage = `url(${iconData})`
 			}
 		} else if (this.iconElement && this.item.type === 'checkbox') {
 			addClass(this.iconElement, 'checkbox')

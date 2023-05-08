@@ -1,8 +1,13 @@
+/* ---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresDev. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *-------------------------------------------------------------------------------------------- */
+
+import { Menu } from 'electron'
 import * as DOM from 'base/common/dom'
 import { Emitter, Event } from 'base/common/event'
 import { Disposable, IDisposable, dispose } from 'base/common/lifecycle'
 import { isMacintosh } from 'base/common/platform'
-import { Menu } from 'electron'
 import { MenuBarOptions } from './menubar-options'
 import { StandardKeyboardEvent } from 'base/browser/keyboardEvent'
 import { KeyCode, KeyMod, ScanCode, ScanCodeUtils } from 'base/common/keyCodes'

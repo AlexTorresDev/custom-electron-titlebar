@@ -11,7 +11,7 @@ const INVERSE_KEY_CODE_MAP: KeyCode[] = new Array(KeyCode.MAX_VALUE);
 
 (function () {
 	for (let i = 0; i < INVERSE_KEY_CODE_MAP.length; i++) {
-		INVERSE_KEY_CODE_MAP[i] = -1
+		INVERSE_KEY_CODE_MAP[i] = 0
 	}
 
 	function define(code: number, keyCode: KeyCode): void {

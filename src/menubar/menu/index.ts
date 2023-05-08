@@ -1,6 +1,11 @@
+/* ---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresDev. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *-------------------------------------------------------------------------------------------- */
+
+import { Menu, MenuItem } from 'electron'
 import { $, EventHelper, EventLike, EventType, addDisposableListener, append, hasClass, isAncestor, removeNode } from 'base/common/dom'
 import { Disposable, dispose } from 'base/common/lifecycle'
-import { Menu, MenuItem } from 'electron'
 import { CETMenuItem, IMenuItem, IMenuStyle } from './item'
 import { KeyCode, KeyCodeUtils, KeyMod } from 'base/common/keyCodes'
 import { StandardKeyboardEvent } from 'base/browser/keyboardEvent'

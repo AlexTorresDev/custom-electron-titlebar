@@ -6,7 +6,7 @@
 export = () => {
 	if (process.type !== 'browser') return
 
-	const { BrowserWindow, Menu, ipcMain } = require('electron')
+	const { BrowserWindow, nativeImage, Menu, ipcMain } = require('electron')
 
 	// Send menu to renderer title bar process
 	ipcMain.handle('request-application-menu', async () => JSON.parse(JSON.stringify(
@@ -20,20 +20,20 @@ export = () => {
 
 		if (window) {
 			switch (eventName) {
-			case 'window-minimize':
-				window?.minimize()
-				break
-			case 'window-maximize':
-				window?.isMaximized() ? window.unmaximize() : window?.maximize()
-				break
-			case 'window-close':
-				window?.close()
-				break
-			case 'window-is-maximized':
-				event.returnValue = window?.isMaximized()
-				break
-			default:
-				break
+				case 'window-minimize':
+					window?.minimize()
+					break
+				case 'window-maximize':
+					window?.isMaximized() ? window.unmaximize() : window?.maximize()
+					break
+				case 'window-close':
+					window?.close()
+					break
+				case 'window-is-maximized':
+					event.returnValue = window?.isMaximized()
+					break
+				default:
+					break
 			}
 		}
 	})
@@ -42,6 +42,16 @@ export = () => {
 	ipcMain.on('menu-event', (event, commandId: Number) => {
 		const item = getMenuItemByCommandId(commandId, Menu.getApplicationMenu())
 		if (item) item.click(undefined, BrowserWindow.fromWebContents(event.sender), event.sender)
+	})
+
+	// Handle menu item icon
+	ipcMain.on('menu-icon', (event, commandId: Number) => {
+		const item = getMenuItemByCommandId(commandId, Menu.getApplicationMenu())
+		if (item && item.icon && typeof item.icon !== 'string') {
+			event.returnValue = item.icon.toDataURL()
+		} else {
+			event.returnValue = null
+		}
 	})
 }
 

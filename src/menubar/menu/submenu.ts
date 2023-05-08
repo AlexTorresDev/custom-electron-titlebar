@@ -1,3 +1,9 @@
+/* ---------------------------------------------------------------------------------------------
+ *  Copyright (c) AlexTorresDev. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *-------------------------------------------------------------------------------------------- */
+
+import { MenuItem } from 'electron'
 import { applyFill } from 'consts'
 import { CETMenuItem } from './item'
 import { IDisposable, dispose } from 'base/common/lifecycle'
@@ -5,7 +11,6 @@ import { $, EventHelper, EventLike, EventType, addClass, addClasses, addDisposab
 import { StandardKeyboardEvent } from 'base/browser/keyboardEvent'
 import { CETMenu, IMenuOptions } from './index'
 import { RunOnceScheduler } from 'base/common/async'
-import { MenuItem } from 'electron'
 import { MenuBarOptions } from 'menubar/menubar-options'
 import { KeyCode } from 'base/common/keyCodes'
 import { IMenuIcons } from 'menubar'
@@ -57,9 +62,9 @@ export class CETSubMenu extends CETMenuItem {
 
 		this.submenuIndicator = append(this.itemElement, $('span.cet-submenu-indicator'))
 		this.submenuIndicator.innerHTML = this.submenuIcons.submenuIndicator
+		this.submenuIndicator.setAttribute('aria-hidden', 'true')
 
 		applyFill(this.submenuIndicator, this.menuStyle?.svgColor, this.menuStyle?.foregroundColor)
-		this.submenuIndicator.setAttribute('aria-hidden', 'true')
 
 		if (this.element) {
 			addDisposableListener(this.element, EventType.KEY_UP, e => {

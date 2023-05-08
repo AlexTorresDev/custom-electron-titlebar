@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu } = require('electron')
-const path = require('path')
+const { app, BrowserWindow, Menu, nativeImage } = require('electron')
 const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main')
+const path = require('path')
 
 // Setup the titlebar
 setupTitlebar()
@@ -9,7 +9,7 @@ setupTitlebar()
 function createWindow() {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
-		width: 800,
+		width: 1000,
 		height: 600,
 		frame: false,
 		titleBarStyle: 'hidden',
@@ -19,12 +19,12 @@ function createWindow() {
 		}
 	})
 
-	const menu = Menu.buildFromTemplate(exampleMenuTemplate())
+	const menu = Menu.buildFromTemplate(exampleMenuTemplate)
 	Menu.setApplicationMenu(menu)
 
 	// and load the index.html of the app.
 	// mainWindow.loadFile('index.html')
-	mainWindow.loadURL('https://www.electronjs.org/')
+	mainWindow.loadURL('https://github.com')
 
 	// Open the DevTools.
 	// mainWindow.webContents.openDevTools()
@@ -57,8 +57,8 @@ app.on('window-all-closed', function () {
 // code. You can also put them in separate files and require them here.
 
 
-
-const exampleMenuTemplate = () => [
+// Custom menu
+const exampleMenuTemplate = [
 	{
 		label: 'Simple O&ptions',
 		submenu: [
@@ -91,6 +91,34 @@ const exampleMenuTemplate = () => [
 				click: (item) => {
 					console.log('item is checked? ' + item.checked)
 				}
+			}
+		]
+	},
+	{
+		label: 'With &Icons',
+		submenu: [
+			{
+				icon: nativeImage.createFromPath(path.resolve('example/assets', 'home.png')),
+				label: 'Go to &Home using Native Image'
+			},
+			{
+				icon: path.resolve('example/assets', 'run.png'),
+				label: 'Run using string',
+				submenu: [
+					{
+						label: 'Submenu of run'
+					},
+					{
+						label: 'Print',
+						accelerator: 'CmdOrCtrl+P'
+					},
+					{
+						type: 'separator'
+					},
+					{
+						label: 'Item 2 of submenu of run'
+					}
+				]
 			}
 		]
 	},
@@ -192,7 +220,7 @@ const exampleMenuTemplate = () => [
 			{ role: 'zoomIn' },
 			{ role: 'zoomOut' },
 			{ role: 'resetZoom' },
-			{ role: 'toggleDevTools' }
+			{ role: 'toggleDevTools', icon: path.resolve('example/assets', 'terminal.png') }
 		]
 	}
 ]
