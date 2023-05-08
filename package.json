@@ -1,6 +1,6 @@
 {
   "name": "custom-electron-titlebar",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Library for electron that allows you to configure a fully customizable title bar.",
   "types": "./dist/index.d.ts",
   "typesVersions": {
