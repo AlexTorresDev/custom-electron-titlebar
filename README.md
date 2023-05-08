@@ -4,24 +4,30 @@ This project is a typescript library for electron that allows you to configure a
 
 [![LICENSE](https://img.shields.io/github/license/AlexTorresDev/custom-electron-titlebar.svg)](https://github.com/AlexTorresDev/custom-electron-titlebar/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
-[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar@4.2.0-beta.0)](https://packagephobia.com/result?p=custom-electron-titlebar@4.2.0-beta.0)
+[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar)](https://packagephobia.com/result?p=custom-electron-titlebar)
+
+[📄 Visit Documentation](https://cet.alextrs.dev)
 
 Standard Title Bar
 
-![Screenshot 1](screenshots/cet-screen-1.png)
+![Screenshot 1](screenshots/cet-1.png)
 
 Bottom Menu Bar
 
-![Screenshot 2](screenshots/cet-screen-2.png)
+![Screenshot 2](screenshots/cet-2.png)
 
 Menu
 
-![Screenshot 3](screenshots/cet-screen-3.png)
+![Screenshot 3](screenshots/cet-3.png)
+
+Custom color
+
+![Screenshot 4](screenshots/cet-4.png)
 
 # 📦 Installing
 You can install this package with `npm`.
 ```sh
-npm install custom-electron-titlebar@beta
+npm install custom-electron-titlebar
 ```
 
 # 🛠️ Usage
