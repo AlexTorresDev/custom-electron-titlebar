@@ -13,6 +13,7 @@ import { Emitter, Event } from 'base/common/event'
 import { Disposable, IDisposable, dispose, toDisposable } from 'base/common/lifecycle'
 import * as platform from 'base/common/platform'
 import { coalesce } from 'base/common/arrays'
+import { KeyCode } from 'base/common/keyCodes'
 
 export function clearNode(node: HTMLElement): void {
 	while (node.firstChild) {
@@ -43,6 +44,159 @@ interface IDomClassList {
 	removeClass(node: HTMLElement, className: string): void;
 	removeClasses(node: HTMLElement, ...classNames: string[]): void;
 	toggleClass(node: HTMLElement, className: string, shouldHaveIt?: boolean): void;
+}
+
+type ModifierKey = 'alt' | 'ctrl' | 'shift' | 'meta';
+
+export interface IModifierKeyStatus {
+	altKey: boolean;
+	shiftKey: boolean;
+	ctrlKey: boolean;
+	metaKey: boolean;
+	lastKeyPressed?: ModifierKey;
+	lastKeyReleased?: ModifierKey;
+	event?: KeyboardEvent;
+}
+
+export class ModifierKeyEmitter extends Emitter<IModifierKeyStatus> {
+
+	private _keyStatus: IModifierKeyStatus;
+	private static instance: ModifierKeyEmitter;
+
+	private constructor() {
+		super();
+
+		this._keyStatus = {
+			altKey: false,
+			shiftKey: false,
+			ctrlKey: false,
+			metaKey: false
+		};
+
+		addDisposableListener(window, 'keydown', e => {
+			if (e.defaultPrevented) {
+				return;
+			}
+
+			const event = new StandardKeyboardEvent(e);
+			// If Alt-key keydown event is repeated, ignore it #112347
+			// Only known to be necessary for Alt-Key at the moment #115810
+			if (event.keyCode === KeyCode.Alt && e.repeat) {
+				return;
+			}
+
+			if (e.altKey && !this._keyStatus.altKey) {
+				this._keyStatus.lastKeyPressed = 'alt';
+			} else if (e.ctrlKey && !this._keyStatus.ctrlKey) {
+				this._keyStatus.lastKeyPressed = 'ctrl';
+			} else if (e.metaKey && !this._keyStatus.metaKey) {
+				this._keyStatus.lastKeyPressed = 'meta';
+			} else if (e.shiftKey && !this._keyStatus.shiftKey) {
+				this._keyStatus.lastKeyPressed = 'shift';
+			} else if (event.keyCode !== KeyCode.Alt) {
+				this._keyStatus.lastKeyPressed = undefined;
+			} else {
+				return;
+			}
+
+			this._keyStatus.altKey = e.altKey;
+			this._keyStatus.ctrlKey = e.ctrlKey;
+			this._keyStatus.metaKey = e.metaKey;
+			this._keyStatus.shiftKey = e.shiftKey;
+
+			if (this._keyStatus.lastKeyPressed) {
+				this._keyStatus.event = e;
+				this.fire(this._keyStatus);
+			}
+		}, true);
+
+		addDisposableListener(window, 'keyup', e => {
+			if (e.defaultPrevented) {
+				return;
+			}
+
+			if (!e.altKey && this._keyStatus.altKey) {
+				this._keyStatus.lastKeyReleased = 'alt';
+			} else if (!e.ctrlKey && this._keyStatus.ctrlKey) {
+				this._keyStatus.lastKeyReleased = 'ctrl';
+			} else if (!e.metaKey && this._keyStatus.metaKey) {
+				this._keyStatus.lastKeyReleased = 'meta';
+			} else if (!e.shiftKey && this._keyStatus.shiftKey) {
+				this._keyStatus.lastKeyReleased = 'shift';
+			} else {
+				this._keyStatus.lastKeyReleased = undefined;
+			}
+
+			if (this._keyStatus.lastKeyPressed !== this._keyStatus.lastKeyReleased) {
+				this._keyStatus.lastKeyPressed = undefined;
+			}
+
+			this._keyStatus.altKey = e.altKey;
+			this._keyStatus.ctrlKey = e.ctrlKey;
+			this._keyStatus.metaKey = e.metaKey;
+			this._keyStatus.shiftKey = e.shiftKey;
+
+			if (this._keyStatus.lastKeyReleased) {
+				this._keyStatus.event = e;
+				this.fire(this._keyStatus);
+			}
+		}, true);
+
+		addDisposableListener(document.body, 'mousedown', () => {
+			this._keyStatus.lastKeyPressed = undefined;
+		}, true);
+
+		addDisposableListener(document.body, 'mouseup', () => {
+			this._keyStatus.lastKeyPressed = undefined;
+		}, true);
+
+		addDisposableListener(document.body, 'mousemove', e => {
+			if (e.buttons) {
+				this._keyStatus.lastKeyPressed = undefined;
+			}
+		}, true);
+
+		addDisposableListener(window, 'blur', () => {
+			this.resetKeyStatus();
+		});
+	}
+
+	get keyStatus(): IModifierKeyStatus {
+		return this._keyStatus;
+	}
+
+	get isModifierPressed(): boolean {
+		return this._keyStatus.altKey || this._keyStatus.ctrlKey || this._keyStatus.metaKey || this._keyStatus.shiftKey;
+	}
+
+	/**
+	 * Allows to explicitly reset the key status based on more knowledge (#109062)
+	 */
+	resetKeyStatus(): void {
+		this.doResetKeyStatus();
+		this.fire(this._keyStatus);
+	}
+
+	private doResetKeyStatus(): void {
+		this._keyStatus = {
+			altKey: false,
+			shiftKey: false,
+			ctrlKey: false,
+			metaKey: false
+		};
+	}
+
+	static getInstance() {
+		if (!ModifierKeyEmitter.instance) {
+			ModifierKeyEmitter.instance = new ModifierKeyEmitter();
+		}
+
+		return ModifierKeyEmitter.instance;
+	}
+
+	override dispose() {
+		super.dispose();
+	}
 }
 
 const _manualClassList = new class implements IDomClassList {

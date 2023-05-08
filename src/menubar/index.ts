@@ -5,7 +5,7 @@ import { isMacintosh } from 'base/common/platform'
 import { Menu } from 'electron'
 import { MenuBarOptions } from './menubar-options'
 import { StandardKeyboardEvent } from 'base/browser/keyboardEvent'
-import { KeyCode, KeyMod } from 'base/common/keyCodes'
+import { KeyCode, KeyMod, ScanCode, ScanCodeUtils } from 'base/common/keyCodes'
 import { MENU_ESCAPED_MNEMONIC_REGEX, MENU_MNEMONIC_REGEX, cleanMnemonic } from 'consts'
 import { CETMenu, Direction, IMenuOptions } from './menu'
 import { IMenuStyle } from './menu/item'
@@ -122,6 +122,8 @@ export class MenuBar extends Disposable {
 			}))
 		}
 
+		this._register(DOM.ModifierKeyEmitter.getInstance().event(this.onModifierKeyToggled, this));
+
 		this._register(DOM.addDisposableListener(this.container, DOM.EventType.KEY_DOWN, (e) => {
 			const event = new StandardKeyboardEvent(e as KeyboardEvent)
 			let eventHandled = true
@@ -184,6 +186,7 @@ export class MenuBar extends Disposable {
 			if (!this.options.enableMnemonics || !e.altKey || e.ctrlKey || e.defaultPrevented) {
 				return
 			}
+			console.log(this.mnemonics)
 
 			const key = e.key.toLocaleLowerCase()
 			if (!this.mnemonics.has(key)) {
@@ -685,79 +688,79 @@ export class MenuBar extends Disposable {
 		this._focusState = value
 
 		switch (value) {
-		case MenubarState.HIDDEN:
-			if (isVisible) {
-				this.hideMenubar()
-			}
-
-			if (isOpen) {
-				this.cleanupMenu()
-			}
-
-			if (isFocused) {
-				this.focusedMenu = undefined
-
-				if (this.focusToReturn) {
-					this.focusToReturn.focus()
-					this.focusToReturn = undefined
+			case MenubarState.HIDDEN:
+				if (isVisible) {
+					this.hideMenubar()
 				}
-			}
 
+				if (isOpen) {
+					this.cleanupMenu()
+				}
 
-			break
-		case MenubarState.VISIBLE:
-			if (!isVisible) {
-				this.showMenubar()
-			}
+				if (isFocused) {
+					this.focusedMenu = undefined
 
-			if (isOpen) {
-				this.cleanupMenu()
-			}
-
-			if (isFocused) {
-				if (this.focusedMenu) {
-					if (this.focusedMenu.index === MenuBar.OVERFLOW_INDEX) {
-						this.overflowMenu.buttonElement.blur()
-					} else {
-						this.menus[this.focusedMenu.index].buttonElement?.blur()
+					if (this.focusToReturn) {
+						this.focusToReturn.focus()
+						this.focusToReturn = undefined
 					}
 				}
 
-				this.focusedMenu = undefined
 
-				if (this.focusToReturn) {
-					this.focusToReturn.focus()
-					this.focusToReturn = undefined
+				break
+			case MenubarState.VISIBLE:
+				if (!isVisible) {
+					this.showMenubar()
 				}
-			}
 
-			break
-		case MenubarState.FOCUSED:
-			if (!isVisible) {
-				this.showMenubar()
-			}
-
-			if (isOpen) {
-				this.cleanupMenu()
-			}
-
-			if (this.focusedMenu) {
-				if (this.focusedMenu.index === MenuBar.OVERFLOW_INDEX) {
-					this.overflowMenu.buttonElement.focus()
-				} else {
-					this.menus[this.focusedMenu.index].buttonElement?.focus()
+				if (isOpen) {
+					this.cleanupMenu()
 				}
-			}
-			break
-		case MenubarState.OPEN:
-			if (!isVisible) {
-				this.showMenubar()
-			}
 
-			if (this.focusedMenu) {
-				this.showMenu(this.focusedMenu.index, this.openedViaKeyboard)
-			}
-			break
+				if (isFocused) {
+					if (this.focusedMenu) {
+						if (this.focusedMenu.index === MenuBar.OVERFLOW_INDEX) {
+							this.overflowMenu.buttonElement.blur()
+						} else {
+							this.menus[this.focusedMenu.index].buttonElement?.blur()
+						}
+					}
+
+					this.focusedMenu = undefined
+
+					if (this.focusToReturn) {
+						this.focusToReturn.focus()
+						this.focusToReturn = undefined
+					}
+				}
+
+				break
+			case MenubarState.FOCUSED:
+				if (!isVisible) {
+					this.showMenubar()
+				}
+
+				if (isOpen) {
+					this.cleanupMenu()
+				}
+
+				if (this.focusedMenu) {
+					if (this.focusedMenu.index === MenuBar.OVERFLOW_INDEX) {
+						this.overflowMenu.buttonElement.focus()
+					} else {
+						this.menus[this.focusedMenu.index].buttonElement?.focus()
+					}
+				}
+				break
+			case MenubarState.OPEN:
+				if (!isVisible) {
+					this.showMenubar()
+				}
+
+				if (this.focusedMenu) {
+					this.showMenu(this.focusedMenu.index, this.openedViaKeyboard)
+				}
+				break
 		}
 
 		this._focusState = value
@@ -857,6 +860,8 @@ export class MenuBar extends Disposable {
 	}
 
 	private updateMnemonicVisibility(visible: boolean): void {
+		console.log({ visible });
+
 		if (this.menus) {
 			this.menus.forEach(menuBarMenu => {
 				if (menuBarMenu.titleElement && menuBarMenu.titleElement.children.length) {
@@ -913,6 +918,50 @@ export class MenuBar extends Disposable {
 			this.focusedMenu = { index: menuIndex }
 			this.openedViaKeyboard = !clicked
 			this.focusState = MenubarState.OPEN
+		}
+	}
+
+	private onModifierKeyToggled(modifierKeyStatus: DOM.IModifierKeyStatus): void {
+		const allModifiersReleased = !modifierKeyStatus.altKey && !modifierKeyStatus.ctrlKey && !modifierKeyStatus.shiftKey && !modifierKeyStatus.metaKey;
+
+		if (this.options.visibility === 'hidden') {
+			return;
+		}
+
+		// Prevent alt-key default if the menu is not hidden and we use alt to focus
+		if (modifierKeyStatus.event && this.shouldAltKeyFocus) {
+			if (ScanCodeUtils.toEnum(modifierKeyStatus.event.code) === ScanCode.AltLeft) {
+				modifierKeyStatus.event.preventDefault();
+			}
+		}
+
+		// Alt key pressed while menu is focused. This should return focus away from the menubar
+		if (this.isFocused && modifierKeyStatus.lastKeyPressed === 'alt' && modifierKeyStatus.altKey) {
+			this.setUnfocusedState();
+			this.mnemonicsInUse = false;
+			this.awaitingAltRelease = true;
+		}
+
+		// Clean alt key press and release
+		if (allModifiersReleased && modifierKeyStatus.lastKeyPressed === 'alt' && modifierKeyStatus.lastKeyReleased === 'alt') {
+			if (!this.awaitingAltRelease) {
+				if (!this.isFocused && this.shouldAltKeyFocus) {
+					this.mnemonicsInUse = true;
+					this.focusedMenu = { index: this.numMenusShown > 0 ? 0 : MenuBar.OVERFLOW_INDEX };
+					this.focusState = MenubarState.FOCUSED;
+				} else if (!this.isOpen) {
+					this.setUnfocusedState();
+				}
+			}
+		}
+
+		// Alt key released
+		if (!modifierKeyStatus.altKey && modifierKeyStatus.lastKeyReleased === 'alt') {
+			this.awaitingAltRelease = false;
+		}
+
+		if (this.options.enableMnemonics && this.menus && !this.isOpen) {
+			this.updateMnemonicVisibility((!this.awaitingAltRelease && modifierKeyStatus.altKey) || this.mnemonicsInUse);
 		}
 	}
 
