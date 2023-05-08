@@ -29,10 +29,20 @@ export interface MenuBarOptions {
      */
     menu?: Menu;
     /**
+     * The background color of the menu.
+     * **The default is automatic**
+     */
+    menuBarBackgroundColor?: Color;
+    /**
      * The position of menubar on titlebar.
      * **The default is left**
      */
     menuPosition?: 'left' | 'bottom';
+    /**
+     * The color of the menu separator.
+     * **The default is automatic**
+     */
+    menuSeparatorColor?: Color;
     /**
      * The menu container transparency
      * **The default is 0 (not apply transparency)*

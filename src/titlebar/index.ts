@@ -392,7 +392,7 @@ export class CustomTitlebar extends ThemeBar {
 
 		if (this.menuBar) {
 			let fgColor
-			const backgroundColor = this.currentOptions.backgroundColor?.darken(0.12)
+			const backgroundColor = this.currentOptions.menuBarBackgroundColor ?? this.currentOptions.backgroundColor?.darken(0.12)
 
 			const foregroundColor = backgroundColor?.isLighter()
 				? INACTIVE_FOREGROUND_DARK
@@ -414,7 +414,7 @@ export class CustomTitlebar extends ThemeBar {
 				foregroundColor,
 				selectionBackgroundColor: bgColor,
 				selectionForegroundColor: fgColor,
-				separatorColor: foregroundColor,
+				separatorColor: this.currentOptions.menuSeparatorColor ?? foregroundColor,
 				svgColor: this.currentOptions.svgColor
 			})
 		}
