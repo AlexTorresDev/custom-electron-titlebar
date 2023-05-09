@@ -348,6 +348,8 @@ export class CustomTitlebar extends ThemeBar {
 	private updateMenu(menu?: Menu) {
 		if (isMacintosh || !menu) return
 
+		if (this.menuBar) this.menuBar.dispose()
+
 		this.menuBar = new MenuBar(this.menuBarContainer, menuIcons, this.currentOptions, { enableMnemonics: true }, this.closeMenu) // TODO: Verify menubar options
 		this.menuBar.push(menu)
 		this.menuBar.update()
