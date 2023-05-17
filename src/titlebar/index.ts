@@ -229,6 +229,12 @@ export class CustomTitlebar extends ThemeBar {
 	}
 
 	private setupContainer() {
+		const containerOverflow = this.currentOptions.containerOverflow
+			
+		if (containerOverflow) {
+			this.container.style.overflow = containerOverflow
+		}
+
 		while (document.body.firstChild) {
 			append(this.container, document.body.firstChild)
 		}
