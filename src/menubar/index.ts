@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------- */
 
-import { Menu } from 'electron'
+import { Menu, ipcRenderer } from 'electron'
 import * as DOM from 'base/common/dom'
 import { Emitter, Event } from 'base/common/event'
 import { Disposable, IDisposable, dispose } from 'base/common/lifecycle'
@@ -912,6 +912,10 @@ export class MenuBar extends Disposable {
 	}
 
 	private onMenuTriggered(menuIndex: number, clicked: boolean) {
+		if (!this.menus[menuIndex].actions) {
+	   		electron_1.ipcRenderer.send('menu-event', menuIndex + 1);
+	   	        return;
+   		}
 		if (this.isOpen) {
 			if (this.isCurrentMenu(menuIndex)) {
 				this.setUnfocusedState()
