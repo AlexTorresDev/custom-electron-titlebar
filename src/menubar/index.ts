@@ -191,7 +191,7 @@ export class MenuBar extends Disposable {
 			if (!this.options.enableMnemonics || !e.altKey || e.ctrlKey || e.defaultPrevented) {
 				return
 			}
-			console.log(this.mnemonics)
+			// console.log(this.mnemonics)
 
 			const key = e.key.toLocaleLowerCase()
 			if (!this.mnemonics.has(key)) {
@@ -865,7 +865,7 @@ export class MenuBar extends Disposable {
 	}
 
 	private updateMnemonicVisibility(visible: boolean): void {
-		console.log({ visible });
+		// console.log({ visible });
 
 		if (this.menus) {
 			this.menus.forEach(menuBarMenu => {
