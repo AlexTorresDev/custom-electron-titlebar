@@ -14,7 +14,7 @@ import { Emitter, Event } from 'base/common/event'
 import { MenuBarOptions } from '../menubar-options'
 import { CETSeparator } from './separator'
 import { CETSubMenu, ISubMenuData } from './submenu'
-import { isLinux } from 'base/common/platform'
+import { isLinux, isFreeBSD } from 'base/common/platform'
 import { IMenuIcons } from 'menubar'
 
 export enum Direction {
@@ -124,6 +124,22 @@ export class CETMenu extends Disposable {
 		}
 
 		if (isLinux) {
+			this._register(addDisposableListener(this.menuContainer, EventType.KEY_DOWN, e => {
+				const event = new StandardKeyboardEvent(e)
+
+				if (event.equals(KeyCode.Home) || event.equals(KeyCode.PageUp)) {
+					this.focusedItem = this.items.length - 1
+					this.focusNext()
+					EventHelper.stop(e, true)
+				} else if (event.equals(KeyCode.End) || event.equals(KeyCode.PageDown)) {
+					this.focusedItem = 0
+					this.focusPrevious()
+					EventHelper.stop(e, true)
+				}
+			}))
+		}
+
+		if (isFreeBSD) {
 			this._register(addDisposableListener(this.menuContainer, EventType.KEY_DOWN, e => {
 				const event = new StandardKeyboardEvent(e)
 

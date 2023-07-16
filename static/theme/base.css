@@ -36,7 +36,8 @@ body {
 }
 
 .cet-titlebar.cet-windows,
-.cet-titlebar.cet-linux {
+.cet-titlebar.cet-linux,
+.cet-titlebar.cet-freebsd {
   padding: 0;
   height: 30px;
   line-height: 30px;

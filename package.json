@@ -18,7 +18,7 @@
     "clean": "rimraf ./dist",
     "build:package": "tsc && tsc-alias",
     "build:babel": "babel ./dist --out-dir ./dist --extensions \".js\"",
-    "start": "electron example/main.js",
+    "start": "electron24 example/main.js",
     "dev": "npm run build && npm run start",
     "build": "npm run clean && npm run build:package && npm run build:babel"
   },
@@ -34,7 +34,8 @@
     "title bar",
     "menubar",
     "windows",
-    "linux"
+    "linux",
+    "freebsd"
   ],
   "bugs": {
     "url": "https://github.com/AlexTorresDev/custom-electron-titlebar/issues"

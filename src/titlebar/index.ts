@@ -6,7 +6,7 @@
 import { ipcRenderer, Menu } from 'electron'
 import { Color } from 'base/common/color'
 import { $, addClass, addDisposableListener, append, EventType, hide, prepend, removeClass, show } from 'base/common/dom'
-import { isLinux, isMacintosh, isWindows, platform, PlatformToString } from 'base/common/platform'
+import { isLinux, isFreeBSD, isMacintosh, isWindows, platform, PlatformToString } from 'base/common/platform'
 import { MenuBar } from 'menubar'
 import { TitleBarOptions } from './options'
 import { ThemeBar } from './themebar'
@@ -321,7 +321,7 @@ export class CustomTitlebar extends ThemeBar {
 	}
 
 	private onMenuBarVisibilityChanged(visible: boolean) {
-		if (isWindows || isLinux) {
+		if (isWindows || isLinux || isFreeBSD) {
 			if (visible) {
 				// Hack to fix issue #52522 with layered webkit-app-region elements appearing under cursor
 				hide(this.dragRegion)
@@ -331,7 +331,7 @@ export class CustomTitlebar extends ThemeBar {
 	}
 
 	private onMenuBarFocusChanged(focused: boolean) {
-		if (isWindows || isLinux) {
+		if (isWindows || isLinux || isFreeBSD) {
 			if (focused) hide(this.dragRegion)
 			else show(this.dragRegion)
 		}
