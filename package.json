@@ -36,7 +36,8 @@
     "title bar",
     "menubar",
     "windows",
-    "linux"
+    "linux",
+    "freebsd"
   ],
   "bugs": {
     "url": "https://github.com/AlexTorresDev/custom-electron-titlebar/issues"
