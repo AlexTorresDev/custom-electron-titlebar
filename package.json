@@ -2,17 +2,17 @@
   "name": "custom-electron-titlebar",
   "version": "4.2.3",
   "description": "Library for electron that allows you to configure a fully customizable title bar.",
-  "types": "./dist/index.d.ts",
+  "types": "./index.d.ts",
   "typesVersions": {
     "*": {
       "main": [
-        "./dist/main/index.d.ts"
+        "./main/index.d.ts"
       ]
     }
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./main": "./dist/main/index.js"
+    ".": "./index.js",
+    "./main": "./main/index.js"
   },
   "scripts": {
     "clean": "rimraf ./dist",
@@ -20,7 +20,8 @@
     "build:babel": "babel ./dist --out-dir ./dist --extensions \".js\"",
     "start": "electron example/main.js",
     "dev": "npm run build && npm run start",
-    "build": "npm run clean && npm run build:package && npm run build:babel"
+    "build": "npm run clean && npm run build:package && npm run build:babel",
+    "test": ""
   },
   "author": "AlexTorresDev <alextorressk@gmail.com>",
   "license": "MIT",
@@ -40,10 +41,6 @@
     "url": "https://github.com/AlexTorresDev/custom-electron-titlebar/issues"
   },
   "homepage": "https://github.com/AlexTorresDev/custom-electron-titlebar#readme",
-  "directories": {
-    "example": "example",
-    "dist": "dist"
-  },
   "peerDependencies": {
     "electron": ">20.0.0"
   },
@@ -63,7 +60,11 @@
     "eslint-plugin-n": "15.7.0",
     "eslint-plugin-promise": "6.1.1",
     "rimraf": "5.0.0",
+    "standard": "17.1.0",
     "tsc-alias": "1.8.6",
     "typescript": "5.0.4"
+  },
+  "eslintConfig": {
+    "extends": "./node_modules/standard/eslintrc.json"
   }
 }

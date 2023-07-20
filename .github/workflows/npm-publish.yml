@@ -1,29 +1,84 @@
-name: NPM Publish
+name: Build & Publish
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize]
 
   workflow_dispatch:
 
 jobs:
-  npm-publish:
+  avoid_redundant:
+    name: ❌ Avoid redundant builds
     runs-on: ubuntu-22.04
     steps:
-      - name: ⬇️ Checkout repository
+      - uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+  
+  build:
+    name: 📦 Build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+          run_install: false
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Build package
+        run: pnpm build
+      - name: Copy files to dist
+        run: |
+          cp LICENSE dist/
+          cp README.md dist/
+          cp package.json dist/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cet-package
+          path: dist
+
+  publish:
+    name: 🚀 Publish
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: "18.x"
           registry-url: https://registry.npmjs.org/
-
-      - name: 📦 Install dependencies
-        run: npm ci
-
-      - name: ✅ Build package
-        run: npm run build
-
+      - name: Get artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cet-package
       - name: 🚀 Publish package to NPM
-        run: npm publish --access public
+        run: ls -l
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

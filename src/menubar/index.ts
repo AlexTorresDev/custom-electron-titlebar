@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------- */
 
-import { Menu } from 'electron'
+import { Menu, ipcRenderer } from 'electron'
 import * as DOM from 'base/common/dom'
 import { Emitter, Event } from 'base/common/event'
 import { Disposable, IDisposable, dispose } from 'base/common/lifecycle'
@@ -127,7 +127,7 @@ export class MenuBar extends Disposable {
 			}))
 		}
 
-		this._register(DOM.ModifierKeyEmitter.getInstance().event(this.onModifierKeyToggled, this));
+		this._register(DOM.ModifierKeyEmitter.getInstance().event(this.onModifierKeyToggled, this))
 
 		this._register(DOM.addDisposableListener(this.container, DOM.EventType.KEY_DOWN, (e) => {
 			const event = new StandardKeyboardEvent(e as KeyboardEvent)
@@ -191,7 +191,6 @@ export class MenuBar extends Disposable {
 			if (!this.options.enableMnemonics || !e.altKey || e.ctrlKey || e.defaultPrevented) {
 				return
 			}
-			console.log(this.mnemonics)
 
 			const key = e.key.toLocaleLowerCase()
 			if (!this.mnemonics.has(key)) {
@@ -865,8 +864,6 @@ export class MenuBar extends Disposable {
 	}
 
 	private updateMnemonicVisibility(visible: boolean): void {
-		console.log({ visible });
-
 		if (this.menus) {
 			this.menus.forEach(menuBarMenu => {
 				if (menuBarMenu.titleElement && menuBarMenu.titleElement.children.length) {
@@ -912,6 +909,11 @@ export class MenuBar extends Disposable {
 	}
 
 	private onMenuTriggered(menuIndex: number, clicked: boolean) {
+		if (!this.menus[menuIndex].actions) {
+			ipcRenderer.send('menu-event', menuIndex + 1)
+			return
+		}
+
 		if (this.isOpen) {
 			if (this.isCurrentMenu(menuIndex)) {
 				this.setUnfocusedState()
@@ -927,46 +929,46 @@ export class MenuBar extends Disposable {
 	}
 
 	private onModifierKeyToggled(modifierKeyStatus: DOM.IModifierKeyStatus): void {
-		const allModifiersReleased = !modifierKeyStatus.altKey && !modifierKeyStatus.ctrlKey && !modifierKeyStatus.shiftKey && !modifierKeyStatus.metaKey;
+		const allModifiersReleased = !modifierKeyStatus.altKey && !modifierKeyStatus.ctrlKey && !modifierKeyStatus.shiftKey && !modifierKeyStatus.metaKey
 
 		if (this.options.visibility === 'hidden') {
-			return;
+			return
 		}
 
 		// Prevent alt-key default if the menu is not hidden and we use alt to focus
 		if (modifierKeyStatus.event && this.shouldAltKeyFocus) {
 			if (ScanCodeUtils.toEnum(modifierKeyStatus.event.code) === ScanCode.AltLeft) {
-				modifierKeyStatus.event.preventDefault();
+				modifierKeyStatus.event.preventDefault()
 			}
 		}
 
 		// Alt key pressed while menu is focused. This should return focus away from the menubar
 		if (this.isFocused && modifierKeyStatus.lastKeyPressed === 'alt' && modifierKeyStatus.altKey) {
-			this.setUnfocusedState();
-			this.mnemonicsInUse = false;
-			this.awaitingAltRelease = true;
+			this.setUnfocusedState()
+			this.mnemonicsInUse = false
+			this.awaitingAltRelease = true
 		}
 
 		// Clean alt key press and release
 		if (allModifiersReleased && modifierKeyStatus.lastKeyPressed === 'alt' && modifierKeyStatus.lastKeyReleased === 'alt') {
 			if (!this.awaitingAltRelease) {
 				if (!this.isFocused && this.shouldAltKeyFocus) {
-					this.mnemonicsInUse = true;
-					this.focusedMenu = { index: this.numMenusShown > 0 ? 0 : MenuBar.OVERFLOW_INDEX };
-					this.focusState = MenubarState.FOCUSED;
+					this.mnemonicsInUse = true
+					this.focusedMenu = { index: this.numMenusShown > 0 ? 0 : MenuBar.OVERFLOW_INDEX }
+					this.focusState = MenubarState.FOCUSED
 				} else if (!this.isOpen) {
-					this.setUnfocusedState();
+					this.setUnfocusedState()
 				}
 			}
 		}
 
 		// Alt key released
 		if (!modifierKeyStatus.altKey && modifierKeyStatus.lastKeyReleased === 'alt') {
-			this.awaitingAltRelease = false;
+			this.awaitingAltRelease = false
 		}
 
 		if (this.options.enableMnemonics && this.menus && !this.isOpen) {
-			this.updateMnemonicVisibility((!this.awaitingAltRelease && modifierKeyStatus.altKey) || this.mnemonicsInUse);
+			this.updateMnemonicVisibility((!this.awaitingAltRelease && modifierKeyStatus.altKey) || this.mnemonicsInUse)
 		}
 	}
 

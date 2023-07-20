@@ -230,7 +230,7 @@ export class CustomTitlebar extends ThemeBar {
 
 	private setupContainer() {
 		const containerOverflow = this.currentOptions.containerOverflow
-			
+
 		if (containerOverflow) {
 			this.container.style.overflow = containerOverflow
 		}
