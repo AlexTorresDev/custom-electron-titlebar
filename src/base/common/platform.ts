@@ -7,6 +7,7 @@
 let _isWindows = false
 let _isMacintosh = false
 let _isLinux = false
+let _isFreeBSD = false
 let _isNative = false
 let _isWeb = false
 
@@ -43,11 +44,13 @@ if (typeof navigator === 'object' && !isElectronRenderer) {
 	_isWindows = userAgent.indexOf('Windows') >= 0
 	_isMacintosh = userAgent.indexOf('Macintosh') >= 0
 	_isLinux = userAgent.indexOf('Linux') >= 0
+	_isFreeBSD = userAgent.indexOf('FreeBSD') >= 0
 	_isWeb = true
 } else if (typeof process === 'object') {
 	_isWindows = (process.platform === 'win32')
 	_isMacintosh = (process.platform === 'darwin')
 	_isLinux = (process.platform === 'linux')
+	_isFreeBSD = (process.platform === 'freebsd')
 	_isNative = true
 }
 
@@ -55,6 +58,7 @@ export const enum Platform {
 	Web,
 	Mac,
 	Linux,
+	FreeBSD,
 	Windows
 }
 export function PlatformToString(platform: Platform) {
@@ -62,6 +66,7 @@ export function PlatformToString(platform: Platform) {
 		case Platform.Web: return 'Web'
 		case Platform.Mac: return 'Mac'
 		case Platform.Linux: return 'Linux'
+		case Platform.FreeBSD: return 'FreeBSD'
 		case Platform.Windows: return 'Windows'
 	}
 }
@@ -74,12 +79,15 @@ if (_isNative) {
 		_platform = Platform.Windows
 	} else if (_isLinux) {
 		_platform = Platform.Linux
+	} else if (_isFreeBSD) {
+		_platform = Platform.FreeBSD
 	}
 }
 
 export const isWindows = _isWindows
 export const isMacintosh = _isMacintosh
 export const isLinux = _isLinux
+export const isFreeBSD = _isFreeBSD
 export const isNative = _isNative
 export const isWeb = _isWeb
 export const platform = _platform
@@ -109,10 +117,11 @@ export function setImmediate(callback: (...args: any[]) => void): number {
 export const enum OperatingSystem {
 	Windows = 1,
 	Macintosh = 2,
-	Linux = 3
+	Linux = 3,
+	FreeBSD = 4
 }
 
-const _wl = _isWindows ? OperatingSystem.Windows : OperatingSystem.Linux
+const _wl = _isWindows ? OperatingSystem.Windows : OperatingSystem.Linux | OperatingSystem.FreeBSD
 export const OS = (_isMacintosh ? OperatingSystem.Macintosh : _wl)
 
 export const enum AccessibilitySupport {
