@@ -47,7 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
       - name: Build package
         run: pnpm build
       - name: Copy files to dist
@@ -63,8 +63,9 @@ jobs:
 
   publish:
     name: 🚀 Publish
-    runs-on: ubuntu-22.04
+    if: github.event_name == 'push'
     needs: build
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
