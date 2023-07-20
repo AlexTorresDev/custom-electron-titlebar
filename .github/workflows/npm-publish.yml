@@ -68,20 +68,10 @@ jobs:
     needs: build
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
-          registry-url: https://registry.npmjs.org/
       - name: Get artifact
         uses: actions/download-artifact@v3
         with:
           name: cet-package
-          path: package
-      - name: Go to package directory
-        run: cd package
       - name: 🚀 Publish package to NPM
         run: ls -l
         env:
