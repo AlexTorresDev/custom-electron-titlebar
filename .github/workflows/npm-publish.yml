@@ -1,9 +1,8 @@
 name: Build & Publish
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
   pull_request:
     branches:
       - main
@@ -64,7 +63,7 @@ jobs:
 
   publish:
     name: 🚀 Publish
-    if: github.event_name == 'push'
+    if: github.event_name == 'release'
     needs: build
     runs-on: ubuntu-22.04
     steps:
