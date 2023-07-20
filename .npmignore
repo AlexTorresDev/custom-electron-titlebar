@@ -36,4 +36,4 @@ tsconfig.json
 npm-debug.log
 .babelrc
 .eslintrc
-.prettierrc.json
+.prettierrc

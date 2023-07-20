@@ -228,8 +228,6 @@ export class StandardKeyboardEvent implements IKeyboardEvent {
 
 		this._asKeybinding = this._computeKeybinding()
 		this._asRuntimeKeybinding = this._computeRuntimeKeybinding()
-
-		// console.log(`code: ${e.code}, keyCode: ${e.keyCode}, key: ${e.key}`);
 	}
 
 	public preventDefault(): void {
