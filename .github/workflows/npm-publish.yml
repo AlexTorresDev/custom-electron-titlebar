@@ -80,6 +80,6 @@ jobs:
           name: cet-package
           path: dist
       - name: 🚀 Publish package to NPM
-        run: npm publish dist --access public
+        run: npm publish /dist --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
