@@ -71,6 +71,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cet-package
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          registry-url: https://registry.npmjs.org/
       - name: 🚀 Publish package to NPM
         run: npm publish --access public
         env:
