@@ -2,18 +2,18 @@
   "name": "custom-electron-titlebar",
   "version": "4.2.4",
   "description": "Library for electron that allows you to configure a fully customizable title bar.",
-  "types": "./index.d.ts",
-  "main": "./index.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.ts",
   "typesVersions": {
     "*": {
       "main": [
-        "./main/index.d.ts"
+        "./dist/main/index.d.ts"
       ]
     }
   },
   "exports": {
-    ".": "./index.js",
-    "./main": "./main/index.js"
+    ".": "./dist/index.js",
+    "./main": "./dist/main/index.js"
   },
   "scripts": {
     "clean": "rimraf ./dist",
@@ -48,24 +48,24 @@
     "electron": ">20.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.21.5",
-    "@babel/core": "7.21.8",
-    "@typescript-eslint/eslint-plugin": "5.59.2",
-    "@typescript-eslint/parser": "5.59.2",
+    "@babel/cli": "7.22.9",
+    "@babel/core": "7.22.9",
+    "@typescript-eslint/eslint-plugin": "6.1.0",
+    "@typescript-eslint/parser": "6.1.0",
     "babel-plugin-import-require-as-string": "1.0.2",
     "babel-plugin-module-resolver": "5.0.0",
     "babel-plugin-rewire": "1.2.0",
-    "electron": "24.2.0",
-    "eslint": "8.40.0",
+    "electron": "25.3.1",
+    "eslint": "8.45.0",
     "eslint-config-prettier": "8.8.0",
-    "eslint-config-standard": "17.0.0",
+    "eslint-config-standard": "17.1.0",
     "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-n": "15.7.0",
+    "eslint-plugin-n": "16.0.1",
     "eslint-plugin-promise": "6.1.1",
-    "rimraf": "5.0.0",
+    "rimraf": "5.0.1",
     "standard": "17.1.0",
-    "tsc-alias": "1.8.6",
-    "typescript": "5.0.4"
+    "tsc-alias": "1.8.7",
+    "typescript": "5.1.6"
   },
   "eslintConfig": {
     "extends": "./node_modules/standard/eslintrc.json"
