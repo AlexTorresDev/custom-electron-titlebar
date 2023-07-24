@@ -23,7 +23,7 @@
     "dev": "npm run build && npm run start",
     "build": "npm run clean && npm run build:package && npm run build:babel",
     "postversion": "cp package.json .. && chmod u+x ../revert.sh && ../revert.sh",
-    "test": "echo \"Test script here\""
+    "test": "jest"
   },
   "author": "AlexTorresDev <alextorressk@gmail.com>",
   "license": "MIT",
@@ -50,6 +50,7 @@
   "devDependencies": {
     "@babel/cli": "7.22.9",
     "@babel/core": "7.22.9",
+    "@jest/globals": "29.6.1",
     "@typescript-eslint/eslint-plugin": "6.1.0",
     "@typescript-eslint/parser": "6.1.0",
     "babel-plugin-import-require-as-string": "1.0.2",
@@ -62,8 +63,11 @@
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-n": "16.0.1",
     "eslint-plugin-promise": "6.1.1",
+    "jest": "^29.6.1",
+    "jest-environment-jsdom": "29.6.1",
     "rimraf": "5.0.1",
     "standard": "17.1.0",
+    "ts-jest": "29.1.1",
     "tsc-alias": "1.8.7",
     "typescript": "5.1.6"
   },

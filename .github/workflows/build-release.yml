@@ -37,10 +37,10 @@ jobs:
           node-version: "lts/*"
           cache: pnpm
       - run: pnpm install --no-frozen-lockfile
-      - name: Test
-        run: pnpm test
       - name: Build
         run: pnpm build
+      - name: Test
+        run: pnpm test
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
