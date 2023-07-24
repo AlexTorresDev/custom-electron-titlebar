@@ -2,9 +2,10 @@
 
 This project is a typescript library for electron that allows you to configure a fully customizable title bar.
 
-[![LICENSE](https://img.shields.io/github/license/AlexTorresDev/custom-electron-titlebar.svg)](https://github.com/AlexTorresDev/custom-electron-titlebar/blob/master/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/custom-electron-titlebar.svg)](https://npmjs.org/package/custom-electron-titlebar)
-[![install size](https://packagephobia.com/badge?p=custom-electron-titlebar)](https://packagephobia.com/result?p=custom-electron-titlebar)
+[![CI](https://badgen.net/github/checks/AlexTorresDev/custom-electron-titlebar?label=CI)](https://github.com/AlexTorresDev/custom-electron-titlebar/actions/workflows/build-release.yml)
+[![License](https://badgen.net/github/license/AlexTorresDev/custom-electron-titlebar?label=License)](https://github.com/AlexTorresDev/custom-electron-titlebar/blob/master/LICENSE)
+[![NPM](https://badgen.net/npm/v/custom-electron-titlebar?label=NPM)](https://npmjs.org/package/custom-electron-titlebar)
+[![Install size](https://badgen.net/packagephobia/install/custom-electron-titlebar?label=Install%20size)](https://packagephobia.com/result?p=custom-electron-titlebar)
 
 [📄 Visit Documentation](https://cet.alextrs.dev)
 
@@ -72,11 +73,13 @@ window.addEventListener('DOMContentLoaded', () => {
 To see the options you can include in the Title Bar constructor, such as color of elements, icons, menu position, and much more, and the methods you can use, go to the [wiki](https://github.com/AlexTorresDev/custom-electron-titlebar/wiki)
 
 ## 💰 Support
-If you want to support my development, you can do so by donating through [Buy me a coffee](https://www.buymeacoffee.com/AlexTorresDev)
+If you want to support my development, you can do so by donating through [💖 Sponsor](https://github.com/sponsors/AlexTorresDev)
 
 
-## 📝 Collaborators
+## 📝 Contributors
 I would like to express my sincere gratitude to all the people who have collaborated in the development and advancement of this project. I appreciate your contributions.
+
+[![](https://contrib.rocks/image?repo=AlexTorresDev/custom-electron-titlebar)](https://github.com/AlexTorresDev/custom-electron-titlebar/graphs/contributors)
 
 
 ## ✅ License

@@ -68,7 +68,7 @@ export class CustomTitlebar extends ThemeBar {
 
 		this.currentOptions = { ...this.currentOptions, ...options }
 
-		const jWindowIcons = (menuIcons as any)[PlatformToString(platform).toLocaleLowerCase()]
+		const jWindowIcons = (menuIcons as any)[PlatformToString(platform)?.toLocaleLowerCase()]
 		this.platformIcons = jWindowIcons
 
 		this.titlebar = $('.cet-titlebar')
@@ -182,7 +182,7 @@ export class CustomTitlebar extends ThemeBar {
 	}
 
 	private setupMenubar() {
-		ipcRenderer.invoke('request-application-menu').then((menu?: Menu) => this.updateMenu(menu))
+		ipcRenderer.invoke('request-application-menu')?.then((menu?: Menu) => this.updateMenu(menu))
 
 		const menuPosition = this.currentOptions.menuPosition
 
@@ -221,9 +221,9 @@ export class CustomTitlebar extends ThemeBar {
 
 		if (isMacintosh || onlyRendererMenuBar) return
 
-		this.createControlButton(this.controls.minimize, this.platformIcons.minimize, tooltips.minimize!, this.currentOptions.minimizable)
-		this.createControlButton(this.controls.maximize, this.platformIcons.maximize, tooltips.maximize!, this.currentOptions.maximizable)
-		this.createControlButton(this.controls.close, this.platformIcons.close, tooltips.close!, this.currentOptions.closeable)
+		this.createControlButton(this.controls.minimize, this.platformIcons?.minimize, tooltips.minimize!, this.currentOptions.minimizable)
+		this.createControlButton(this.controls.maximize, this.platformIcons?.maximize, tooltips.maximize!, this.currentOptions.maximizable)
+		this.createControlButton(this.controls.close, this.platformIcons?.close, tooltips.close!, this.currentOptions.closeable)
 
 		append(this.titlebar, this.controlsContainer)
 	}
@@ -246,7 +246,7 @@ export class CustomTitlebar extends ThemeBar {
 		const order = this.currentOptions.order
 		const hasShadow = this.currentOptions.shadow
 
-		addClass(this.titlebar, `cet-${PlatformToString(platform).toLocaleLowerCase()}`)
+		addClass(this.titlebar, `cet-${PlatformToString(platform)?.toLocaleLowerCase()}`)
 
 		if (order) {
 			addClass(this.titlebar, `cet-${order}`)
@@ -550,7 +550,7 @@ export class CustomTitlebar extends ThemeBar {
 	 */
 	public updateBackground(backgroundColor: Color) {
 		this.currentOptions.backgroundColor = backgroundColor
-		// this.updateStyles()
+		this.updateStyles()
 
 		return this
 	}
@@ -561,7 +561,7 @@ export class CustomTitlebar extends ThemeBar {
 	 */
 	public updateItemBGColor(itemBGColor: Color) {
 		this.currentOptions.itemBackgroundColor = itemBGColor
-		// this._updateStyles()
+		this.updateStyles()
 
 		return this
 	}
@@ -610,5 +610,21 @@ export class CustomTitlebar extends ThemeBar {
 		this.titlebar.remove()
 		while (this.container.firstChild) append(document.body, this.container.firstChild)
 		this.container.remove()
+	}
+
+	public get titlebarElement() {
+		return this.titlebar
+	}
+
+	public get menubarElement() {
+		return this.menuBar
+	}
+
+	public get containerElement() {
+		return this.container
+	}
+
+	public get titleElement() {
+		return this.title
 	}
 }
