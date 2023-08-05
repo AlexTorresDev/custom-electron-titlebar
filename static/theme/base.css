@@ -250,13 +250,11 @@ body {
   opacity: 0.4;
 }
 
-.cet-menubar .cet-menubar-menu-button:not(.disabled):focus,
 .cet-menubar .cet-menubar-menu-button:not(.disabled):hover,
 .cet-menubar .cet-menubar-menu-button:not(.disabled).open {
   background-color: rgb(255 255 255 / 12%);
 }
 
-.cet-titlebar.light .cet-menubar .cet-menubar-menu-button:not(.disabled):focus,
 .cet-titlebar.light .cet-menubar .cet-menubar-menu-button:not(.disabled):hover,
 .cet-titlebar.light .cet-menubar .cet-menubar-menu-button:not(.disabled).open {
   background-color: rgb(0 0 0 / 12%);
