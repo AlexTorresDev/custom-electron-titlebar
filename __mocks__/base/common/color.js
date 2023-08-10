@@ -1,7 +1,6 @@
 module.exports = {
-  Color: {
-    fromHex: jest.fn(),
-    isLighter: jest.fn(),
-    WHITE: 'mocked-white-color'
-  }
+	Color: {
+		fromHex: jest.fn(),
+		MOCKED_COLOR: '#000000'
+	}
 }

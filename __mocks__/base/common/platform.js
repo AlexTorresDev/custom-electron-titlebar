@@ -1,6 +1,6 @@
 module.exports = {
-  platform: 'Windows',
-  isMacintosh: false,
-  isWindows: true,
-  isLinux: false,
+	platform: 'Windows',
+	isMacintosh: false,
+	isWindows: true,
+	isLinux: false
 }
