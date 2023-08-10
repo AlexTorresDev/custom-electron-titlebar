@@ -37,6 +37,7 @@ export class CustomTitlebar extends ThemeBar {
 	}
 
 	private currentOptions: TitleBarOptions = {
+		backgroundColor: Color.WHITE,
 		closeable: true,
 		enableMnemonics: true,
 		// hideWhenClickingClose: false,
@@ -396,25 +397,24 @@ export class CustomTitlebar extends ThemeBar {
 				: ACTIVE_FOREGROUND
 		}
 
-		this.titlebar.style.color = foregroundColor.toString()
+		this.titlebar.style.color = foregroundColor?.toString()
 
 		if (this.menuBar) {
 			let fgColor
-			const backgroundColor = this.currentOptions.menuBarBackgroundColor ?? this.currentOptions.backgroundColor?.darken(0.12)
+			const backgroundColor = this.currentOptions.menuBarBackgroundColor || this.currentOptions.backgroundColor!.darken(0.12)
 
 			const foregroundColor = backgroundColor?.isLighter()
 				? INACTIVE_FOREGROUND_DARK
 				: INACTIVE_FOREGROUND
 
-			const bgColor = !this.currentOptions.itemBackgroundColor || this.currentOptions.itemBackgroundColor.equals(backgroundColor!)
-				? DEFAULT_ITEM_SELECTOR
-				: this.currentOptions.itemBackgroundColor
+			const bgColor = this.currentOptions.itemBackgroundColor && !this.currentOptions.itemBackgroundColor.equals(backgroundColor)
+				? this.currentOptions.itemBackgroundColor
+				: DEFAULT_ITEM_SELECTOR
 
-
-			if (bgColor.equals(DEFAULT_ITEM_SELECTOR)) {
+			if (bgColor?.equals(DEFAULT_ITEM_SELECTOR)) {
 				fgColor = backgroundColor?.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
 			} else {
-				fgColor = bgColor.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
+				fgColor = bgColor?.isLighter() ? ACTIVE_FOREGROUND_DARK : ACTIVE_FOREGROUND
 			}
 
 			this.menuBar.setStyles({
@@ -549,6 +549,7 @@ export class CustomTitlebar extends ThemeBar {
 	 * @param backgroundColor The color for the background
 	 */
 	public updateBackground(backgroundColor: Color) {
+		if (typeof backgroundColor === 'string') backgroundColor = Color.fromHex(backgroundColor)
 		this.currentOptions.backgroundColor = backgroundColor
 		this.updateStyles()
 
@@ -560,6 +561,7 @@ export class CustomTitlebar extends ThemeBar {
 	 * @param itemBGColor The color for the item background
 	 */
 	public updateItemBGColor(itemBGColor: Color) {
+		if (typeof itemBGColor === 'string') itemBGColor = Color.fromHex(itemBGColor)
 		this.currentOptions.itemBackgroundColor = itemBGColor
 		this.updateStyles()
 
