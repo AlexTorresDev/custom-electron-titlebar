@@ -422,8 +422,7 @@ export class CETMenu extends Disposable {
 			if (transparency < 0) transparency = 0
 			if (transparency > 1) transparency = 1
 			const rgba = style.backgroundColor?.rgba
-			const color = new Color(new RGBA(rgba.r, rgba.g, rgba.b, 1 - transparency))
-			container.style.backgroundColor = color.toString()
+			container.style.backgroundColor = `rgb(${rgba.r} ${rgba.g} ${rgba.b} / ${1 - transparency})`
 		}
 
 		if (this.items) {

@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, nativeImage } = require('electron')
+const { app, BrowserWindow, Menu, nativeImage, ipcMain, nativeTheme } = require('electron')
 const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main')
 const path = require('path')
 
@@ -11,16 +11,16 @@ function createWindow() {
 	const mainWindow = new BrowserWindow({
 		width: 1000,
 		height: 600,
-		frame: false,
 		titleBarStyle: 'hidden',
+		titleBarOverlay: true,
 		webPreferences: {
 			sandbox: false,
 			preload: path.join(__dirname, 'preload.js')
 		}
 	})
 
-	const menu = Menu.buildFromTemplate(exampleMenuTemplate)
-	Menu.setApplicationMenu(menu)
+	/* const menu = Menu.buildFromTemplate(exampleMenuTemplate)
+	Menu.setApplicationMenu(menu) */
 
 	// and load the index.html of the app.
 	// mainWindow.loadFile('index.html')
@@ -32,6 +32,19 @@ function createWindow() {
 	// Attach listeners
 	attachTitlebarToWindow(mainWindow)
 }
+
+ipcMain.handle('dark-mode:toggle', () => {
+	if (nativeTheme.shouldUseDarkColors) {
+		nativeTheme.themeSource = 'light'
+	} else {
+		nativeTheme.themeSource = 'dark'
+	}
+	return nativeTheme.shouldUseDarkColors
+})
+
+ipcMain.handle('dark-mode:system', () => {
+	nativeTheme.themeSource = 'system'
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

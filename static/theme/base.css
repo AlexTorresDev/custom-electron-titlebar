@@ -142,7 +142,7 @@ body {
 }
 
 .cet-control-icon {
-  width: 46px;
+  width: 2.85rem;
 }
 
 .cet-control-icon:not(.inactive):hover {
@@ -277,7 +277,7 @@ body {
   justify-content: flex-end;
   white-space: nowrap;
   border-radius: 7px;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
   z-index: 99999;
 }

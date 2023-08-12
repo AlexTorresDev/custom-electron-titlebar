@@ -5,7 +5,7 @@
 import { WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from 'consts'
 import { BrowserWindow } from 'electron'
 
-export = (browserWindow: BrowserWindow) => {
+export default (browserWindow: BrowserWindow) => {
 	browserWindow.setMinimumSize(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT)
 
 	browserWindow.on('enter-full-screen', () => {
