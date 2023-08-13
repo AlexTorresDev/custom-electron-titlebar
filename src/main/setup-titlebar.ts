@@ -3,10 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------- */
 
-export = () => {
+export default () => {
 	if (process.type !== 'browser') return
 
-	const { BrowserWindow, nativeImage, Menu, ipcMain } = require('electron')
+	const { BrowserWindow, Menu, MenuItem, ipcMain } = require('electron')
 
 	// Send menu to renderer title bar process
 	ipcMain.handle('request-application-menu', async () => JSON.parse(JSON.stringify(
@@ -18,6 +18,7 @@ export = () => {
 	ipcMain.on('window-event', (event, eventName: String) => {
 		const window = BrowserWindow.fromWebContents(event.sender)
 
+		/* eslint-disable indent */
 		if (window) {
 			switch (eventName) {
 				case 'window-minimize':
@@ -51,6 +52,16 @@ export = () => {
 			event.returnValue = item.icon.toDataURL()
 		} else {
 			event.returnValue = null
+		}
+	})
+
+	ipcMain.on('update-window-controls', (event, args: Electron.TitleBarOverlay) => {
+		const window = BrowserWindow.fromWebContents(event.sender)
+		try {
+			if (window) window.setTitleBarOverlay(args)
+			event.returnValue = true
+		} catch (_) {
+			event.returnValue = false
 		}
 	})
 }

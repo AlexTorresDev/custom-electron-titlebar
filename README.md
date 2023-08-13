@@ -7,7 +7,7 @@ This project is a typescript library for electron that allows you to configure a
 [![NPM](https://badgen.net/npm/v/custom-electron-titlebar?label=NPM)](https://npmjs.org/package/custom-electron-titlebar)
 [![Install size](https://badgen.net/packagephobia/install/custom-electron-titlebar?label=Install%20size)](https://packagephobia.com/result?p=custom-electron-titlebar)
 
-[📄 Visit Documentation](https://cet.alextrs.dev)
+[📄 Documentation](https://github.com/AlexTorresDev/custom-electron-titlebar/wiki)
 
 Standard Title Bar
 
@@ -26,9 +26,15 @@ Custom color
 ![Screenshot 4](screenshots/cet-4.png)
 
 # 📦 Installing
-You can install this package with `npm`.
+You can install this package with `npm`, `pnpm` or `yarn`.
 ```sh
 npm install custom-electron-titlebar
+```
+```sh
+pnpm add custom-electron-titlebar
+```
+```sh
+yarn add custom-electron-titlebar
 ```
 
 # 🛠️ Usage
@@ -46,8 +52,10 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    titleBarStyle: 'hidden',
     //frame: false, // needed if process.versions.electron < 14
+    titleBarStyle: 'hidden',
+    /* You can use *titleBarOverlay: true* to use the original Windows controls */
+    titleBarOverlay: true,
     webPreferences: {
       sandbox: false,
       preload: path.join(__dirname, 'preload.js')

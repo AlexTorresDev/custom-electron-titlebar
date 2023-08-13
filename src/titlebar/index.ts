@@ -10,7 +10,7 @@ import { isLinux, isFreeBSD, isMacintosh, isWindows, platform, PlatformToString 
 import { MenuBar } from 'menubar'
 import { TitleBarOptions } from './options'
 import { ThemeBar } from './themebar'
-import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, DEFAULT_ITEM_SELECTOR, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, loadWindowIcons, menuIcons, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from 'consts'
+import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, DEFAULT_ITEM_SELECTOR, getPx, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, loadWindowIcons, menuIcons, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from 'consts'
 
 export class CustomTitlebar extends ThemeBar {
 	private titlebar: HTMLElement
@@ -37,7 +37,6 @@ export class CustomTitlebar extends ThemeBar {
 	}
 
 	private currentOptions: TitleBarOptions = {
-		backgroundColor: Color.WHITE,
 		closeable: true,
 		enableMnemonics: true,
 		// hideWhenClickingClose: false,
@@ -136,7 +135,7 @@ export class CustomTitlebar extends ThemeBar {
 			this.currentOptions.backgroundColor = color
 		}
 
-		this.titlebar.style.backgroundColor = color!.toString()
+		this.titlebar.style.backgroundColor = color.toString()
 	}
 
 	/**
@@ -273,6 +272,8 @@ export class CustomTitlebar extends ThemeBar {
 		const maximizable = this.currentOptions.maximizable
 		const closeable = this.currentOptions.closeable
 
+		this.onDidChangeMaximized(ipcRenderer.sendSync('window-event', 'window-is-maximized'))
+
 		ipcRenderer.on('window-maximize', (_, isMaximized) => this.onDidChangeMaximized(isMaximized))
 		ipcRenderer.on('window-fullscreen', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen))
 		ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused))
@@ -378,7 +379,7 @@ export class CustomTitlebar extends ThemeBar {
 			: this.currentOptions.backgroundColor
 
 		if (backgroundColor) {
-			this.titlebar.style.backgroundColor = backgroundColor.toString()
+			this.titlebar.style.backgroundColor = backgroundColor?.toString()
 		}
 
 		let foregroundColor: Color
@@ -398,6 +399,18 @@ export class CustomTitlebar extends ThemeBar {
 		}
 
 		this.titlebar.style.color = foregroundColor?.toString()
+
+		const updatedWindowControls = ipcRenderer.sendSync('update-window-controls', {
+			color: backgroundColor?.toString(),
+			symbolColor: foregroundColor?.toString(),
+			height: TOP_TITLEBAR_HEIGHT_WIN
+		})
+
+		if (updatedWindowControls) {
+			hide(this.controlsContainer)
+		} else {
+			show(this.controlsContainer)
+		}
 
 		if (this.menuBar) {
 			let fgColor
@@ -452,6 +465,9 @@ export class CustomTitlebar extends ThemeBar {
 	 * @param fullscreen Fullscreen state of the window
 	 */
 	public onWindowFullScreen(fullscreen: boolean) {
+		const height = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
+		const hasShadow = this.currentOptions.shadow
+
 		if (!isMacintosh) {
 			if (fullscreen) {
 				hide(this.titlebar)
@@ -459,10 +475,10 @@ export class CustomTitlebar extends ThemeBar {
 			} else {
 				show(this.titlebar)
 				if (this.currentOptions.menuPosition === 'bottom') {
-					this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
-					this.controlsContainer.style.height = TOP_TITLEBAR_HEIGHT_WIN
+					this.container.style.top = getPx(BOTTOM_TITLEBAR_HEIGHT)
+					this.controlsContainer.style.height = getPx(TOP_TITLEBAR_HEIGHT_WIN)
 				} else {
-					this.container.style.top = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
+					this.container.style.top = getPx(height + (hasShadow ? 1 : 0))
 				}
 			}
 		}
@@ -524,13 +540,13 @@ export class CustomTitlebar extends ThemeBar {
 			removeClass(this.title, 'cet-title-center')
 
 			if (menuPosition !== 'bottom') {
-				/* addDisposableListener(window, 'resize', () => {
+				addDisposableListener(window, 'resize', () => {
 					if (window.innerWidth >= 1188) {
 						addClass(this.title, 'cet-title-center')
 					} else {
 						removeClass(this.title, 'cet-title-center')
 					}
-				}) */
+				})
 				addClass(this.title, 'cet-title-center')
 			}
 
@@ -587,17 +603,18 @@ export class CustomTitlebar extends ThemeBar {
 	public updateMenuPosition(menuPosition: 'left' | 'bottom') {
 		const height = isMacintosh ? TOP_TITLEBAR_HEIGHT_MAC : TOP_TITLEBAR_HEIGHT_WIN
 		const onlyRendererMenuBar = this.currentOptions.onlyShowMenuBar
+		const hasShadow = this.currentOptions.shadow
 
 		this.currentOptions.menuPosition = menuPosition
 
 		if (menuPosition === 'left' || onlyRendererMenuBar) {
-			this.titlebar.style.height = height
-			this.container.style.top = height
+			this.titlebar.style.height = getPx(height + (hasShadow ? 1 : 0))
+			this.container.style.top = getPx(height + (hasShadow ? 1 : 0))
 			removeClass(this.menuBarContainer, 'bottom')
 		} else {
-			this.titlebar.style.height = BOTTOM_TITLEBAR_HEIGHT
-			this.container.style.top = BOTTOM_TITLEBAR_HEIGHT
-			this.controlsContainer.style.height = height
+			this.titlebar.style.height = getPx(BOTTOM_TITLEBAR_HEIGHT)
+			this.container.style.top = getPx(BOTTOM_TITLEBAR_HEIGHT)
+			this.controlsContainer.style.height = getPx(height)
 			addClass(this.menuBarContainer, 'bottom')
 		}
 

@@ -14,9 +14,9 @@ export const ACTIVE_FOREGROUND = Color.fromHex('#FFFFFF')
 export const DEFAULT_ITEM_SELECTOR = Color.fromHex('#0000001F')
 
 export const IS_MAC_BIGSUR_OR_LATER = isMacintosh && parseInt(process.getSystemVersion().split('.')[0]) >= 11
-export const BOTTOM_TITLEBAR_HEIGHT = '60px'
-export const TOP_TITLEBAR_HEIGHT_MAC = IS_MAC_BIGSUR_OR_LATER ? '28px' : '22px'
-export const TOP_TITLEBAR_HEIGHT_WIN = '32px'
+export const BOTTOM_TITLEBAR_HEIGHT = 60
+export const TOP_TITLEBAR_HEIGHT_MAC = IS_MAC_BIGSUR_OR_LATER ? 28 : 22
+export const TOP_TITLEBAR_HEIGHT_WIN = 30
 
 export const WINDOW_MIN_WIDTH = 400
 export const WINDOW_MIN_HEIGHT = 270
@@ -68,6 +68,10 @@ export const menuIcons: ITitlebarIcons = {
 		restore: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 11"><path d="M7.9,2.2h-7C0.4,2.2,0,2.6,0,3.1v7C0,10.6,0.4,11,0.9,11h7c0.5,0,0.9-0.4,0.9-0.9v-7C8.8,2.6,8.4,2.2,7.9,2.2z M7.7,9.6 c0,0.2-0.1,0.3-0.3,0.3h-6c-0.2,0-0.3-0.1-0.3-0.3v-6c0-0.2,0.1-0.3,0.3-0.3h6c0.2,0,0.3,0.1,0.3,0.3V9.6z"/><path d="M10,0H3.5v1.1h6.1c0.2,0,0.3,0.1,0.3,0.3v6.1H11V1C11,0.4,10.6,0,10,0z"/></svg>',
 		close: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 11"><path d="M6.279 5.5L11 10.221l-.779.779L5.5 6.279.779 11 0 10.221 4.721 5.5 0 .779.779 0 5.5 4.721 10.221 0 11 .779 6.279 5.5z"/></svg>'
 	}
+}
+
+export function getPx(value: number): string {
+	return `${value}px`
 }
 
 /**
