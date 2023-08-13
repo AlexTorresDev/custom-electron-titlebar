@@ -29,8 +29,8 @@ describe('CustomTitlebar', () => {
 
 	test('should update the menu position', () => {
 		titlebar.updateMenuPosition('bottom')
-		expect(titlebar.titlebarElement.style.height).toBe(BOTTOM_TITLEBAR_HEIGHT)
-		expect(titlebar.containerElement.style.top).toBe(BOTTOM_TITLEBAR_HEIGHT)
+		expect(titlebar.titlebarElement.style.height).toBe(`${BOTTOM_TITLEBAR_HEIGHT}px`)
+		expect(titlebar.containerElement.style.top).toBe(`${BOTTOM_TITLEBAR_HEIGHT}px`)
 		expect(titlebar.menuBarContainer.classList.contains('bottom')).toBe(true)
 	})
 

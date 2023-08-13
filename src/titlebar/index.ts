@@ -278,7 +278,6 @@ export class CustomTitlebar extends ThemeBar {
 		ipcRenderer.on('window-fullscreen', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen))
 		ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused))
 
-
 		if (minimizable) {
 			addDisposableListener(this.controls.minimize, EventType.CLICK, () => {
 				ipcRenderer.send('window-event', 'window-minimize')
@@ -344,7 +343,7 @@ export class CustomTitlebar extends ThemeBar {
 
 		if (maximize) {
 			maximize.title = isMaximized ? this.currentOptions.tooltips?.restoreDown! : this.currentOptions.tooltips?.maximize!
-			maximize.innerHTML = isMaximized ? this.platformIcons.restore : this.platformIcons.maximize
+			maximize.innerHTML = isMaximized ? this.platformIcons?.restore : this.platformIcons?.maximize
 		}
 
 		if (this.resizer) {
