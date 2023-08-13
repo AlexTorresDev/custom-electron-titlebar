@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.7](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.2.6...v4.2.7) (2023-08-13)
+
+
+### Bug Fixes
+
+* **window-controls:** :adhesive_bandage: Fix Maximization button ([38740fc](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/38740fcd9450b9b02654005f562a13c81bbc180e)), closes [#235](https://github.com/AlexTorresDev/custom-electron-titlebar/issues/235)
+
 ## [4.2.6](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.2.5...v4.2.6) (2023-08-10)
 
 
