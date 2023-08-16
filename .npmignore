@@ -26,6 +26,7 @@ example/
 screenshots/
 src/
 static/
+docs/
 .gitignore
 .editorconfig
 circle.yml
