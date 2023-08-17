@@ -6,19 +6,22 @@ on:
       - main
     paths:
       - docs/**
+  
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 concurrency:
   group: publish-wiki
   cancel-in-progress: true
 
-permissions:
-  contents: write
-
 jobs:
   publish-wiki:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - uses: Andrew-Chen-Wang/github-wiki-action@v4
         with:
           path: docs
+          token: ${{ secrets.PAT }}
