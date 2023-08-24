@@ -11,6 +11,7 @@ function createWindow() {
 	const mainWindow = new BrowserWindow({
 		width: 1000,
 		height: 600,
+  frame: false // Use to linux
 		titleBarStyle: 'hidden',
 		titleBarOverlay: true,
 		webPreferences: {
