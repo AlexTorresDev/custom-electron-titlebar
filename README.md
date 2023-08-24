@@ -9,21 +9,21 @@ This project is a typescript library for electron that allows you to configure a
 
 [📄 Documentation](https://github.com/AlexTorresDev/custom-electron-titlebar/wiki)
 
-Standard Title Bar
+### Standard Title Bar
 
-![Screenshot 1](screenshots/cet-1.png)
+![Screenshot 1](screenshots/70shots_so.jpg)
 
-Bottom Menu Bar
+### Bottom Menu Bar
 
-![Screenshot 2](screenshots/cet-2.png)
+![Screenshot 2](screenshots/544shots_so.jpg)
 
-Menu
+### Menu
 
-![Screenshot 3](screenshots/cet-3.png)
+![Screenshot 3](screenshots/780shots_so.jpg)
 
-Custom color
+### Custom color
 
-![Screenshot 4](screenshots/cet-4.png)
+![Screenshot 4](screenshots/262shots_so.jpg)
 
 # 📦 Installing
 You can install this package with `npm`, `pnpm` or `yarn`.
