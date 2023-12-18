@@ -540,7 +540,9 @@ export class CustomTitlebar extends ThemeBar {
 
 			if (menuPosition !== 'bottom') {
 				addDisposableListener(window, 'resize', () => {
-					if (window.innerWidth >= 1188) {
+					const menuBarContainerMargin = 20
+					const menuSpaceLimit = window.innerWidth / 2 - this.menuBarContainer.getBoundingClientRect().right - menuBarContainerMargin
+					if (this.title.getBoundingClientRect().width / 2 <= menuSpaceLimit) {
 						addClass(this.title, 'cet-title-center')
 					} else {
 						removeClass(this.title, 'cet-title-center')
