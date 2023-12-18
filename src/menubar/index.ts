@@ -1004,15 +1004,15 @@ export class MenuBar extends Disposable {
 		const actualMenuIndex = menuIndex >= this.numMenusShown ? MenuBar.OVERFLOW_INDEX : menuIndex
 		const customMenu = actualMenuIndex === MenuBar.OVERFLOW_INDEX ? this.overflowMenu : this.menus[actualMenuIndex]
 
-		if (!customMenu.actions || !customMenu.buttonElement || !customMenu.titleElement) {
+		if (!customMenu.actions || !customMenu.buttonElement) {
 			return
 		}
 
 		const menuHolder = $('.cet-menubar-menu-container', { title: '' })
 		customMenu.buttonElement.classList.add('open')
 
-		const titleBoundingRect = customMenu.titleElement.getBoundingClientRect()
-		const titleBoundingRectZoom = DOM.getDomNodeZoomLevel(customMenu.titleElement)
+		const titleBoundingRect = customMenu.buttonElement.getBoundingClientRect()
+		const titleBoundingRectZoom = DOM.getDomNodeZoomLevel(customMenu.buttonElement)
 
 		if (this.options.compactMode === Direction.Right) {
 			menuHolder.style.top = `${titleBoundingRect.top}px`
