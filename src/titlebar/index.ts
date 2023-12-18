@@ -440,6 +440,12 @@ export class CustomTitlebar extends ThemeBar {
 		}
 	}
 
+	private canCenterTitle() {
+		const menuBarContainerMargin = 20
+		const menuSpaceLimit = window.innerWidth / 2 - this.menuBarContainer.getBoundingClientRect().right - menuBarContainerMargin
+		return (this.title.getBoundingClientRect().width / 2 <= menuSpaceLimit)
+	}
+
 	/// Public methods
 
 	/**
@@ -540,15 +546,15 @@ export class CustomTitlebar extends ThemeBar {
 
 			if (menuPosition !== 'bottom') {
 				addDisposableListener(window, 'resize', () => {
-					const menuBarContainerMargin = 20
-					const menuSpaceLimit = window.innerWidth / 2 - this.menuBarContainer.getBoundingClientRect().right - menuBarContainerMargin
-					if (this.title.getBoundingClientRect().width / 2 <= menuSpaceLimit) {
+					if (this.canCenterTitle()) {
 						addClass(this.title, 'cet-title-center')
 					} else {
 						removeClass(this.title, 'cet-title-center')
 					}
 				})
-				addClass(this.title, 'cet-title-center')
+				if (this.canCenterTitle()) {
+					addClass(this.title, 'cet-title-center')
+				}
 			}
 
 			if (!isMacintosh && order === 'first-buttons') {
