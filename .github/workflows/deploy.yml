@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: 🚀 Deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build.yml
+          github_token: ${{ secrets.PAT }}
+          name: build-artifact
+          path: dist
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+      - name: Set correct path
+        run: sed -i "s/\/dist//g" package.json
+      - name: Copy files
+        run: |
+          cp README.md dist
+          cp LICENSE dist
+          cp package.json dist
+          cp .npmignore dist
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GIT_AUTHOR_NAME: 'GitHub Actions'
+          GIT_AUTHOR_EMAIL: 'action@github.com'
+          GIT_COMMITTER_NAME: 'GitHub Actions'
+          GIT_COMMITTER_EMAIL: 'action@github.com'
