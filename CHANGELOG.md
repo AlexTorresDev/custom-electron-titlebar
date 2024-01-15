@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.8](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.2.7...v4.2.8) (2024-01-15)
+
+
+### Bug Fixes
+
+* **unfocusEffect:** :bug: Fix unfocusEffect on titlebar ([45c6917](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/45c6917c41743ba51fd6f44c3102f85600d66392))
+
 ## [4.2.7](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.2.6...v4.2.7) (2023-08-13)
 
 
