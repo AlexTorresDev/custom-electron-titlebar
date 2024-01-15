@@ -87,5 +87,10 @@ export interface TitleBarOptions extends MenuBarOptions {
 		 * **The default is "Close"**
 		 */
 		close?: string
-	}
+	},
+	/**
+	 * Enables or disables the blur option in titlebar.
+	 * *The default is true*
+	 */
+	unfocusEffect?: boolean;
 }

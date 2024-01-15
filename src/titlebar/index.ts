@@ -54,7 +54,8 @@ export class CustomTitlebar extends ThemeBar {
 			maximize: 'Maximize',
 			minimize: 'Minimize',
 			restoreDown: 'Restore Down'
-		}
+		},
+		unfocusEffect: true
 	}
 
 	private platformIcons: { [key: string]: string }
@@ -373,7 +374,7 @@ export class CustomTitlebar extends ThemeBar {
 			removeClass(this.titlebar, 'inactive')
 		}
 
-		const backgroundColor = this.isInactive
+		const backgroundColor = this.isInactive && this.currentOptions.unfocusEffect
 			? this.currentOptions.backgroundColor?.lighten(0.12)
 			: this.currentOptions.backgroundColor
 
@@ -386,13 +387,13 @@ export class CustomTitlebar extends ThemeBar {
 		if (backgroundColor?.isLighter()) {
 			addClass(this.titlebar, 'light')
 
-			foregroundColor = this.isInactive
+			foregroundColor = this.isInactive && this.currentOptions.unfocusEffect
 				? INACTIVE_FOREGROUND_DARK
 				: ACTIVE_FOREGROUND_DARK
 		} else {
 			removeClass(this.titlebar, 'light')
 
-			foregroundColor = this.isInactive
+			foregroundColor = this.isInactive && this.currentOptions.unfocusEffect
 				? INACTIVE_FOREGROUND
 				: ACTIVE_FOREGROUND
 		}
