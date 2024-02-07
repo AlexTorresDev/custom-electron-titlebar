@@ -93,4 +93,15 @@ export interface TitleBarOptions extends MenuBarOptions {
 	 * *The default is true*
 	 */
 	unfocusEffect?: boolean;
+	/**
+	* Controls the Minimum Width the user is allowed to resize the window to.
+	* **The default is 400*
+	*/
+	minWidth: 400;
+	
+	/**
+	* Controls the Minimum Height the user is allowed to resize the window to.
+	* **The default is 270*
+	*/
+	minHeight: 270;
 }
