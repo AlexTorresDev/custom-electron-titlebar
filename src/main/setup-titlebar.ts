@@ -45,6 +45,16 @@ export default () => {
 		if (item) item.click(undefined, BrowserWindow.fromWebContents(event.sender), event.sender)
 	})
 
+	// Handle the minimum size.
+	ipcMain.on('window-set-minimumSize', (event, width, height) => {
+	    const window = BrowserWindow.fromWebContents(event.sender);
+		
+	    /* eslint-disable indent */
+	    if (window) {
+		window?.setMinimumSize(width, height);
+	    }
+	});
+
 	// Handle menu item icon
 	ipcMain.on('menu-icon', (event, commandId: Number) => {
 		const item = getMenuItemByCommandId(commandId, Menu.getApplicationMenu())
