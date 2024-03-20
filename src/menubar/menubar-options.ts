@@ -47,6 +47,11 @@ export interface MenuBarOptions {
      */
     onlyShowMenuBar?: boolean;
     /**
+     * Define if MenuBar exists on TitleBar or not.
+     * **The default is false**
+     */
+    removeMenuBar?: boolean;
+    /**
      * The color of the svg icons in the menu
      * **The default is automatic**
      */

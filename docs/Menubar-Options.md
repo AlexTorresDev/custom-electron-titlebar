@@ -81,6 +81,17 @@ const options = {
 };
 ```
 
+## Remove Menu from Title Bar
+
+This option allows removing the `menubar` from `titlebar`. The default value is `false`
+
+```js
+const options = {
+  // title bar options
+  removeMenuBar: true
+};
+```
+
 ## Menu Item Color
 
 This is the background color of the menu items when the cursor is hovering over each one. It can be a hexadecimal color using `TitlebarColor.fromHex(color)` or a `TitlebarColor`.

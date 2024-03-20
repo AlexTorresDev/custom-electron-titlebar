@@ -47,6 +47,7 @@ export class CustomTitlebar extends ThemeBar {
 		menuTransparency: 0,
 		minimizable: true,
 		onlyShowMenuBar: false,
+		removeMenuBar: false,
 		shadow: false,
 		titleHorizontalAlignment: 'center',
 		tooltips: {
@@ -186,10 +187,13 @@ export class CustomTitlebar extends ThemeBar {
 		ipcRenderer.invoke('request-application-menu')?.then((menu?: Menu) => this.updateMenu(menu))
 
 		const menuPosition = this.currentOptions.menuPosition
+		const removeMenuBar = this.currentOptions.removeMenuBar
 
 		if (menuPosition) {
 			this.updateMenuPosition(menuPosition)
 		}
+
+		if (removeMenuBar) return
 
 		append(this.titlebar, this.menuBarContainer)
 	}
