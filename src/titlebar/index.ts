@@ -56,7 +56,9 @@ export class CustomTitlebar extends ThemeBar {
 			minimize: 'Minimize',
 			restoreDown: 'Restore Down'
 		},
-		unfocusEffect: true
+		unfocusEffect: true,
+		minWidth: 400,
+		minHeight: 270,
 	}
 
 	private platformIcons: { [key: string]: string }
@@ -196,6 +198,8 @@ export class CustomTitlebar extends ThemeBar {
 		if (removeMenuBar) return
 
 		append(this.titlebar, this.menuBarContainer)
+
+		ipcRenderer.send('window-set-minimumSize', this.currentOptions.minWidth, this.currentOptions.minHeight);
 	}
 
 	private setupTitle() {
