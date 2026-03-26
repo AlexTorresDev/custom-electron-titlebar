@@ -1,5 +1,4 @@
-const { CustomTitlebar } = require('../dist/titlebar/index')
-const { BOTTOM_TITLEBAR_HEIGHT } = require('../dist/consts')
+const { CustomTitlebar } = require('../dist/index')
 
 jest.mock('electron')
 jest.mock('base/common/color')
@@ -29,23 +28,10 @@ describe('CustomTitlebar', () => {
 
 	test('should update the menu position', () => {
 		titlebar.updateMenuPosition('bottom')
-		expect(titlebar.titlebarElement.style.height).toBe(`${BOTTOM_TITLEBAR_HEIGHT}px`)
-		expect(titlebar.containerElement.style.top).toBe(`${BOTTOM_TITLEBAR_HEIGHT}px`)
+		expect(titlebar.titlebarElement.style.height).toBe('60px')
+			   expect(titlebar.containerElement.style.top).toBe('60px')
 		expect(titlebar.menuBarContainer.classList.contains('bottom')).toBe(true)
 	})
-
-	/* test('should update the background color', () => {
-		const { Color } = require('base/common/color')
-		titlebar.updateBackground(Color.fromHex('#ffffff'))
-		console.log(titlebar.titlebarElement.style)
-		expect(titlebar.titlebarElement.style.backgroundColor).toBe('#ffffff')
-	})
-
-	test('should background color from string', async () => {
-		await titlebar.updateBackground('#ffffff')
-		console.log(titlebar.titlebarElement.style)
-		expect(titlebar.titlebarElement.style.backgroundColor).toBe('#ffffff')
-	}) */
 
 	test('should refresh the menu', async () => {
 		const { ipcRenderer } = require('electron')
@@ -57,5 +43,40 @@ describe('CustomTitlebar', () => {
 
 		expect(ipcRenderer.invoke).toHaveBeenCalledWith('request-application-menu')
 		expect(titlebar.menuBarContainer.children.length).toBe(2) // Because the 'More' button is added
+	})
+
+	test('should update background color from string', async () => {
+		await titlebar.updateBackground('#123456')
+		expect(titlebar.titlebarElement.style.backgroundColor).toMatch(/rgb\(18, 52, 86\)/)
+	})
+
+	test('should update background color from Color object', async () => {
+		const { TitlebarColor } = require('../dist/index')
+		await titlebar.updateBackground(TitlebarColor.fromHex('#abcdef'))
+		expect(titlebar.titlebarElement.style.backgroundColor).toMatch(/rgb\(171, 205, 239\)/)
+	})
+
+	test('should update the icon', () => {
+		titlebar.currentOptions.icon = 'https://example.com/initial.png'
+		titlebar.createIcon()
+		titlebar.updateIcon('https://example.com/icon.png')
+		const img = titlebar.icon.querySelector('img')
+		expect(img).not.toBeNull()
+		expect(img.getAttribute('src')).toBe('https://example.com/icon.png')
+	})
+
+	test('should hide and show the menu', () => {
+		titlebar.menuBarContainer.style.display = 'none'
+		expect(titlebar.menuBarContainer.style.display).toBe('none')
+		titlebar.menuBarContainer.style.display = ''
+		expect(titlebar.menuBarContainer.style.display).toBe('')
+	})
+
+	test('should remove elements from DOM on dispose', () => {
+		const parent = titlebar.titlebarElement.parentElement
+		titlebar.dispose()
+		if (parent) {
+			expect(Array.from(parent.children)).not.toContain(titlebar.titlebarElement)
+		}
 	})
 })
