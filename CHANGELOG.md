@@ -1,5 +1,21 @@
 # Changelog
 
+# [4.3.0](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.2.8...v4.3.0) (2026-03-26)
+
+
+### Bug Fixes
+
+* streamline menu handling and improve submenu assignment logic in MenuBar ([6f4fa09](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/6f4fa09f607d3491c8664086c558e4ded971df97))
+* update wiki path in publish workflow from 'docs' to 'wiki' ([21639d6](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/21639d655b23b870f3d37eb3ec6513b6a131ca1c))
+
+
+### Features
+
+* add Compatibility & Troubleshooting documentation and update sidebar ([6e21f68](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/6e21f68acd35765de442f96df07e256264e854e6))
+* add Help menu item and improve menu event handling in MenuBar [#252](https://github.com/AlexTorresDev/custom-electron-titlebar/issues/252) ([b626272](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/b6262729045cd46b515b1620e17d9200d5266c03))
+* Enhance IPC communication and theme configuration for titlebar ([57016c2](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/57016c23ba0fe218156731522e43db37cfa07390))
+* load theme CSS dynamically from dist or static directory ([5ca21b1](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/5ca21b17cf3b0c194aec72fb85a17be4e226634c))
+
 ## [4.2.8](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.2.7...v4.2.8) (2024-01-15)
 
 
