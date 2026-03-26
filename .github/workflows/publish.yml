@@ -6,6 +6,8 @@ on:
 permissions:
   contents: write
   id-token: write
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,7 +34,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
       - name: Set correct path
         run: sed -i "s/\/dist//g" package.json
       - name: Copy files
@@ -48,7 +50,6 @@ jobs:
             @semantic-release/changelog
             @semantic-release/git
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PAT }}
           GIT_AUTHOR_NAME: 'GitHub Actions'
           GIT_AUTHOR_EMAIL: 'action@github.com'
