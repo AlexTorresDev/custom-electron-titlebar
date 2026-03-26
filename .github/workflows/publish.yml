@@ -1,4 +1,4 @@
-name: Deploy
+name: Publish
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   release:
-    name: 🚀 Deploy
+    name: 🚀 Publish NPM
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
