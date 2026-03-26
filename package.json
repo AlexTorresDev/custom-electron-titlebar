@@ -3,7 +3,8 @@
   "version": "5.0.0",
   "description": "Library for electron that allows you to configure a fully customizable title bar.",
   "types": "./dist/index.d.ts",
-  "main": "./dist/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "typesVersions": {
     "*": {
       "main": [
@@ -12,16 +13,25 @@
     }
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./main": "./dist/main/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./main": {
+      "types": "./dist/main/index.d.ts",
+      "require": "./dist/main/index.js",
+      "import": "./dist/main/index.mjs"
+    }
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:package": "tsc && tsc-alias",
-    "build:babel": "babel dist --out-dir dist --extensions \".js\"",
+    "build:package": "tsup",
+    "copy:styles": "cpx \"static/theme/**/*\" dist/theme/",
     "start": "electron example/main.js",
-    "dev": "npm run build && npm run start",
-    "build": "npm run clean && npm run build:package && npm run build:babel",
+    "dev": "tsup --watch",
+    "launch": "pnpm run build && pnpm run start",
+    "build": "npm run clean && npm run build:package && npm run copy:styles",
     "postversion": "cp package.json .. && chmod u+x ../revert.sh && ../revert.sh",
     "test": "jest"
   },
@@ -48,14 +58,10 @@
     "electron": ">40.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.6",
-    "@babel/core": "^7.29.0",
     "@jest/globals": "^30.3.0",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
-    "babel-plugin-import-require-as-string": "^1.0.2",
-    "babel-plugin-module-resolver": "^5.0.3",
-    "babel-plugin-rewire": "^1.2.0",
+    "cpx": "^1.5.0",
     "electron": "^41.0.4",
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
@@ -68,7 +74,7 @@
     "rimraf": "^6.1.3",
     "standard": "^17.1.2",
     "ts-jest": "^29.4.6",
-    "tsc-alias": "^1.8.16",
+    "tsup": "^8.5.0",
     "typescript": "^6.0.2"
   },
   "eslintConfig": {

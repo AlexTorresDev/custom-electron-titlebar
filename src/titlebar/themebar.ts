@@ -4,9 +4,25 @@
  *-------------------------------------------------------------------------------------------- */
 
 import { toDisposable, IDisposable, Disposable } from 'base/common/lifecycle'
-const baseTheme: string = require('static/theme/base.css')
-const macTheme: string = require('static/theme/mac.css')
-const winTheme: string = require('static/theme/win.css')
+import * as path from 'path'
+import * as fs from 'fs'
+
+function loadThemeCss(filename: string): string {
+	let cssPath = path.resolve(process.cwd(), 'dist/theme', filename)
+	if (!fs.existsSync(cssPath)) {
+		cssPath = path.resolve(process.cwd(), 'static/theme', filename)
+	}
+	try {
+		return fs.readFileSync(cssPath, 'utf8')
+	} catch (e) {
+		console.warn('Could not load theme CSS:', cssPath, e)
+		return ''
+	}
+}
+
+const baseTheme: string = loadThemeCss('base.css')
+const macTheme: string = loadThemeCss('mac.css')
+const winTheme: string = loadThemeCss('win.css')
 
 export interface CssStyle {
 	addRule(rule: string): void;

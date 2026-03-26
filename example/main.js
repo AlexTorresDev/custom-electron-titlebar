@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu, nativeImage, ipcMain, nativeTheme } = require('electron')
-const { setupTitlebarAndAttachToWindow } = require('../dist/main/index.js')
+const { setupTitlebarAndAttachToWindow } = require('custom-electron-titlebar/main')
 const path = require('path')
 
 function createWindow() {
@@ -21,11 +21,11 @@ function createWindow() {
 	Menu.setApplicationMenu(menu)
 
 	// and load the index.html of the app.
-	mainWindow.loadFile('index.html')
-	//mainWindow.loadURL('https://github.com')
+	//mainWindow.loadFile('index.html')
+	mainWindow.loadURL('https://github.com')
 
 	// Open the DevTools.
-	mainWindow.webContents.openDevTools()
+	// mainWindow.webContents.openDevTools()
 
 	// Setup IPC + attach listeners
 	// Note: setupTitlebarAndAttachToWindow is now async to load theme config if provided
