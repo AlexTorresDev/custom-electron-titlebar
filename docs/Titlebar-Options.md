@@ -1,5 +1,6 @@
 > If you want to learn about the menu bar options, see [Menubar Options](./menubar-options).
 
+
 The titlebar has various options that allow for customization. These options are passed as an object to the `Titlebar` or `CustomTitlebar` component:
 
 ```js
@@ -10,73 +11,119 @@ const options = {
 new Titlebar(options);
 ```
 
-## Background color of the titlebar
-This is the background color of the titlebar. It can be a hexadecimal color using `TitlebarColor.fromHex(color)` or a `TitlebarColor`.
 
-For more details on colors, see [Colors](./Colors).
-
+## backgroundColor
+The background color of the titlebar. Accepts a `TitlebarColor` or hex string.
 ```js
-const options = {
-  backgroundColor: TitlebarColor.fromHex('#FF0000')
-};
+backgroundColor: TitlebarColor.fromHex('#FF0000')
+```
+See [Colors](./Colors.md) for more.
+
+
+## containerOverflow
+How the content after the titlebar is displayed if it overflows. Can be `'auto'`, `'hidden'`, or `'visible'`. Default: `'auto'`.
+```js
+containerOverflow: 'auto'
 ```
 
-## Container overflow
 
-The overflow of the container is the way the content is displayed when the container size is smaller than the content size. It can be `auto`, `hidden` or `visible`.
-
+## icon
+The icon shown on the left side of the titlebar. Can be a path or a `NativeImage`.
 ```js
-const options = {
-  overflow: 'auto'
-};
+icon: path.join(__dirname, 'icon.png')
+// or
+icon: nativeImage.createFromPath(path.join(__dirname, 'icon.png'))
+```
+See [Electron NativeImage](https://www.electronjs.org/docs/latest/api/native-image).
+
+
+## iconSize
+The size (in px) of the icon. Number between 16 and 24. Default: 16.
+```js
+iconSize: 20
 ```
 
-## Application icon
 
-This is the icon that is displayed in the titlebar. It can be a `NativeImage` icon or a path to an image file.
-
+## titleHorizontalAlignment
+Horizontal alignment of the window title. `'left'`, `'center'`, or `'right'`. Default: `'center'`.
 ```js
-const options = {
-  icon: path.join(__dirname, 'icon.png')
-};
+titleHorizontalAlignment: 'left'
 ```
 
-or using `nativeImage`
+
+## order
+Order of the elements on the titlebar. `'inverted'` (all reversed), `'first-buttons'` (buttons left, title right), or undefined (default).
 ```js
-const options = {
-  icon: nativeImage.createFromPath(path.join(__dirname, 'icon.png'))
-};
+order: 'inverted'
 ```
 
-For more details on `NativeImage`, see [Electron NativeImage](https://www.electronjs.org/docs/latest/api/native-image).
-
-## Application icon size
-
-This is the size of the icon that is displayed in the titlebar. This must be a number and must be between 16 and 24. (size in pixels)
-
+## closeable, maximizable, minimizable
+Enable/disable the close, maximize, or minimize buttons. Default: `true` for all.
 ```js
-const options = {
-  iconSize: 20
-};
+closeable: false,
+maximizable: false,
+minimizable: false
 ```
 
-## Title location
-
-This is the location of the title. It can be `left`, `center` or `right`.
-
+## shadow
+Show a shadow under the titlebar. Default: `false`.
 ```js
-const options = {
-  titleHorizontalAlignment: 'left'
-};
+shadow: true
 ```
 
-## Buttons order
+## unfocusEffect
+Enable/disable blur effect when window loses focus. Default: `true`.
+```js
+unfocusEffect: false
+```
 
-It can be `inverted` or `first-buttons`.
+## minWidth, minHeight
+Minimum width/height the window can be resized to. Default: 400x270.
+```js
+minWidth: 600,
+minHeight: 300
+```
 
-`inverted` completely reverses the bar, meaning buttons on the left are shown on the right and vice versa.
+## tooltips
+Customize the tooltips for window controls.
+```js
+tooltips: {
+  minimize: 'Min',
+  maximize: 'Max',
+  restoreDown: 'Restore',
+  close: 'Exit'
+}
+```
 
-`first-buttons` shows the titlebar normally, but buttons on the right are shown on the left.
+## themeConfig
+Advanced: In-memory theme configuration for titlebar and menubar. Prefer using `themeConfigPath` in main process.
+```js
+themeConfig: {
+  version: 1,
+  fontFamily: 'Segoe UI',
+  fontSize: 13,
+  colors: {
+    titlebar: '#222',
+    titlebarForeground: '#fff'
+  }
+}
+```
+
+---
+
+# MenuBarOptions (inherited)
+These options are also available (see [Menubar Options](Menubar-Options.md) for details):
+
+- **enableMnemonics**: Enable keyboard mnemonics. Default: `true`.
+- **icons**: Path to menu icons JSON.
+- **itemBackgroundColor**: Background color for hovered menu items.
+- **menuBarBackgroundColor**: Background color of the menu bar.
+- **menuPosition**: `'left'` or `'bottom'`. Default: `'left'`.
+- **menuSeparatorColor**: Color of menu separators.
+- **menuTransparency**: Transparency (0-1) for menu container.
+- **onlyShowMenuBar**: Show only the menubar, no titlebar.
+- **removeMenuBar**: Remove menubar from titlebar.
+- **svgColor**: Color for SVG icons in the menu.
 
 ```js
 const options = {
