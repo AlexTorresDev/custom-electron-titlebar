@@ -33,7 +33,8 @@
     "launch": "pnpm run build && pnpm run start",
     "build": "npm run clean && npm run build:package && npm run copy:styles",
     "postversion": "cp package.json .. && chmod u+x ../revert.sh && ../revert.sh",
-    "test": "jest"
+    "test": "jest",
+    "dist": "electron-builder"
   },
   "author": "AlexTorresDev <contacto@alextrs.dev>",
   "license": "MIT",
@@ -58,6 +59,7 @@
     "electron": ">40.0.0"
   },
   "devDependencies": {
+    "electron-builder": "^26.8.1",
     "@jest/globals": "^30.3.0",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
@@ -79,5 +81,20 @@
   },
   "eslintConfig": {
     "extends": "./node_modules/standard/eslintrc.json"
+  },
+  "build": {
+    "appId": "com.custom.electron.titlebar.example",
+    "productName": "CustomElectronTitlebarExample",
+    "directories": {
+      "app": "example",
+      "output": "dist_electron"
+    },
+    "files": [
+      "../dist/**",
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
   }
 }
