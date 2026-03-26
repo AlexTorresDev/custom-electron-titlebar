@@ -1,5 +1,19 @@
 # Changelog
 
+# [4.4.0](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.3.0...v4.4.0) (2026-03-26)
+
+
+### Bug Fixes
+
+* specify semantic version in publish workflow ([f4bacae](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/f4bacaeef4716ceb69dab7ce163f02109c27f544))
+* update Node.js setup action to v6 and correct wiki links in sidebar ([2d550c8](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/2d550c8696c4a73f321416725d581419e0fdce2c))
+* update permissions and clean up environment variables in publish workflow ([ce9d567](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/ce9d567dd3dc44111a5f696a1aa63d5410ab3656))
+
+
+### Features
+
+* add publish workflow for NPM with semantic release ([1382f45](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/1382f459832a92bc77da0fa4ea0bf1674f16fcc3))
+
 # [4.3.0](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.2.8...v4.3.0) (2026-03-26)
 
 
