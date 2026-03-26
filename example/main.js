@@ -1,17 +1,14 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu, nativeImage, ipcMain, nativeTheme } = require('electron')
-const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main')
+const { setupTitlebarAndAttachToWindow } = require('../dist/main/index.js')
 const path = require('path')
-
-// Setup the titlebar
-setupTitlebar()
 
 function createWindow() {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
 		width: 1000,
 		height: 600,
-                frame: false, // Use to linux
+    frame: false, // Use to linux
 		titleBarStyle: 'hidden',
 		titleBarOverlay: true,
 		webPreferences: {
@@ -20,18 +17,21 @@ function createWindow() {
 		}
 	})
 
-	/* const menu = Menu.buildFromTemplate(exampleMenuTemplate)
-	Menu.setApplicationMenu(menu) */
+	const menu = Menu.buildFromTemplate(exampleMenuTemplate)
+	Menu.setApplicationMenu(menu)
 
 	// and load the index.html of the app.
-	// mainWindow.loadFile('index.html')
-	mainWindow.loadURL('https://github.com')
+	mainWindow.loadFile('index.html')
+	//mainWindow.loadURL('https://github.com')
 
 	// Open the DevTools.
-	// mainWindow.webContents.openDevTools()
+	mainWindow.webContents.openDevTools()
 
-	// Attach listeners
-	attachTitlebarToWindow(mainWindow)
+	// Setup IPC + attach listeners
+	// Note: setupTitlebarAndAttachToWindow is now async to load theme config if provided
+	setupTitlebarAndAttachToWindow(mainWindow, {
+		themeConfigPath: path.join(__dirname, 'titlebar.theme.json')
+	})
 }
 
 ipcMain.handle('dark-mode:toggle', () => {

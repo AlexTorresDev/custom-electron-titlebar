@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "fontFamily": "Segoe UI, Arial, sans-serif",
+  "fontSize": 13,
+  "colors": {
+    "titlebar": "#1f2430",
+    "titlebarForeground": "#f3f4f6",
+    "menuBar": "#181c25",
+    "menuItemSelection": "#2f3a4f",
+    "menuSeparator": "#4b5563",
+    "svg": "#e5e7eb"
+  }
+}

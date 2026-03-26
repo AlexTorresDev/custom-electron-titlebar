@@ -14,8 +14,8 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  font-size: 13px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--cet-font-size, 13px);
+  font-family: var(--cet-font-family, Arial, Helvetica, sans-serif);
   box-sizing: border-box;
   padding: 0 16px;
   overflow: hidden;
@@ -98,7 +98,7 @@ body {
 /* Title */
 .cet-title {
   flex: 0 1 auto;
-  font-size: 12px;
+  font-size: var(--cet-title-font-size, 12px);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -208,11 +208,13 @@ body {
 
 /* MenuBar */
 .cet-menubar {
+  min-width: 0;
   display: flex;
   flex-shrink: 1;
+  flex-grow: 0;
   box-sizing: border-box;
   overflow: hidden;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-right: 20px;
 }
 
@@ -243,7 +245,12 @@ body {
 }
 
 .cet-menubar .cet-menubar-menu-button .cet-menubar-menu-title {
-  font-size: 12px;
+  font-size: var(--cet-menu-font-size, 12px);
+}
+
+.cet-menubar .cet-menubar-menu-title.cet-toggle-more {
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .cet-menubar .cet-menubar-menu-button.disabled {

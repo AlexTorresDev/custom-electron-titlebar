@@ -13,6 +13,7 @@ import { MenuBarOptions } from '../menubar-options'
 import { IMenuOptions } from './index'
 import * as strings from 'base/common/strings'
 import { IMenuIcons } from 'menubar'
+import { IpcChannels } from 'types/ipc-contract'
 
 export interface IMenuStyle {
 	foregroundColor?: Color
@@ -110,7 +111,7 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 	onClick(event: EventLike) {
 		EventHelper.stop(event, true)
-		ipcRenderer.send('menu-event', this.item.commandId)
+		ipcRenderer.send(IpcChannels.MENU_EVENT, this.item.commandId)
 
 		if (this.item.type === 'checkbox') {
 			this.item.checked = !this.item.checked
@@ -284,16 +285,19 @@ export class CETMenuItem extends Disposable implements IMenuItem {
 
 			if (this.iconElement && icon) {
 				const iconE = append(this.iconElement, $('.icon'))
-				let iconData: string | undefined
 
 				if (typeof this.item.icon !== 'string') {
-					iconData = ipcRenderer.sendSync('menu-icon', this.item.commandId)
+					// Request icon data asynchronously from main process
+					void ipcRenderer.invoke(IpcChannels.REQUEST_MENU_ICON, this.item.commandId).then((iconData: string | null) => {
+						if (iconData) {
+							iconE.style.maskImage = `url(${iconData})`
+						}
+					})
 				} else {
 					const iconPath = this.item.icon
-					iconData = nativeImage.createFromPath(iconPath).toDataURL()
+					const iconData = nativeImage.createFromPath(iconPath).toDataURL()
+					if (iconData) iconE.style.maskImage = `url(${iconData})`
 				}
-
-				if (iconData) iconE.style.webkitMaskBoxImage = `url(${iconData})`
 			}
 		} else if (this.iconElement && this.item.type === 'checkbox') {
 			addClass(this.iconElement, 'checkbox')

@@ -47,10 +47,7 @@ The implementation is done as follows:
 
 In the main application file (main.js or .ts)
 ```js
-import { setupTitlebar, attachTitlebarToWindow } from "custom-electron-titlebar/main";
-
-// setup the titlebar main process
-setupTitlebar();
+import { setupTitlebarAndAttachToWindow } from "custom-electron-titlebar/main";
 
 function createWindow() {
   // Create the browser window.
@@ -69,20 +66,42 @@ function createWindow() {
   
   ...
 
-  // attach fullScreen(f11 and not 'maximized') && focus listeners
-  attachTitlebarToWindow(mainWindow);
+  // Setup main IPC + attach window listeners + load theme config
+  setupTitlebarAndAttachToWindow(mainWindow, {
+    themeConfigPath: path.join(__dirname, "titlebar.theme.json")
+  });
 }
 ```
 
 In the preload file (preload.js or .ts)
 ```js
-import { Titlebar } from "custom-electron-titlebar";
+import { createTitlebarOnDOMContentLoaded } from "custom-electron-titlebar";
 
-window.addEventListener('DOMContentLoaded', () => {
-  // Title bar implementation
-  new Titlebar();
-});
+// Theme configuration is automatically loaded from main process
+createTitlebarOnDOMContentLoaded();
 ```
+
+**Theme Configuration:**
+
+Themes are loaded in the main process and delivered to the renderer via IPC. Specify the theme file path in `setupTitlebarAndAttachToWindow()` options:
+
+Theme JSON schema (v1):
+```json
+{
+  "version": 1,
+  "fontFamily": "Segoe UI, Arial, sans-serif",
+  "fontSize": 13,
+  "colors": {
+    "titlebar": "#1f2430",
+    "titlebarForeground": "#f3f4f6",
+    "menuBar": "#181c25",
+    "menuItemSelection": "#2f3a4f",
+    "menuSeparator": "#4b5563",
+    "svg": "#e5e7eb"
+  }
+}
+```
+
 To see the options you can include in the Title Bar constructor, such as color of elements, icons, menu position, and much more, and the methods you can use, go to the [wiki](https://github.com/AlexTorresDev/custom-electron-titlebar/wiki)
 
 ## 💰 Support

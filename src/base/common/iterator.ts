@@ -18,7 +18,7 @@ export interface Iterator<T> {
 	next(): IteratorResult<T>;
 }
 
-export module Iterator {
+export namespace Iterator {
 	const _empty: Iterator<any> = {
 		next() {
 			return FIN

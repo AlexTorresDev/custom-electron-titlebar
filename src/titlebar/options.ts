@@ -7,6 +7,25 @@ import { NativeImage } from 'electron'
 import { Color } from 'base/common/color'
 import { MenuBarOptions } from '../menubar/menubar-options'
 
+export interface TitlebarThemeColors {
+	titlebar?: string
+	titlebarForeground?: string
+	menuBar?: string
+	menuItemSelection?: string
+	menuSeparator?: string
+	svg?: string
+}
+
+export interface TitlebarThemeConfig {
+	/**
+	 * Theme schema version. Current supported version is 1.
+	 */
+	version?: number
+	fontFamily?: string
+	fontSize?: number
+	colors?: TitlebarThemeColors
+}
+
 export interface TitleBarOptions extends MenuBarOptions {
 	/**
 	 * The background color of titlebar.
@@ -97,11 +116,17 @@ export interface TitleBarOptions extends MenuBarOptions {
 	* Controls the Minimum Width the user is allowed to resize the window to.
 	* **The default is 400*
 	*/
-	minWidth: 400;
+	minWidth?: number
 	
 	/**
 	* Controls the Minimum Height the user is allowed to resize the window to.
 	* **The default is 270*
 	*/
-	minHeight: 270;
+	minHeight?: number
+
+	/**
+	 * In-memory theme configuration for titlebar and menubar (optional, for backwards compatibility).
+	 * Note: Prefer using themeConfigPath in setupTitlebarAndAttachToWindow() in main process instead.
+	 */
+	themeConfig?: TitlebarThemeConfig
 }

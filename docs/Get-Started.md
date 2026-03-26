@@ -8,13 +8,10 @@ npm i custom-electron-titlebar
 
 ## How to use?
 
-In the main file of the project `main.js` or `index.js` import the library and call the `setupTitlebar` and `attachTitlebarToWindow` functions:
+In the main file of the project `main.js` or `index.js` import the library and call `setupTitlebarAndAttachToWindow`:
 
 ```js
-const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main');
-
-// setup the titlebar main process
-setupTitlebar();
+const { setupTitlebarAndAttachToWindow } = require('custom-electron-titlebar/main');
 
 function createWindow() {
   // Create the browser window.
@@ -33,8 +30,8 @@ function createWindow() {
   
   ...
 
-  // attach fullscreen(f11 and not 'maximized') && focus listeners
-  attachTitlebarToWindow(mainWindow);
+  // setup main process + attach listeners in one call
+  setupTitlebarAndAttachToWindow(mainWindow);
 }
 ```
 

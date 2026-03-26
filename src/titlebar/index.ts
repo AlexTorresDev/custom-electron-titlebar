@@ -6,11 +6,14 @@
 import { ipcRenderer, Menu } from 'electron'
 import { Color } from 'base/common/color'
 import { $, addClass, addDisposableListener, append, EventType, hide, prepend, removeClass, show } from 'base/common/dom'
+import { IDisposable } from 'base/common/lifecycle'
 import { isLinux, isFreeBSD, isMacintosh, isWindows, platform, PlatformToString } from 'base/common/platform'
 import { MenuBar } from 'menubar'
-import { TitleBarOptions } from './options'
+import { TitleBarOptions, TitlebarThemeConfig } from './options'
 import { ThemeBar } from './themebar'
+import { normalizeThemeConfig } from './theme-config'
 import { ACTIVE_FOREGROUND, ACTIVE_FOREGROUND_DARK, BOTTOM_TITLEBAR_HEIGHT, DEFAULT_ITEM_SELECTOR, getPx, INACTIVE_FOREGROUND, INACTIVE_FOREGROUND_DARK, loadWindowIcons, menuIcons, TOP_TITLEBAR_HEIGHT_MAC, TOP_TITLEBAR_HEIGHT_WIN } from 'consts'
+import { IpcChannels } from 'types/ipc-contract'
 
 export class CustomTitlebar extends ThemeBar {
 	private titlebar: HTMLElement
@@ -22,6 +25,8 @@ export class CustomTitlebar extends ThemeBar {
 	private container: HTMLElement
 
 	private menuBar?: MenuBar
+	private titleResizeListener?: IDisposable
+	private forcedForegroundColor?: Color
 
 	private isInactive: boolean = false
 
@@ -63,11 +68,15 @@ export class CustomTitlebar extends ThemeBar {
 
 	private platformIcons: { [key: string]: string }
 
+	private readonly onWindowMaximizeEvent = (_: unknown, isMaximized: boolean) => this.onDidChangeMaximized(isMaximized)
+	private readonly onWindowFullscreenEvent = (_: unknown, isFullScreen: boolean) => this.onWindowFullScreen(isFullScreen)
+	private readonly onWindowFocusEvent = (_: unknown, isFocused: boolean) => this.onWindowFocus(isFocused)
+
 	/**
 	 * Create a new TitleBar instance
 	 * @param options The options for the title bar
 	 */
-	constructor(options: TitleBarOptions) {
+	constructor(options: TitleBarOptions = {}) {
 		super()
 
 		this.currentOptions = { ...this.currentOptions, ...options }
@@ -108,6 +117,7 @@ export class CustomTitlebar extends ThemeBar {
 		this.setupTitleBar()
 
 		this.loadEvents()
+		this.applyThemeConfigFromSource()
 
 		// this.registerTheme(ThemeBar.win)
 	}
@@ -129,10 +139,11 @@ export class CustomTitlebar extends ThemeBar {
 		let color = this.currentOptions.backgroundColor
 
 		if (!color) {
-			const metaColor = document.querySelectorAll('meta[name="theme-color"]') || document.querySelectorAll('meta[name="msapplication-TileColor"]')
-			metaColor.forEach((meta) => {
-				color = Color.fromHex(meta.getAttribute('content')!)
-			})
+			const metaColor = document.querySelector('meta[name="theme-color"], meta[name="msapplication-TileColor"]')
+			const metaContent = metaColor?.getAttribute('content')
+			if (metaContent) {
+				color = Color.fromHex(metaContent)
+			}
 
 			if (!color) color = Color.WHITE
 
@@ -154,14 +165,12 @@ export class CustomTitlebar extends ThemeBar {
 		let icon = this.currentOptions.icon
 
 		if (!icon) {
-			const tagLink = document.querySelectorAll('link')
-			tagLink.forEach((link) => {
-				if (link.getAttribute('rel') === 'icon' || link.getAttribute('rel') === 'shortcut icon') {
-					icon = link.getAttribute('href')!
-				}
-
-				this.currentOptions.icon = icon
-			})
+			const linkIcon = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]')
+			const href = linkIcon?.getAttribute('href')
+			if (href) {
+				icon = href
+				this.currentOptions.icon = href
+			}
 		}
 
 		if (icon) {
@@ -179,14 +188,16 @@ export class CustomTitlebar extends ThemeBar {
 	}
 
 	private setIconSize(size: number) {
+		if (!this.icon.firstElementChild) return
+
 		if (size < 16) size = 16
 		if (size > 24) size = 24
 
-		this.icon.firstElementChild!.setAttribute('style', `height: ${size}px`)
+		this.icon.firstElementChild.setAttribute('style', `height: ${size}px`)
 	}
 
 	private setupMenubar() {
-		ipcRenderer.invoke('request-application-menu')?.then((menu?: Menu) => this.updateMenu(menu))
+		ipcRenderer.invoke(IpcChannels.REQUEST_APPLICATION_MENU)?.then((menu?: Menu) => this.updateMenu(menu))
 
 		const menuPosition = this.currentOptions.menuPosition
 		const removeMenuBar = this.currentOptions.removeMenuBar
@@ -199,7 +210,7 @@ export class CustomTitlebar extends ThemeBar {
 
 		append(this.titlebar, this.menuBarContainer)
 
-		ipcRenderer.send('window-set-minimumSize', this.currentOptions.minWidth, this.currentOptions.minHeight);
+		ipcRenderer.send(IpcChannels.SET_MINIMUM_SIZE, this.currentOptions.minWidth, this.currentOptions.minHeight)
 	}
 
 	private setupTitle() {
@@ -281,39 +292,40 @@ export class CustomTitlebar extends ThemeBar {
 		const maximizable = this.currentOptions.maximizable
 		const closeable = this.currentOptions.closeable
 
-		this.onDidChangeMaximized(ipcRenderer.sendSync('window-event', 'window-is-maximized'))
+		void ipcRenderer.invoke(IpcChannels.GET_WINDOW_MAXIMIZED).then((isMaximized: boolean) => {
+			this.onDidChangeMaximized(isMaximized)
+		})
 
-		ipcRenderer.on('window-maximize', (_, isMaximized) => this.onDidChangeMaximized(isMaximized))
-		ipcRenderer.on('window-fullscreen', (_, isFullScreen) => this.onWindowFullScreen(isFullScreen))
-		ipcRenderer.on('window-focus', (_, isFocused) => this.onWindowFocus(isFocused))
+		ipcRenderer.on('window-maximize', this.onWindowMaximizeEvent)
+		ipcRenderer.on('window-fullscreen', this.onWindowFullscreenEvent)
+		ipcRenderer.on('window-focus', this.onWindowFocusEvent)
 
 		if (minimizable) {
-			addDisposableListener(this.controls.minimize, EventType.CLICK, () => {
-				ipcRenderer.send('window-event', 'window-minimize')
-			})
+			this._register(addDisposableListener(this.controls.minimize, EventType.CLICK, () => {
+				ipcRenderer.send(IpcChannels.WINDOW_EVENT, 'window-minimize')
+			}))
 		}
 
 		if (isMacintosh) {
-			addDisposableListener(this.titlebar, EventType.DBLCLICK, () => {
-				ipcRenderer.send('window-event', 'window-maximize')
-			})
+			this._register(addDisposableListener(this.titlebar, EventType.DBLCLICK, () => {
+				ipcRenderer.send(IpcChannels.WINDOW_EVENT, 'window-maximize')
+			}))
 		}
 
 		if (maximizable) {
-			addDisposableListener(this.controls.maximize, EventType.CLICK, () => {
-				ipcRenderer.send('window-event', 'window-maximize')
-			})
+			this._register(addDisposableListener(this.controls.maximize, EventType.CLICK, () => {
+				ipcRenderer.send(IpcChannels.WINDOW_EVENT, 'window-maximize')
+			}))
 		}
 
 		if (closeable) {
-			addDisposableListener(this.controls.close, EventType.CLICK, () => {
-				ipcRenderer.send('window-event', 'window-close')
-			})
+			this._register(addDisposableListener(this.controls.close, EventType.CLICK, () => {
+				ipcRenderer.send(IpcChannels.WINDOW_EVENT, 'window-close')
+			}))
 		}
 	}
 
 
-	// TODO: Refactor, verify if is possible use into menubar
 	private closeMenu = () => {
 		if (this.menuBar) {
 			this.menuBar.blur()
@@ -347,11 +359,13 @@ export class CustomTitlebar extends ThemeBar {
 		}
 	}
 
-	private onDidChangeMaximized(isMaximized: Boolean) {
+	private onDidChangeMaximized(isMaximized: boolean) {
 		const maximize = this.controls.maximize
 
 		if (maximize) {
-			maximize.title = isMaximized ? this.currentOptions.tooltips?.restoreDown! : this.currentOptions.tooltips?.maximize!
+			maximize.title = isMaximized
+				? (this.currentOptions.tooltips?.restoreDown || 'Restore Down')
+				: (this.currentOptions.tooltips?.maximize || 'Maximize')
 			maximize.innerHTML = isMaximized ? this.platformIcons?.restore : this.platformIcons?.maximize
 		}
 
@@ -366,13 +380,114 @@ export class CustomTitlebar extends ThemeBar {
 
 		if (this.menuBar) this.menuBar.dispose()
 
-		this.menuBar = new MenuBar(this.menuBarContainer, menuIcons, this.currentOptions, { enableMnemonics: true }, this.closeMenu) // TODO: Verify menubar options
+		this.menuBar = new MenuBar(this.menuBarContainer, menuIcons, this.currentOptions, { enableMnemonics: this.currentOptions.enableMnemonics ?? true }, this.closeMenu)
 		this.menuBar.push(menu)
 		this.menuBar.update()
 		this.menuBar.onVisibilityChange(e => this.onMenuBarVisibilityChanged(e))
 		this.menuBar.onFocusStateChange(e => this.onMenuBarFocusChanged(e))
 
 		this.updateStyles()
+	}
+
+	private async applyThemeConfigFromSource(): Promise<void> {
+		// First, check for inline config (backward compatibility)
+		const inlineConfig = this.currentOptions.themeConfig
+		if (inlineConfig) {
+			this.applyThemeConfig(inlineConfig, 'inline')
+			return
+		}
+
+		// Load pre-configured theme delivered by main process
+		try {
+			const loaded = await ipcRenderer.invoke(IpcChannels.GET_THEME_CONFIG) as unknown
+			if (loaded) {
+				const normalized = normalizeThemeConfig(loaded)
+				normalized.warnings.forEach(warning => {
+					console.warn(`[custom-electron-titlebar] ${warning}`)
+				})
+				if (normalized.config) {
+					this.applyThemeConfig(normalized.config, 'main-process')
+				}
+			}
+		} catch (_) {
+			// Ignore theme loading errors and keep default style.
+		}
+	}
+
+	private applyThemeConfig(themeConfig: TitlebarThemeConfig, source: string): void {
+		const normalized = normalizeThemeConfig(themeConfig)
+		normalized.warnings.forEach(warning => {
+			console.warn(`[custom-electron-titlebar] ${warning} (source: ${source})`)
+		})
+
+		if (!normalized.config) {
+			return
+		}
+
+		const cfg = normalized.config
+
+		if (cfg.fontFamily) {
+			this.titlebar.style.setProperty('--cet-font-family', cfg.fontFamily)
+		}
+
+		if (typeof cfg.fontSize === 'number' && Number.isFinite(cfg.fontSize)) {
+			const baseSize = Math.max(10, Math.floor(cfg.fontSize))
+			this.titlebar.style.setProperty('--cet-font-size', getPx(baseSize))
+			this.titlebar.style.setProperty('--cet-title-font-size', getPx(Math.max(10, baseSize - 1)))
+			this.titlebar.style.setProperty('--cet-menu-font-size', getPx(Math.max(10, baseSize - 1)))
+		}
+
+		const colors = cfg.colors
+		if (colors) {
+			const titlebarColor = this.parseThemeColor(colors.titlebar)
+			if (titlebarColor) {
+				this.currentOptions.backgroundColor = titlebarColor
+			}
+
+			const menuBarColor = this.parseThemeColor(colors.menuBar)
+			if (menuBarColor) {
+				this.currentOptions.menuBarBackgroundColor = menuBarColor
+			}
+
+			const menuSelectionColor = this.parseThemeColor(colors.menuItemSelection)
+			if (menuSelectionColor) {
+				this.currentOptions.itemBackgroundColor = menuSelectionColor
+			}
+
+			const menuSeparatorColor = this.parseThemeColor(colors.menuSeparator)
+			if (menuSeparatorColor) {
+				this.currentOptions.menuSeparatorColor = menuSeparatorColor
+			}
+
+			const svgColor = this.parseThemeColor(colors.svg)
+			if (svgColor) {
+				this.currentOptions.svgColor = svgColor
+			}
+
+			const titlebarForeground = this.parseThemeColor(colors.titlebarForeground)
+			if (titlebarForeground) {
+				this.forcedForegroundColor = titlebarForeground
+			}
+		}
+
+		this.updateStyles()
+	}
+
+	private parseThemeColor(colorValue?: string): Color | undefined {
+		if (!colorValue || typeof colorValue !== 'string') {
+			return undefined
+		}
+
+		const normalized = colorValue.trim()
+		if (!normalized.startsWith('#')) {
+			return undefined
+		}
+
+		try {
+			return Color.fromHex(normalized)
+		} catch (_) {
+			return undefined
+		}
 	}
 
 	private updateStyles() {
@@ -406,23 +521,28 @@ export class CustomTitlebar extends ThemeBar {
 				: ACTIVE_FOREGROUND
 		}
 
-		this.titlebar.style.color = foregroundColor?.toString()
+		const effectiveForegroundColor = this.forcedForegroundColor || foregroundColor
+		this.titlebar.style.color = effectiveForegroundColor?.toString()
 
-		const updatedWindowControls = ipcRenderer.sendSync('update-window-controls', {
+		show(this.controlsContainer)
+
+		void ipcRenderer.invoke(IpcChannels.UPDATE_WINDOW_CONTROLS, {
 			color: backgroundColor?.toString(),
-			symbolColor: foregroundColor?.toString(),
+			symbolColor: effectiveForegroundColor?.toString(),
 			height: TOP_TITLEBAR_HEIGHT_WIN
-		})
-
-		if (updatedWindowControls) {
-			hide(this.controlsContainer)
-		} else {
+		}).then((updatedWindowControls: boolean) => {
+			if (updatedWindowControls) {
+				hide(this.controlsContainer)
+			} else {
+				show(this.controlsContainer)
+			}
+		}).catch(() => {
 			show(this.controlsContainer)
-		}
+		})
 
 		if (this.menuBar) {
 			let fgColor
-			const backgroundColor = this.currentOptions.menuBarBackgroundColor || this.currentOptions.backgroundColor!.darken(0.12)
+			const backgroundColor = this.currentOptions.menuBarBackgroundColor || this.currentOptions.backgroundColor?.darken(0.12) || Color.WHITE
 
 			const foregroundColor = backgroundColor?.isLighter()
 				? INACTIVE_FOREGROUND_DARK
@@ -515,8 +635,8 @@ export class CustomTitlebar extends ThemeBar {
 	 * @param path path to icon
 	 */
 	public updateIcon(path: string) {
-		if (this.icon) {
-			this.icon.firstElementChild!.setAttribute('src', path)
+		if (this.icon && this.icon.firstElementChild) {
+			this.icon.firstElementChild.setAttribute('src', path)
 		}
 
 		return this
@@ -529,6 +649,11 @@ export class CustomTitlebar extends ThemeBar {
 	public updateTitleAlignment(side: 'left' | 'center' | 'right') {
 		const order = this.currentOptions.order
 		const menuPosition = this.currentOptions.menuPosition
+
+		if (this.titleResizeListener) {
+			this.titleResizeListener.dispose()
+			this.titleResizeListener = undefined
+		}
 
 		if (side === 'left' || (side === 'right' && order === 'inverted')) {
 			removeClass(this.title, 'cet-title-left')
@@ -554,13 +679,13 @@ export class CustomTitlebar extends ThemeBar {
 			removeClass(this.title, 'cet-title-center')
 
 			if (menuPosition !== 'bottom') {
-				addDisposableListener(window, 'resize', () => {
+				this.titleResizeListener = this._register(addDisposableListener(window, 'resize', () => {
 					if (this.canCenterTitle()) {
 						addClass(this.title, 'cet-title-center')
 					} else {
 						removeClass(this.title, 'cet-title-center')
 					}
-				})
+				}))
 				if (this.canCenterTitle()) {
 					addClass(this.title, 'cet-title-center')
 				}
@@ -605,7 +730,7 @@ export class CustomTitlebar extends ThemeBar {
 	 */
 	public async refreshMenu() {
 		if (!isMacintosh) {
-			ipcRenderer.invoke('request-application-menu')
+			ipcRenderer.invoke(IpcChannels.REQUEST_APPLICATION_MENU)
 				.then((menu: Menu) => this.updateMenu(menu))
 		}
 
@@ -641,7 +766,22 @@ export class CustomTitlebar extends ThemeBar {
 	 * Remove the titlebar, menubar and all methods.
 	 */
 	public dispose() {
-		// if (this.menuBar) this.menuBar.dispose()
+		if (this.titleResizeListener) {
+			this.titleResizeListener.dispose()
+			this.titleResizeListener = undefined
+		}
+
+		ipcRenderer.removeListener('window-maximize', this.onWindowMaximizeEvent)
+		ipcRenderer.removeListener('window-fullscreen', this.onWindowFullscreenEvent)
+		ipcRenderer.removeListener('window-focus', this.onWindowFocusEvent)
+
+		if (this.menuBar) {
+			this.menuBar.dispose()
+			this.menuBar = undefined
+		}
+
+		super.dispose()
+
 		this.titlebar.remove()
 		while (this.container.firstChild) append(document.body, this.container.firstChild)
 		this.container.remove()
