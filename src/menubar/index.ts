@@ -1154,7 +1154,7 @@ export class MenuBar extends Disposable {
 
   private onMenuTriggered(menuIndex: number, clicked: boolean) {
     const menu = this.menus[menuIndex]
-    if (menuIndex !== MenuBar.OVERFLOW_INDEX && !menu?.submenu) {      
+    if (menuIndex !== MenuBar.OVERFLOW_INDEX && !menu?.submenu) {
       ipcRenderer.send(IpcChannels.MENU_EVENT, menu.commandId)
       return
     }
@@ -1356,9 +1356,7 @@ export class MenuBar extends Disposable {
     >,
     fromIndex: number
   ): void {
-    const hiddenMenus = showableMenus
-      .slice(fromIndex)
-      .filter((menu) => !!menu.submenu)
+    const hiddenMenus = showableMenus.slice(fromIndex)
 
     if (!hiddenMenus.length) {
       this.overflowMenu.submenu = undefined
@@ -1366,12 +1364,22 @@ export class MenuBar extends Disposable {
     }
 
     this.overflowMenu.submenu = {
-      items: hiddenMenus.map((menu) => ({
-        ...menu,
-        label: cleanMnemonic(menu.label),
-        submenu: menu.submenu,
-        type: 'submenu'
-      }))
+      items: hiddenMenus.map((menu) => {
+        if (!menu.submenu) {
+          return {
+            ...menu,
+            label: cleanMnemonic(menu.label),
+            type: menu.type
+          }
+        }
+
+        return {
+          ...menu,
+          label: cleanMnemonic(menu.label),
+          submenu: menu.submenu,
+          type: 'submenu'
+        }
+      })
     } as any
   }
 }
