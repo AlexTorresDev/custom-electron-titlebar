@@ -236,5 +236,11 @@ const exampleMenuTemplate = [
 			{ role: 'resetZoom' },
 			{ role: 'toggleDevTools', icon: path.resolve('example/assets', 'terminal.png') }
 		]
+	},
+	{
+		label: 'Help',
+		click: () => {
+			console.log('Help clicked')
+		}
 	}
 ]

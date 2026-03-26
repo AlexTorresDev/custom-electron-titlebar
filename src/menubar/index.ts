@@ -22,6 +22,7 @@ import { RunOnceScheduler } from 'base/common/async'
 import { StandardMouseEvent } from 'base/browser/mouseEvent'
 import { EventType, Gesture, GestureEvent } from 'base/browser/touch'
 import * as strings from 'base/common/strings'
+import { IpcChannels } from 'types/ipc-contract'
 
 const $ = DOM.$
 
@@ -286,9 +287,9 @@ export class MenuBar extends Disposable {
 
       if (this.isCompact) {
         this.menus.push({
-					...menuBarMenu,
-					label: '',
-				})
+          ...menuBarMenu,
+          label: ''
+        })
       } else {
         const buttonElement = $('.cet-menubar-menu-button', {
           role: 'menuitem',
@@ -429,7 +430,7 @@ export class MenuBar extends Disposable {
         )
 
         this.menus.push({
-					...menuBarMenu,
+          ...menuBarMenu,
           buttonElement,
           titleElement
         })
@@ -579,24 +580,24 @@ export class MenuBar extends Disposable {
     )
 
     this.overflowMenu = {
-			type: 'submenu',
-			toolTip: '',
-			visible: true,
-			sublabel: '',
-			registerAccelerator: false,
+      type: 'submenu',
+      toolTip: '',
+      visible: true,
+      sublabel: '',
+      registerAccelerator: false,
       buttonElement,
       titleElement,
       label: 'More',
       submenu: undefined,
-			checked: false,
-			click: () => {},
-			commandId: 0,
-			enabled: true,
-			id: '',
-			menu: {} as any,
-			sharingItem: {},
-			accelerator: null,
-			userAccelerator: null,
+      checked: false,
+      click: () => {},
+      commandId: 0,
+      enabled: true,
+      id: '',
+      menu: {} as any,
+      sharingItem: {},
+      accelerator: null,
+      userAccelerator: null
     }
   }
 
@@ -1152,11 +1153,9 @@ export class MenuBar extends Disposable {
   }
 
   private onMenuTriggered(menuIndex: number, clicked: boolean) {
-    if (
-      menuIndex !== MenuBar.OVERFLOW_INDEX &&
-      !this.menus[menuIndex]?.submenu
-    ) {
-      ipcRenderer.send('menu-event', menuIndex + 1)
+    const menu = this.menus[menuIndex]
+    if (menuIndex !== MenuBar.OVERFLOW_INDEX && !menu?.submenu) {      
+      ipcRenderer.send(IpcChannels.MENU_EVENT, menu.commandId)
       return
     }
 
@@ -1368,10 +1367,10 @@ export class MenuBar extends Disposable {
 
     this.overflowMenu.submenu = {
       items: hiddenMenus.map((menu) => ({
-				...menu,
+        ...menu,
         label: cleanMnemonic(menu.label),
         submenu: menu.submenu,
-        type: 'submenu',
+        type: 'submenu'
       }))
     } as any
   }
