@@ -5,7 +5,8 @@ on:
     branches:
       - main
     paths:
-      - docs/**
+      - wiki/**
+      - .github/workflows/publish-wiki.yaml
   
   workflow_dispatch:
 
@@ -18,7 +19,7 @@ concurrency:
 
 jobs:
   publish-wiki:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: Andrew-Chen-Wang/github-wiki-action@v4
