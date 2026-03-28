@@ -1,6 +1,6 @@
 {
   "name": "custom-electron-titlebar",
-  "version": "4.4.0",
+  "version": "4.3.0",
   "description": "Library for electron that allows you to configure a fully customizable title bar.",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
@@ -14,9 +14,9 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/dist/index.d.ts",
-      "require": "./dist/dist/index.js",
-      "import": "./dist/dist/index.mjs"
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
     },
     "./main": {
       "types": "./dist/main/index.d.ts",
@@ -27,11 +27,10 @@
   "scripts": {
     "clean": "rimraf dist",
     "build:package": "tsup",
-    "copy:styles": "cpx \"static/theme/**/*\" dist/theme/",
     "start": "electron example/main.js",
     "dev": "tsup --watch",
     "launch": "pnpm run build && pnpm run start",
-    "build": "npm run clean && npm run build:package && npm run copy:styles",
+    "build": "npm run clean && npm run build:package",
     "postversion": "cp package.json .. && chmod u+x ../revert.sh && ../revert.sh",
     "test": "jest",
     "dist": "electron-builder"
@@ -56,7 +55,7 @@
   },
   "homepage": "https://github.com/AlexTorresDev/custom-electron-titlebar#readme",
   "peerDependencies": {
-    "electron": ">40.0.0"
+    "electron": ">36.0.0"
   },
   "devDependencies": {
     "electron-builder": "^26.8.1",
@@ -64,7 +63,8 @@
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
     "cpx": "^1.5.0",
-    "electron": "^41.0.4",
+    "electron": "^41.1.0",
+    "esbuild-plugin-raw": "^0.3.0",
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-config-standard": "^17.1.0",
@@ -76,25 +76,10 @@
     "rimraf": "^6.1.3",
     "standard": "^17.1.2",
     "ts-jest": "^29.4.6",
-    "tsup": "^8.5.0",
+    "tsup": "^8.5.1",
     "typescript": "^6.0.2"
   },
   "eslintConfig": {
     "extends": "./node_modules/standard/eslintrc.json"
-  },
-  "build": {
-    "appId": "com.custom.electron.titlebar.example",
-    "productName": "CustomElectronTitlebarExample",
-    "directories": {
-      "app": "example",
-      "output": "dist_electron"
-    },
-    "files": [
-      "../**",
-      "**/*"
-    ],
-    "win": {
-      "target": "nsis"
-    }
   }
 }

@@ -4,106 +4,88 @@
  *-------------------------------------------------------------------------------------------- */
 
 import { toDisposable, IDisposable, Disposable } from 'base/common/lifecycle'
-import * as path from 'path'
-import * as fs from 'fs'
-
-function loadThemeCss(filename: string): string {
-	let cssPath = path.resolve(process.cwd(), 'dist/theme', filename)
-	if (!fs.existsSync(cssPath)) {
-		cssPath = path.resolve(process.cwd(), 'static/theme', filename)
-	}
-	try {
-		return fs.readFileSync(cssPath, 'utf8')
-	} catch (e) {
-		console.warn('Could not load theme CSS:', cssPath, e)
-		return ''
-	}
-}
-
-const baseTheme: string = loadThemeCss('base.css')
-const macTheme: string = loadThemeCss('mac.css')
-const winTheme: string = loadThemeCss('win.css')
+import baseTheme from '../../static/theme/base.css?raw'
+import macTheme from '../../static/theme/mac.css?raw'
+import winTheme from '../../static/theme/win.css?raw'
 
 export interface CssStyle {
-	addRule(rule: string): void;
+  addRule(rule: string): void
 }
 
 export interface Theme {
-	(collector: CssStyle): void;
+  (collector: CssStyle): void
 }
 
 class ThemingRegistry extends Disposable {
-	private readonly theming: Theme[] = []
+  private readonly theming: Theme[] = []
 
-	constructor() {
-		super()
+  constructor() {
+    super()
+  }
 
-		this.theming = []
-	}
+  protected onThemeChange(theme: Theme): IDisposable {
+    this.theming.push(theme)
+    return toDisposable(() => {
+      const idx = this.theming.indexOf(theme)
+      this.theming.splice(idx, 1)
+    })
+  }
 
-	protected onThemeChange(theme: Theme): IDisposable {
-		this.theming.push(theme)
-		return toDisposable(() => {
-			const idx = this.theming.indexOf(theme)
-			this.theming.splice(idx, 1)
-		})
-	}
-
-	protected getTheming(): Theme[] {
-		return this.theming
-	}
+  protected getTheming(): Theme[] {
+    return this.theming
+  }
 }
 
 export class ThemeBar extends ThemingRegistry {
-	constructor() {
-		super()
+  constructor() {
+    super()
+		
+    this.registerTheme((collector: CssStyle) => {
+      collector.addRule(baseTheme)
+    })
+  }
 
-		this.registerTheme((collector: CssStyle) => {
-			collector.addRule(baseTheme)
-		})
-	}
+  protected registerTheme(theme: Theme) {
+    this.onThemeChange(theme)
 
-	protected registerTheme(theme: Theme) {
-		this.onThemeChange(theme)
+    const cssRules: string[] = []
+    const hasRule: { [rule: string]: boolean } = {}
+    const ruleCollector = {
+      addRule: (rule: string) => {
+        if (!hasRule[rule]) {
+          cssRules.push(rule)
+          hasRule[rule] = true
+        }
+      }
+    }
 
-		const cssRules: string[] = []
-		const hasRule: { [rule: string]: boolean } = {}
-		const ruleCollector = {
-			addRule: (rule: string) => {
-				if (!hasRule[rule]) {
-					cssRules.push(rule)
-					hasRule[rule] = true
-				}
-			}
-		}
+    this.getTheming().forEach((p) => p(ruleCollector))
 
-		this.getTheming().forEach(p => p(ruleCollector))
+    _applyRules(cssRules.join('\n'), 'titlebar-style')
+  }
 
-		_applyRules(cssRules.join('\n'), 'titlebar-style')
-	}
+  static get win(): Theme {
+    return (collector: CssStyle) => {
+      collector.addRule(winTheme)
+    }
+  }
 
-	static get win(): Theme {
-		return (collector: CssStyle) => {
-			collector.addRule(winTheme)
-		}
-	}
-
-	static get mac(): Theme {
-		return (collector: CssStyle) => {
-			collector.addRule(macTheme)
-		}
-	}
+  static get mac(): Theme {
+    return (collector: CssStyle) => {
+      collector.addRule(macTheme)
+    }
+  }
 }
 
 function _applyRules(styleSheetContent: string, rulesClassName: string) {
-	const themeStyles = document.head.getElementsByClassName(rulesClassName)
+  const themeStyles = document.head.getElementsByClassName(rulesClassName)
 
-	if (themeStyles.length === 0) {
-		const styleElement = document.createElement('style')
-		styleElement.className = rulesClassName
-		styleElement.innerHTML = styleSheetContent
-		document.head.appendChild(styleElement)
-	} else {
-		(<HTMLStyleElement>themeStyles[0]).innerHTML = styleSheetContent
-	}
+  if (themeStyles.length === 0) {
+    const styleElement = document.createElement('style')
+    styleElement.className = rulesClassName
+    styleElement.innerHTML = styleSheetContent
+    document.head.appendChild(styleElement)
+  } else {
+    ;(<HTMLStyleElement>themeStyles[0]).innerHTML = styleSheetContent
+  }
 }

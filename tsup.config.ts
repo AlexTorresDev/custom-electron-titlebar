@@ -1,4 +1,5 @@
-import { defineConfig } from 'tsup';
+import RawPlugin from 'esbuild-plugin-raw'
+import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: ['src/index.ts', 'src/main/index.ts'],
@@ -8,5 +9,6 @@ export default defineConfig({
   clean: false,
   target: 'node16',
   outDir: 'dist',
-  splitting: false
-});
+  splitting: false,
+  esbuildPlugins: [RawPlugin()]
+})

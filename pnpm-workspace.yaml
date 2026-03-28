@@ -1,3 +1,6 @@
 onlyBuiltDependencies:
+  - core-js
   - electron
+  - electron-winstaller
+  - esbuild
   - unrs-resolver

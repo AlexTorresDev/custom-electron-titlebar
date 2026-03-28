@@ -1,17 +1,9 @@
 {
   "compilerOptions": {
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
+    "lib": ["ES2022", "DOM"],
     "baseUrl": "./src",
     "paths": {
-      "base/*": [
-        "./base/*"
-      ],
-      "static/*": [
-        "../static/*"
-      ],
+      "base/*": ["./base/*"]
     },
     "module": "CommonJS",
     "target": "ES2021",
@@ -23,7 +15,8 @@
     "strict": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["esbuild-plugin-raw/client"]
   },
   "include": [
     "src/**/*"
