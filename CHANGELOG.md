@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.1](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.4.0...v4.4.1) (2026-03-28)
+
+
+### Bug Fixes
+
+* correct paths in package.json, update dependencies, and refactor theme loading in themebar.ts ([8d02502](https://github.com/AlexTorresDev/custom-electron-titlebar/commit/8d0250215cad7ef5d8cc30e23edbf78d85255572))
+
 # [4.4.0](https://github.com/AlexTorresDev/custom-electron-titlebar/compare/v4.3.0...v4.4.0) (2026-03-26)
 
 
